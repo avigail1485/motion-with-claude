@@ -1,0 +1,2089 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מושן עם Claude Code</title>
+<meta name="description" content="מדריך מעשי ליצירת סרטוני מושן גרפיקס וטיפוגרפיה קינטית עם Claude Code: בריף נכון, גיליון פריימים, תצוגה חיה ורינדור ל-MP4. עם דוגמאות חיות, מגרש משחקים ובונה פרומפטים.">
+<meta name="theme-color" content="#3D22EA">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Ccircle cx='17' cy='17' r='16' fill='%233D22EA'/%3E%3Cpath d='M23 17H11M16 12l-5 5 5 5' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta property="og:title" content="מושן עם Claude Code: תנו לטקסט לזוז">
+<meta property="og:description" content="מדריך מעשי ליצירת סרטוני מושן גרפיקס וטיפוגרפיה קינטית עם Claude Code: בריף נכון, גיליון פריימים, תצוגה חיה ורינדור ל-MP4. עם דוגמאות חיות, מגרש משחקים ובונה פרומפטים.">
+<meta property="og:image" content="https://avigail1485.github.io/motion-with-claude/og.jpg">
+<meta property="og:url" content="https://avigail1485.github.io/motion-with-claude/">
+<link rel="canonical" href="https://avigail1485.github.io/motion-with-claude/">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Karantina:wght@700&display=swap">
+<style>
+/* Layout: a working manual for motion designers — a live hero stage, a numbered process (it is a real sequence),
+   principles with live mini-demos, a dark gallery band, a prompt builder tool, one real case study, FAQ.
+   One committed light look with a single ink band; all colors explicit. */
+:root {
+  --paper: #EEEBEA; --paper-2: #E5E1E6; --ink: #150C48; --violet: #3D22EA; --pink: #FF94E6; --orange: #FF5A1F; --sun: #FFC83A;
+  --orange-t: #B83A0B; --line: #D6D1E2; --muted: #5F5986; --on-ink: #EEEBE6; --on-ink-muted: #A7A0CF;
+  --display: Drakonit, Karantina, "Arial Hebrew", sans-serif;
+  --body: "Google Sans", "Arial Hebrew", system-ui, sans-serif;
+  --r: 18px; --max: 1240px;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18px/1.65 var(--body); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; direction: rtl; overflow-x: hidden }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper) }
+main, footer, .strips { overflow-x: clip }
+.wrap { width: 100%; max-width: calc(var(--max) + 2 * 32px); margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+@media (min-width: 720px) { .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)) } }
+a { color: inherit }
+:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; border-radius: 6px }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: .95; margin: 0; text-wrap: balance; letter-spacing: .005em }
+h2 { font-size: clamp(44px, 6.4vw, 92px) }
+h3 { font-size: clamp(28px, 2.6vw, 36px); line-height: 1.05 }
+p { margin: 0 }
+.eyebrow { font: 600 13px/1 var(--body); letter-spacing: .14em; color: var(--violet); display: inline-flex; align-items: center; gap: 10px }
+.eyebrow::before { content: ""; width: 26px; height: 2px; background: currentColor }
+.lead { font-size: clamp(18px, 1.6vw, 21px); color: var(--muted); max-width: 62ch }
+section { padding-block: clamp(72px, 10vw, 140px) }
+.sec-head { display: grid; gap: 18px; margin-bottom: clamp(36px, 5vw, 64px); max-width: 860px }
+
+/* nav */
+.nav { position: sticky; isolation: isolate; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line) }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 64px }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; font-size: 16px; color: var(--violet); flex: none }
+.logo svg { width: 30px; height: 30px }
+.links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; min-width: 0 }
+.links::-webkit-scrollbar { display: none }
+.links a { text-decoration: none; font-weight: 600; font-size: 15px; padding: 8px 12px; border-radius: 999px; white-space: nowrap; color: var(--ink) }
+.links a:hover { background: var(--paper-2) }
+.links a.on { background: var(--ink); color: var(--on-ink) }
+.btn { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; padding: 14px 22px; font: 600 16px/1 var(--body); text-decoration: none; border: 2px solid var(--ink); cursor: pointer; transition: transform .15s ease, background .15s, color .15s }
+.btn:hover { transform: translateY(-2px) }
+.btn.primary { background: var(--violet); border-color: var(--violet); color: #fff }
+.btn.ghost { background: transparent; color: var(--ink) }
+.btn svg { width: 18px; height: 18px }
+.nav .btn { padding: 10px 16px; font-size: 14px; flex: none }
+@media (max-width: 860px) { .nav .btn { display: none } }
+
+/* hero */
+.hero { padding-block: clamp(32px, 5vw, 64px) clamp(56px, 7vw, 96px) }
+.hero-grid { display: grid; grid-template-columns: 1fr; gap: clamp(28px, 4vw, 56px); align-items: center }
+@media (min-width: 980px) { .hero-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr) } }
+.hero h1 { font-size: clamp(64px, 10vw, 150px); line-height: .86 }
+.hero h1 em { font-style: normal; color: var(--violet); display: inline-block }
+.hero-copy { display: grid; gap: 24px; min-width: 0 }
+.cta { display: flex; flex-wrap: wrap; gap: 12px }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 26px; padding-top: 6px; border-top: 1px solid var(--line); margin-top: 6px }
+.facts div { display: grid; gap: 2px; padding-top: 14px }
+.facts b { font: 700 30px/1 var(--display); color: var(--ink) }
+.facts span { font-size: 14px; color: var(--muted) }
+.stage { position: relative; border-radius: 26px; overflow: hidden; background: var(--paper-2); aspect-ratio: 16 / 11; max-width: 100%; box-shadow: 0 40px 80px -40px #150C4866 }
+@media (max-width: 979px) { .stage { aspect-ratio: 4 / 3.4 } }
+.stage canvas, .demo canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block }
+.stage-tag { position: absolute; inset-inline-start: 16px; bottom: 16px; z-index: 2; font: 600 13px/1 var(--body); background: var(--ink); color: var(--on-ink); padding: 8px 12px; border-radius: 999px }
+
+/* guide */
+.steps { display: grid; gap: 0; counter-reset: step }
+.step { display: grid; grid-template-columns: 1fr; gap: 20px 48px; padding-block: clamp(32px, 4vw, 52px); border-top: 1.5px solid var(--ink) }
+.step:last-child { border-bottom: 1.5px solid var(--ink) }
+@media (min-width: 900px) { .step { grid-template-columns: 120px minmax(0, 5fr) minmax(0, 6fr) } }
+.num { font: 700 clamp(64px, 7vw, 104px)/.8 var(--display); color: transparent; -webkit-text-stroke: 2px var(--violet) }
+.step-body { display: grid; gap: 14px; align-content: start; min-width: 0 }
+.step-body p { color: var(--muted) }
+.check { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px }
+.check li { display: flex; gap: 10px; align-items: flex-start }
+.check li::before { content: ""; flex: none; width: 18px; height: 18px; margin-top: 5px; border-radius: 5px; background: var(--pink); box-shadow: inset 0 0 0 2px var(--ink) }
+.prompt { position: relative; background: var(--ink); color: var(--on-ink); border-radius: var(--r); padding: 20px 20px 18px; min-width: 0; align-self: start }
+.prompt .ph { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 13px; color: var(--on-ink-muted); letter-spacing: .06em }
+.prompt pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 15px/1.7 var(--body); color: var(--on-ink); max-height: 420px; overflow: auto }
+.prompt pre .k { color: var(--pink) }
+.copy { border: 1.5px solid #ffffff40; background: transparent; color: var(--on-ink); border-radius: 999px; padding: 9px 14px; min-height: 36px; font: 600 13px/1 var(--body); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; flex: none }
+.copy:hover { border-color: var(--pink); color: var(--pink) }
+.copy.done { background: var(--pink); color: var(--ink); border-color: var(--pink) }
+.vs { display: grid; grid-template-columns: 1fr; gap: 12px; min-width: 0 }
+@media (min-width: 560px) { .vs { grid-template-columns: 1fr 1fr } }
+.vs div { border-radius: 14px; padding: 14px 16px; font-size: 16px; line-height: 1.5 }
+.vs .bad { background: var(--paper-2); color: var(--muted) }
+.vs .good { background: #fff; box-shadow: inset 0 0 0 2px var(--violet) }
+.vs b { display: block; font-size: 13px; letter-spacing: .08em; margin-bottom: 6px }
+.vs .bad b { color: var(--muted) } .vs .good b { color: var(--violet) }
+
+/* principles */
+.pgrid { display: grid; grid-template-columns: 1fr; gap: 20px }
+@media (min-width: 680px) { .pgrid { grid-template-columns: 1fr 1fr } }
+@media (min-width: 1060px) { .pgrid { grid-template-columns: 1fr 1fr 1fr } }
+.pcard { background: #fff; border-radius: var(--r); overflow: hidden; display: grid; grid-template-rows: auto 1fr; box-shadow: 0 1px 0 var(--line) }
+.pcard .demo { position: relative; aspect-ratio: 16 / 10; background: var(--paper-2) }
+.pcard .txt { padding: 20px 22px 24px; display: grid; gap: 8px; align-content: start }
+.pcard .txt p { color: var(--muted); font-size: 16px }
+.tag { font: 600 13px/1 var(--body); letter-spacing: .1em; color: var(--orange-t) }
+
+/* gallery */
+.band { background: var(--ink); color: var(--on-ink) }
+.band .eyebrow { color: var(--pink) }
+.band .lead { color: var(--on-ink-muted) }
+.ggrid { display: grid; grid-template-columns: 1fr; gap: 22px }
+@media (min-width: 680px) { .ggrid { grid-template-columns: 1fr 1fr } }
+@media (min-width: 1060px) { .ggrid { grid-template-columns: 1fr 1fr 1fr } .ggrid .wide { grid-column: span 2 } }
+.gcard { display: grid; gap: 14px; min-width: 0 }
+.gcard .demo { position: relative; aspect-ratio: 16 / 10; border-radius: var(--r); overflow: hidden; background: #000; cursor: zoom-in }
+.gcard .demo:focus-visible { outline: 3px solid var(--pink) }
+.gmeta { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px }
+.gmeta h3 { font-size: 30px; color: var(--on-ink) }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px }
+.chips span { font-size: 12px; font-weight: 600; color: var(--on-ink-muted); border: 1px solid #ffffff2a; border-radius: 999px; padding: 3px 9px }
+.expand { position: absolute; top: 12px; inset-inline-end: 12px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 0; background: #ffffffe6; color: var(--ink); display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity .2s }
+.gcard .demo:hover .expand, .expand:focus-visible { opacity: 1 }
+@media (hover: none) { .expand { opacity: 1 } }
+.expand svg { width: 18px; height: 18px }
+
+/* builder */
+.builder { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: start }
+@media (min-width: 1000px) { .builder { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr) } }
+.form { display: grid; gap: 26px; min-width: 0 }
+.field { display: grid; gap: 10px; border: 0; padding: 0; margin: 0; min-width: 0 }
+.field legend, .field > label { font-weight: 600; font-size: 15px; padding: 0; margin-bottom: 10px }
+.opts { display: flex; flex-wrap: wrap; gap: 8px }
+.opt { position: relative }
+.opt input { position: absolute; opacity: 0; pointer-events: none }
+.opt span { display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-weight: 600; font-size: 15px; cursor: pointer; transition: border-color .15s, background .15s, color .15s; user-select: none }
+.opt span:hover { border-color: var(--ink) }
+.opt input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--on-ink) }
+.opt input:focus-visible + span { outline: 3px solid var(--orange); outline-offset: 2px }
+.sw { display: inline-flex; gap: 0; border-radius: 999px; overflow: hidden; box-shadow: 0 0 0 1px #0002 }
+.sw i { width: 14px; height: 14px; display: block }
+.text-in { width: 100%; font: 600 17px var(--body); padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; color: var(--ink) }
+.text-in:focus { outline: 3px solid var(--orange); outline-offset: 1px; border-color: var(--ink) }
+.out { position: sticky; top: calc(84px + env(safe-area-inset-top, 0px)) }
+.out .prompt pre { max-height: min(62vh, 560px) }
+.out-note { font-size: 14px; color: var(--muted); margin-top: 12px }
+
+/* case */
+.case { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: start }
+@media (min-width: 1000px) { .case { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr) } }
+.case figure { margin: 0; display: grid; gap: 10px }
+.case img { width: 100%; height: auto; border-radius: var(--r); display: block; background: var(--ink) }
+.case figcaption { font-size: 14px; color: var(--muted) }
+.numbers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: var(--r); overflow: hidden; margin-bottom: 28px }
+.numbers div { background: #fff; padding: 16px 14px; display: grid; gap: 4px }
+.numbers b { font: 700 34px/1 var(--display); font-variant-numeric: tabular-nums }
+.numbers span { font-size: 13px; color: var(--muted) }
+.lessons { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px }
+.lessons li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start }
+.lessons li > i { width: 34px; height: 34px; border-radius: 50%; background: var(--orange); color: var(--ink); display: grid; place-items: center; font: 600 15px/1 var(--body); font-style: normal }
+.lessons b { display: block; margin-bottom: 2px }
+.lessons p { color: var(--muted); font-size: 16px }
+
+/* faq */
+.faq { display: grid; gap: 0; max-width: 900px }
+.faq details { border-top: 1.5px solid var(--ink); padding-block: 4px }
+.faq details:last-child { border-bottom: 1.5px solid var(--ink) }
+.faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 20px; font: 700 clamp(26px, 2.6vw, 34px)/1.1 var(--display) }
+.faq summary::-webkit-details-marker { display: none }
+.faq summary::after { content: "+"; font: 400 34px/1 var(--body); color: var(--violet); transition: transform .2s; flex: none }
+.faq details[open] summary::after { transform: rotate(45deg) }
+.faq details p { padding-bottom: 22px; color: var(--muted); max-width: 70ch }
+
+footer { padding-block: 56px; border-top: 1px solid var(--line) }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 28px; justify-content: space-between; align-items: center; color: var(--muted); font-size: 15px }
+.big-end { font: 700 clamp(56px, 12vw, 180px)/.82 var(--display); color: var(--violet); padding-block: 40px 10px }
+
+/* modal */
+dialog { border: 0; padding: 0; background: transparent; width: min(1200px, calc(100vw - 32px)); max-width: none }
+dialog::backdrop { background: #0a0624e6 }
+.modal { position: relative; aspect-ratio: 16 / 10; max-height: calc(100vh - 120px); margin-inline: auto; border-radius: var(--r); overflow: hidden; background: #000 }
+.modal canvas { position: absolute; inset: 0; width: 100%; height: 100% }
+.mbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; color: var(--on-ink) }
+.mbar h3 { font-size: 30px }
+.close { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--on-ink); color: var(--ink); cursor: pointer; display: grid; place-items: center; flex: none }
+.close svg { width: 18px; height: 18px }
+.toast { position: fixed; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); z-index: 40; background: var(--ink); color: var(--on-ink); padding: 12px 18px; border-radius: 12px; font-weight: 600; font-size: 15px; box-shadow: 0 16px 40px #0005; max-width: calc(100% - 32px) }
+
+/* ===== v2: share, credit, scroll choreography ===== */
+.lat { font-family: var(--body); font-weight: 600; font-size: .74em; letter-spacing: -.02em; vertical-align: .04em }
+.progress { position: absolute; inset: auto 0 -1px 0; height: 3px; background: transparent; pointer-events: none }
+.progress i { position: absolute; inset: 0 0 0 auto; width: 100%; background: linear-gradient(270deg, var(--violet), var(--pink) 60%, var(--orange)); transform-origin: 100% 50%; transform: scaleX(var(--sp, 0)) }
+.nav-actions { display: flex; gap: 8px; align-items: center; flex: none }
+.btn.share { background: transparent; border-color: var(--line); color: var(--ink); padding: 10px 16px; font-size: 14px }
+.btn.share:hover { border-color: var(--ink) }
+.btn.share[aria-expanded="true"] { background: var(--ink); border-color: var(--ink); color: var(--on-ink) }
+@media (max-width: 860px) { .nav .btn.share { display: inline-flex } .logo span { display: none } }
+.share-pop { position: fixed; z-index: 35; top: calc(72px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); width: min(380px, calc(100vw - 32px));
+  background: #fff; border-radius: 22px; padding: 20px; box-shadow: 0 1px 0 var(--line), 0 30px 70px -20px #150C4866; display: grid; gap: 14px; transform-origin: 10% 0; animation: pop .28s cubic-bezier(.2, 1.3, .4, 1) }
+@keyframes pop { from { opacity: 0; transform: translateY(-8px) scale(.96) } to { opacity: 1; transform: none } }
+.share-pop[hidden] { display: none }
+.share-pop > * { min-width: 0 }
+.share-pop h4 { margin: 0; font: 400 34px/1 var(--display); color: var(--ink) }
+.share-pop p { font-size: 15px; color: var(--muted) }
+.sp-link { display: flex; gap: 8px; background: var(--paper); border-radius: 14px; padding: 6px; align-items: center }
+.sp-link input { flex: 1 1 0; width: 0; min-width: 0; border: 0; background: transparent; font: 400 14px var(--body); color: var(--ink); padding: 8px 10px; direction: ltr; text-align: left }
+.sp-link input:focus { outline: none }
+.sp-link button { border: 0; background: var(--violet); color: #fff; border-radius: 10px; padding: 10px 14px; font: 600 14px/1 var(--body); cursor: pointer; flex: none }
+.sp-link button.done { background: var(--ink) }
+.sp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
+.sp-grid a { display: flex; align-items: center; gap: 10px; text-decoration: none; border: 1.5px solid var(--line); border-radius: 14px; padding: 11px 12px; font-weight: 600; font-size: 15px; transition: border-color .15s, transform .15s }
+.sp-grid a:hover { border-color: var(--ink); transform: translateY(-1px) }
+.sp-grid i { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; color: #fff; font: 600 13px/1 var(--body); font-style: normal; flex: none }
+/* hero intro + scroll */
+.hero h1 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-block: .06em; margin-block: -.06em }
+.hero h1 .w > span { display: inline-block; animation: wordIn 1s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i) * 90ms + 120ms) }
+@keyframes wordIn { from { transform: translateY(105%) rotate(4deg) } to { transform: none } }
+.hero-copy { transform: translate3d(0, calc(var(--hp, 0) * -70px), 0); opacity: calc(1 - var(--hp, 0) * .6) }
+.stage { transform: perspective(1400px) rotateX(calc(var(--hp, 0) * 8deg)) scale(calc(1 - var(--hp, 0) * .06)); transform-origin: 50% 0; will-change: transform }
+/* kinetic strips */
+.strips { position: relative; height: clamp(230px, 27vw, 380px); overflow: hidden; margin-block: clamp(-10px, -1vw, 0px) }
+.strip { position: absolute; left: -10%; right: -10%; direction: ltr; display: flex; white-space: nowrap; will-change: transform; padding-block: .14em; font: 400 clamp(46px, 7vw, 104px)/1 var(--display) }
+.strip span { padding-inline: .3em; flex: none }
+.strip.a { z-index: 2; top: 10%; background: var(--violet); color: var(--cream, #F3EEE4); transform: rotate(-3deg) }
+.strip.b { z-index: 1; top: 52%; background: var(--orange); color: var(--ink); transform: rotate(2.4deg) }
+.strip .o { color: transparent; -webkit-text-stroke: 1.5px currentColor }
+.strip.a .o { -webkit-text-stroke-color: #F3EEE4 } .strip.b .o { -webkit-text-stroke-color: var(--ink) }
+.strip .in { direction: ltr; display: flex; transform: translate3d(var(--x, 0px), 0, 0) skewX(var(--sk, 0deg)) }
+/* manifesto */
+.manifesto { padding-block: clamp(80px, 12vw, 180px) clamp(40px, 6vw, 80px) }
+.manifesto p { font: 400 clamp(34px, 5.6vw, 84px)/1.04 var(--display); max-width: 18ch; text-wrap: balance; overflow-wrap: break-word }
+.manifesto .lat { font-size: .7em }
+.manifesto .mw { transition: color .25s, opacity .25s }
+.js .manifesto .mw { opacity: .16 }
+.js .manifesto .mw.on { opacity: 1 }
+.manifesto .mw.hl { color: var(--violet) }
+.manifesto .mw.hl2 { color: var(--orange) }
+/* steps: sticky numerals + progress line */
+.step { position: relative }
+.step::before { content: ""; position: absolute; top: -1.5px; right: 0; height: 3px; width: 100%; background: var(--violet); transform-origin: 100% 50%; transform: scaleX(var(--sp, 0)) }
+@media (min-width: 900px) { .num { position: sticky; top: 104px; align-self: start } }
+.num { transition: color .35s, -webkit-text-stroke-color .35s }
+.step.active .num { color: var(--violet) }
+/* pinned horizontal principles */
+.pin-prog { display: none }
+html.pinned #principles { padding-block: 0; height: var(--pinH, auto) }
+html.pinned #principles .pin-sticky { position: sticky; top: 64px; height: calc(100vh - 64px); overflow: hidden; display: flex; align-items: center }
+html.pinned #principles .pin-sticky > .wrap { width: 100% }
+html.pinned #principles .sec-head { margin-bottom: 28px; max-width: none; grid-template-columns: minmax(0, 1fr) auto; align-items: end }
+html.pinned #principles .sec-head .eyebrow, html.pinned #principles .sec-head h2, html.pinned #principles .sec-head .lead { grid-column: 1 }
+html.pinned #principles .sec-head h2 { font-size: clamp(44px, 5vw, 76px) }
+html.pinned #principles .pin-prog { display: flex; grid-column: 2; grid-row: 1 / span 3; align-self: end; align-items: center; gap: 14px; font: 600 14px/1 var(--body); color: var(--muted); font-variant-numeric: tabular-nums }
+.pin-prog b { width: 160px; height: 3px; background: var(--line); position: relative; overflow: hidden; border-radius: 3px }
+.pin-prog b::after { content: ""; position: absolute; inset: 0; background: var(--violet); transform-origin: 100% 50%; transform: scaleX(var(--pp, 0)) }
+html.pinned #principles .pgrid { display: flex; width: max-content; gap: 24px; transform: translate3d(var(--px, 0px), 0, 0); will-change: transform }
+html.pinned #principles .pcard { width: clamp(340px, 29vw, 430px); flex: none }
+/* gallery spotlight + tilt */
+.band { position: relative; overflow: hidden }
+.band::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 30%), #3D22EA55, transparent 60%); transition: opacity .3s }
+.band > .wrap { position: relative }
+.gcard .demo { transition: transform .5s cubic-bezier(.2, .8, .2, 1), box-shadow .5s; transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) }
+.gcard .demo:hover { box-shadow: 0 30px 60px -20px #000c }
+/* scroll-driven reveals (progressive: browsers without support simply show everything) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sec-head h2 { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 70% }
+    @keyframes rise { from { transform: translateY(60px); clip-path: inset(0 0 100% 0) } to { transform: none; clip-path: inset(0 0 -10% 0) } }
+    .sec-head .eyebrow::before { animation: grow linear both; animation-timeline: view(); animation-range: entry 10% entry 80% }
+    @keyframes grow { from { width: 0 } to { width: 26px } }
+    .gcard { animation: cardIn linear both; animation-timeline: view(); animation-range: entry 0% cover 28% }
+    @keyframes cardIn { from { transform: translateY(80px) scale(.94); opacity: .2 } to { transform: none; opacity: 1 } }
+    .case figure { overflow: hidden; border-radius: var(--r) }
+    .case img { animation: zoomOut linear both; animation-timeline: view(); animation-range: entry 0% cover 55% }
+    @keyframes zoomOut { from { transform: scale(1.18) } to { transform: scale(1) } }
+    .faq details { animation: slideIn linear both; animation-timeline: view(); animation-range: entry 0% entry 90% }
+    @keyframes slideIn { from { transform: translateX(-40px); opacity: .1 } to { transform: none; opacity: 1 } }
+  }
+}
+/* footer */
+footer { padding-block: 0 40px; border-top: 0 }
+.end { overflow: hidden; padding-block: clamp(40px, 6vw, 80px) 0 }
+.end .big-end { display: flex; justify-content: center; padding: 0; line-height: .8; font-size: clamp(90px, 22vw, 340px) }
+.end .big-end span { display: inline-block; will-change: transform }
+.foot { flex: 1 1 100%; width: 100%; display: flex; flex-wrap: wrap; gap: 14px 28px; justify-content: center; align-items: center; padding-top: 28px; border-top: 1.5px solid var(--ink); color: var(--muted); font-size: 15px }
+.credit { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 600 }
+.credit svg { width: 18px; height: 18px; color: var(--orange); animation: beat .545s ease-out infinite; transform-origin: 50% 60% }
+@keyframes beat { 0% { transform: scale(1.22) } 40% { transform: scale(1) } 100% { transform: scale(1) } }
+@media (prefers-reduced-motion: reduce) { .credit svg, .hero h1 .w > span { animation: none } .hero-copy, .stage { transform: none; opacity: 1 } }
+
+/* ===== v3: audit fixes + interactive areas ===== */
+.skip { position: absolute; top: -100px; right: 16px; z-index: 50; background: var(--ink); color: var(--on-ink); padding: 12px 18px; border-radius: 0 0 12px 12px; font-weight: 600; text-decoration: none }
+.skip:focus { top: env(safe-area-inset-top, 0px) }
+.more { display: none; margin-top: 12px; border: 1.5px solid #ffffff40; background: transparent; color: var(--on-ink); border-radius: 999px; padding: 9px 14px; min-height: 36px; font: 600 13px/1 var(--body); cursor: pointer }
+@media (max-width: 700px) {
+  .step .prompt pre { max-height: 132px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent) }
+  .step .prompt.open pre { max-height: none; -webkit-mask-image: none; mask-image: none }
+  .more { display: inline-flex }
+}
+.jump { position: fixed; z-index: 25; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--violet); color: #fff; border: 0; border-radius: 999px; padding: 14px 22px; font: 600 15px/1 var(--body); box-shadow: 0 14px 34px -10px #3D22EAAA; cursor: pointer }
+@media (min-width: 1000px) { .jump { display: none !important } }
+/* compare */
+.cmp { position: relative; aspect-ratio: 16 / 8; max-width: 100%; border-radius: 26px; overflow: hidden; background: #fff; box-shadow: 0 40px 80px -40px #150C4866; touch-action: pan-y }
+@media (max-width: 700px) { .cmp { aspect-ratio: 4 / 3.6 } }
+.cmp canvas { position: absolute; inset: 0; width: 100%; height: 100% }
+.cmp-top { position: absolute; inset: 0; clip-path: inset(0 0 0 var(--pos, 50%)) }
+.cmp-line { position: absolute; top: 0; bottom: 0; left: var(--pos, 50%); width: 3px; margin-left: -1.5px; background: var(--ink); pointer-events: none }
+.cmp-knob { position: absolute; top: 50%; left: var(--pos, 50%); width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; box-shadow: 0 10px 30px #0006; pointer-events: none; transition: transform .2s }
+.cmp:active .cmp-knob { transform: scale(.92) }
+.cmp-knob svg { width: 28px; height: 28px }
+.cmp input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; direction: ltr }
+.cmp input:focus-visible ~ .cmp-knob { outline: 3px solid var(--orange); outline-offset: 4px }
+.cmp-tag { position: absolute; top: 18px; padding: 8px 14px; border-radius: 999px; font: 600 14px/1 var(--body); pointer-events: none }
+.cmp-tag.r { right: 18px; background: #fff; color: var(--ink); box-shadow: 0 0 0 1.5px var(--line) }
+.cmp-tag.l { left: 18px; background: var(--violet); color: #fff }
+.cmp-quotes { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 20px }
+@media (min-width: 760px) { .cmp-quotes { grid-template-columns: 1fr 1fr } }
+.cmp-quotes blockquote { margin: 0; padding: 18px 20px; border-radius: 18px; font-size: 16px; line-height: 1.6 }
+.cmp-quotes .q1 { background: #fff; color: var(--muted); box-shadow: inset 0 0 0 1.5px var(--line) }
+.cmp-quotes .q2 { background: var(--ink); color: var(--on-ink) }
+.cmp-quotes b { display: block; font-size: 13px; letter-spacing: .08em; margin-bottom: 6px }
+.cmp-quotes .q2 b { color: var(--pink) }
+/* playground */
+.pg { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start }
+@media (min-width: 1000px) { .pg { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr) } }
+.pg-stage { position: relative; aspect-ratio: 16 / 10; max-width: 100%; border-radius: 26px; overflow: hidden; background: var(--pink); box-shadow: 0 40px 80px -40px #150C4866 }
+@media (min-width: 1000px) { .pg-stage { position: sticky; top: 96px } }
+.pg-stage canvas { position: absolute; inset: 0; width: 100%; height: 100% }
+.pg-ctrl { display: grid; gap: 22px; min-width: 0; background: #fff; border-radius: 26px; padding: 24px; box-shadow: 0 1px 0 var(--line) }
+.pg-ctrl label, .pg-ctrl legend { font-weight: 600; font-size: 15px; padding: 0 }
+.pg-ctrl fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; min-width: 0 }
+.pg-word { width: 100%; font: 400 40px/1.1 var(--display); padding: 12px 16px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--paper); color: var(--violet) }
+.pg-word:focus { outline: 3px solid var(--orange); outline-offset: 1px; border-color: var(--ink) }
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px }
+.seg .opt span { width: 100%; justify-content: center; padding-inline: 8px }
+.tempo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
+.tempo input[type=range] { flex: 1; min-width: 140px; accent-color: var(--violet) }
+.tempo output { font: 400 30px/1 var(--display); min-width: 3.2ch; text-align: center; font-variant-numeric: tabular-nums }
+.tap { border: 1.5px solid var(--ink); background: transparent; color: var(--ink); border-radius: 999px; padding: 10px 16px; min-height: 40px; font: 600 14px/1 var(--body); cursor: pointer; transition: background .1s, color .1s }
+.tap.hit { background: var(--orange); border-color: var(--orange); color: var(--ink) }
+.pg-ctrl .btn.primary { justify-content: center }
+
+/* ===== v4: chat-style prompt builder ===== */
+.composer-field { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 4; background: var(--paper); padding-top: 10px; box-shadow: 0 -18px 18px -6px var(--paper) }
+.composer { display: flex; align-items: flex-end; gap: 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 28px; padding: 8px; transition: border-color .15s, box-shadow .15s }
+.composer:focus-within { border-color: var(--violet); box-shadow: 0 0 0 4px #3D22EA22 }
+.composer textarea { flex: 1; min-width: 0; resize: none; border: 0; background: transparent; font: 400 17px/1.5 var(--body); color: var(--ink); padding: 10px 12px; max-height: 140px; overflow-y: auto }
+.composer textarea:focus { outline: none }
+.composer textarea::placeholder { color: #8E88AE }
+.send { flex: none; width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--violet); color: #fff; display: grid; place-items: center; cursor: pointer; transition: transform .15s, background .15s; position: relative; touch-action: manipulation }
+.send:hover { transform: scale(1.06) } .send:active { transform: scale(.92) }
+.send:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px }
+.send svg { width: 24px; height: 24px; margin-left: 3px; transition: transform .25s }
+.send:hover svg { transform: translateX(-3px) rotate(-8deg) }
+.send .i-spin { display: none; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #ffffff55; border-top-color: #fff; animation: spin .7s linear infinite }
+.send[aria-busy="true"] { background: var(--ink); cursor: progress } .send[aria-busy="true"] svg { display: none } .send[aria-busy="true"] .i-spin { display: block }
+@keyframes spin { to { transform: rotate(360deg) } }
+.composer-hint { font-size: 13px; color: var(--muted); margin-top: 8px } .composer-hint kbd { font: inherit; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; background: #fff; color: var(--ink) }
+@media (hover: none) { .composer-hint { display: none } }
+.gen { min-height: 300px }
+.gen-empty { display: grid; justify-items: center; text-align: center; gap: 8px; padding: 46px 12px 40px }
+.gen-empty svg { width: 54px; height: 54px; margin-bottom: 6px }
+.gen-empty b { font: 400 30px/1.05 var(--display); color: var(--on-ink) } .gen-empty span { color: var(--on-ink-muted); font-size: 15px; max-width: 30ch }
+.gen:not([data-state="empty"]) .gen-empty { display: none }
+.gen-status[hidden], .gen-stale[hidden] { display: none !important }
+.gen-status { display: flex; gap: 14px; align-items: center; padding: 6px 0 14px }
+.gen-status b { display: block; font-size: 17px; color: var(--on-ink) } .gen-status #genLine { display: block; font-size: 14px; color: var(--on-ink-muted); min-height: 1.5em }
+#genLine.in { animation: lineIn .35s ease-out }
+@keyframes lineIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+.spark { position: relative; width: 40px; height: 40px; flex: none; color: var(--pink) }
+.spark svg { position: absolute; inset: 0; width: 100%; height: 100%; animation: twinkle 1.2s ease-in-out infinite }
+.spark .s2 { width: 46%; height: 46%; inset: auto -4px -2px auto; color: var(--orange); animation-delay: -.6s }
+@keyframes twinkle { 0%, 100% { transform: scale(.7) rotate(0deg); opacity: .6 } 50% { transform: scale(1.08) rotate(45deg); opacity: 1 } }
+.gen[data-state="empty"] pre, .gen[data-state="thinking"] pre { display: none }
+.gen pre .caret { display: inline-block; width: 2px; height: 1.1em; background: var(--pink); vertical-align: -.2em; margin-inline-start: 2px; animation: blink .8s steps(1) infinite }
+@keyframes blink { 50% { opacity: 0 } }
+.gen-stale { margin-top: 12px; font-size: 14px; color: var(--sun) }
+.copy:disabled { opacity: .35; cursor: not-allowed }
+@media (prefers-reduced-motion: reduce) { .spark svg, .send .i-spin, .gen pre .caret { animation: none } }
+
+/* ===== v4: tips ===== */
+.tips-top { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 22px }
+.hero-tip { background: var(--ink); color: var(--on-ink); border-radius: 26px; padding: clamp(24px, 3.4vw, 44px); display: grid; grid-template-columns: 1fr; gap: 28px; align-items: center; overflow: hidden; position: relative }
+@media (min-width: 980px) { .hero-tip { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) } }
+.hero-tip h3 { font-size: clamp(36px, 4vw, 56px); color: var(--on-ink) }
+.hero-tip p { color: var(--on-ink-muted); font-size: 18px; max-width: 52ch }
+.hero-tip .saves { display: flex; gap: 8px; flex-wrap: wrap }
+.flow { display: grid; grid-template-columns: auto 1fr; gap: 16px 18px; align-items: center; min-width: 0 }
+.flow .sheet { grid-row: span 3; width: clamp(120px, 15vw, 190px); aspect-ratio: 4 / 3.2; border-radius: 14px; background: #ffffff10; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 8px; box-shadow: inset 0 0 0 1.5px #ffffff22 }
+.flow .sheet i { border-radius: 3px; display: block; animation: fl 3s ease-in-out infinite; animation-delay: calc(var(--d) * 90ms) }
+@keyframes fl { 0%, 100% { opacity: .55 } 50% { opacity: 1 } }
+.flow .opt-row { display: flex; align-items: center; gap: 12px; background: #ffffff0d; border-radius: 14px; padding: 12px 14px; font-weight: 600; font-size: 15px; position: relative }
+.flow .opt-row::before { content: ""; position: absolute; inset-inline-start: -18px; top: 50%; width: 18px; height: 1.5px; background: #ffffff40 }
+.flow .opt-row b { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex: none; font: 600 15px/1 var(--body); color: var(--ink) }
+.flow .opt-row small { display: block; font-weight: 400; color: var(--on-ink-muted); font-size: 13px }
+.tipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 22px }
+.tipbar span { font-weight: 600; font-size: 15px; margin-inline-end: 6px }
+.tgrid { display: grid; grid-template-columns: 1fr; gap: 16px }
+@media (min-width: 680px) { .tgrid { grid-template-columns: 1fr 1fr } }
+@media (min-width: 1060px) { .tgrid { grid-template-columns: 1fr 1fr 1fr } }
+.tip { background: #fff; border-radius: 22px; padding: 22px 22px 20px; display: grid; gap: 10px; align-content: start; box-shadow: 0 1px 0 var(--line); transition: transform .25s, box-shadow .25s, opacity .25s }
+.tip:hover { transform: translateY(-3px); box-shadow: 0 1px 0 var(--line), 0 22px 40px -24px #150C4855 }
+.tip[hidden] { display: none !important }
+.tip .tn { font: 400 44px/.8 var(--display); color: transparent; -webkit-text-stroke: 1.5px var(--violet) }
+.tip h4 { margin: 0; font: 400 28px/1.05 var(--display); color: var(--ink) }
+.tip p { color: var(--muted); font-size: 16px }
+.tip p em { font-style: normal; color: var(--ink); background: #FF94E644; padding: 0 4px; border-radius: 4px }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px }
+.bdg { font: 600 12.5px/1 var(--body); padding: 6px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px }
+.bdg::before { content: ""; width: 7px; height: 7px; border-radius: 50% }
+.bdg.q { background: #3D22EA14; color: var(--violet) } .bdg.q::before { background: var(--violet) }
+.bdg.t { background: #FF5A1F1a; color: var(--orange-t) } .bdg.t::before { background: var(--orange) }
+.bdg.c { background: #FF94E633; color: #8A1B6F } .bdg.c::before { background: #D946A8 }
+.bdg.e { background: #150C480f; color: var(--ink) } .bdg.e::before { background: var(--ink) }
+.bdg.f { background: #FFC83A33; color: #7A5600 } .bdg.f::before { background: #E0A400 }
+.hero-tip .bdg.t { background: #FF5A1F33; color: #FFB79C } .hero-tip .bdg.c { background: #FF94E633; color: var(--pink) }
+.more-tips { margin: 18px auto 0; display: flex }
+.more-tips[hidden] { display: none !important }
+.tips-count { font-size: 14px; color: var(--muted); margin-inline-start: auto }
+
+/* ===== v5: discovery questions ===== */
+.qd { border: 0; padding: 0; background: transparent; width: min(600px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); overflow: visible }
+.qd::backdrop { background: #150C48b3; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px) }
+.qd[open] { animation: qdIn .35s cubic-bezier(.2, 1.2, .4, 1) }
+@keyframes qdIn { from { opacity: 0; transform: translateY(24px) scale(.97) } to { opacity: 1; transform: none } }
+.qd-card { background: #fff; border-radius: 28px; padding: 22px 24px 20px; display: grid; gap: 14px; max-height: calc(100dvh - 32px); overflow-y: auto; color: var(--ink); direction: rtl; font-family: var(--body) }
+.qd-top { display: flex; align-items: center; gap: 12px }
+.qd-top b { display: block; font-size: 16px } .qd-top small { display: block; color: var(--muted); font-size: 13.5px; line-height: 1.4 }
+.qd-top > div { flex: 1; min-width: 0 }
+.qd-spark { width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--ink); display: grid; place-items: center; color: var(--pink) }
+.qd-spark svg { width: 22px; height: 22px; animation: twinkle 1.4s ease-in-out infinite }
+.qd-x { width: 40px; height: 40px; flex: none; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; color: var(--ink); font-size: 22px; line-height: 1; cursor: pointer }
+.qd-x:hover { border-color: var(--ink) }
+.qd-prog { height: 4px; background: var(--paper-2); border-radius: 4px; overflow: hidden }
+.qd-prog i { display: block; height: 100%; width: 0; margin-inline-start: 0; background: linear-gradient(270deg, var(--violet), var(--pink)); border-radius: 4px; transition: width .4s cubic-bezier(.2, .8, .2, 1) }
+.qd-body { display: grid; gap: 12px }
+.qd-body.in { animation: qIn .35s cubic-bezier(.2, .8, .2, 1) }
+@keyframes qIn { from { opacity: 0; transform: translateX(-24px) } to { opacity: 1; transform: none } }
+.qd-step { font: 600 13px/1 var(--body); color: var(--violet); letter-spacing: .04em }
+.qd h3 { font-size: clamp(32px, 5vw, 42px); color: var(--ink) }
+.qd-why { color: var(--muted); font-size: 15px; margin-top: -4px }
+.qd-opts { display: grid; gap: 8px }
+.qd-opt { position: relative }
+.qd-opt input { position: absolute; opacity: 0; pointer-events: none }
+.qd-opt span { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-radius: 16px; border: 1.5px solid var(--line); cursor: pointer; font-weight: 600; font-size: 16px; transition: border-color .15s, background .15s, transform .1s; user-select: none }
+.qd-opt span:hover { border-color: var(--ink) }
+.qd-opt span:active { transform: scale(.99) }
+.qd-opt kbd { width: 28px; height: 28px; flex: none; border-radius: 9px; display: grid; place-items: center; font: 600 13px/1 var(--body); background: var(--paper); color: var(--muted); border: 0 }
+.qd-opt input:checked + span { border-color: var(--violet); background: #3D22EA0d }
+.qd-opt input:checked + span kbd { background: var(--violet); color: #fff }
+.qd-opt input:focus-visible + span { outline: 3px solid var(--orange); outline-offset: 2px }
+.qd-other input { width: 100%; font: 400 16px var(--body); padding: 13px 14px; border-radius: 14px; border: 1.5px solid var(--violet); background: #fff; color: var(--ink) }
+.qd-other input:focus { outline: 3px solid #3D22EA33 }
+.qd-other[hidden] { display: none !important }
+.qd-nav { display: flex; align-items: center; gap: 8px; padding-top: 4px }
+.qd-nav .btn.primary { margin-inline-start: auto; padding: 13px 22px; min-height: 46px }
+.qd-nav .btn.primary:disabled { opacity: .4; cursor: not-allowed; transform: none }
+.qd-back, .qd-skip { border: 0; background: transparent; color: var(--muted); font: 600 14px/1 var(--body); padding: 12px 10px; min-height: 44px; cursor: pointer; border-radius: 10px }
+.qd-back:hover, .qd-skip:hover { color: var(--ink); background: var(--paper) }
+.qd-back[hidden] { display: none !important }
+.qd-hint { font-size: 12.5px; color: var(--muted); text-align: center }
+@media (hover: none) { .qd-hint, .qd-opt kbd { display: none } }
+@media (max-width: 600px) {
+  .qd { width: 100%; margin: auto 0 0; max-height: 92dvh }
+  .qd[open] { animation: sheetIn .35s cubic-bezier(.2, .9, .3, 1) }
+  @keyframes sheetIn { from { transform: translateY(100%) } to { transform: none } }
+  .qd-card { border-radius: 28px 28px 0 0; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); max-height: 92dvh }
+}
+.gen pre .h { color: var(--pink); font-weight: 600 }
+
+/* ===== v7: showreel ===== */
+.reel { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 26px; overflow: hidden; background: var(--ink); box-shadow: 0 50px 90px -40px #150C48aa; cursor: pointer }
+.reel canvas { position: absolute; inset: 0; width: 100%; height: 100% }
+.reel-big { position: absolute; inset: 0; margin: auto; width: 96px; height: 96px; border-radius: 50%; border: 0; background: var(--violet); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: 0 20px 50px #0008 }
+.reel-big svg { width: 40px; height: 40px; margin-left: -4px }
+.reel-big[hidden] { display: none !important }
+.reel-bar { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap }
+.rb { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); font: 600 14px/1 var(--body); cursor: pointer; transition: border-color .15s, background .15s, color .15s }
+.rb:hover { border-color: var(--ink) }
+.rb svg { width: 18px; height: 18px; flex: none }
+.rb[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--on-ink) }
+.rb:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px }
+#reelSound.nudge { animation: nudge 2.4s ease-in-out infinite }
+@keyframes nudge { 0%, 70%, 100% { box-shadow: 0 0 0 0 #3D22EA00 } 80% { box-shadow: 0 0 0 6px #3D22EA33 } }
+.reel-prog { flex: 1; min-width: 80px; height: 4px; background: var(--line); border-radius: 4px; overflow: hidden }
+.reel-prog i { display: block; height: 100%; width: 0; margin-inline-start: 0; background: var(--violet); border-radius: 4px }
+.reel-time { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; direction: ltr; min-width: 84px; text-align: center }
+.reel-tr { margin-top: 14px; font-size: 15px; color: var(--muted) }
+.reel-tr summary { cursor: pointer; font-weight: 600; color: var(--ink); width: max-content }
+.reel-tr p { margin-top: 8px; max-width: 75ch }
+@media (max-width: 560px) { .reel { border-radius: 16px } .rb span { display: none } .rb { padding: 0; width: 42px; justify-content: center } }
+@media (prefers-reduced-motion: reduce) { #reelSound.nudge { animation: none } }
+
+/* ===== v10: work-with-me CTA ===== */
+.hire { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: center; background: var(--ink); color: var(--on-ink); border-radius: 30px; padding: clamp(28px, 4.4vw, 60px); margin-block: 8px 34px; position: relative; overflow: hidden }
+.hire::after { content: ""; position: absolute; width: 420px; height: 420px; border-radius: 50%; left: -120px; bottom: -220px; background: radial-gradient(circle, #FF94E655, transparent 65%); pointer-events: none }
+@media (min-width: 940px) { .hire { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr) } }
+.hire-copy { display: grid; gap: 14px; position: relative; z-index: 1 }
+.hire .eyebrow { color: var(--pink) }
+.hire h2 { color: var(--on-ink); font-size: clamp(44px, 5.6vw, 84px) }
+.hire p { color: var(--on-ink-muted); font-size: clamp(17px, 1.5vw, 20px); max-width: 52ch }
+.hire-act { display: grid; gap: 14px; justify-items: start; position: relative; z-index: 1 }
+.hire .hire-btn { font-size: 18px; padding: 18px 28px; background: var(--pink); border-color: var(--pink); color: var(--ink) }
+.hire .hire-btn:hover { background: #fff; border-color: #fff }
+.hire-mail { display: flex; align-items: center; gap: 10px; background: #ffffff12; border-radius: 14px; padding: 6px 6px 6px 14px; max-width: 100% }
+.hire-mail span { font-size: 16px; color: var(--on-ink); user-select: all; overflow-wrap: anywhere; min-width: 0 }
+.hire-copy-btn { border: 0; background: #ffffff22; color: var(--on-ink); border-radius: 10px; padding: 9px 14px; min-height: 38px; font: 600 14px/1 var(--body); cursor: pointer; flex: none }
+.hire-copy-btn:hover { background: var(--pink); color: var(--ink) } .hire-copy-btn.done { background: var(--pink); color: var(--ink) }
+.hire-tags { display: flex; flex-wrap: wrap; gap: 6px } .hire-tags span { font-size: 13px; font-weight: 600; color: var(--on-ink-muted); border: 1px solid #ffffff2a; border-radius: 999px; padding: 5px 11px }
+.credit a.me { color: var(--violet); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-color: var(--pink); transition: color .15s, text-decoration-color .15s }
+.credit a.me:hover { color: var(--orange); text-decoration-color: var(--orange) }
+
+/* ===== v11: contact window ===== */
+.cdlg { border: 0; padding: 0; background: transparent; width: min(460px, calc(100vw - 32px)); max-width: none }
+.cdlg::backdrop { background: #150C48b3; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px) }
+.cdlg[open] { animation: qdIn .3s cubic-bezier(.2, 1.2, .4, 1) }
+.cd-card { background: #fff; color: var(--ink); border-radius: 26px; padding: 22px; display: grid; gap: 14px; direction: rtl; font-family: var(--body) }
+.cd-top { display: flex; align-items: center; justify-content: space-between; gap: 12px }
+.cd-top h3 { font-size: 34px; color: var(--ink) }
+.cd-sub { color: var(--muted); font-size: 15px }
+.cd-opts { display: grid; gap: 8px }
+.cd-opt { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; border: 1.5px solid var(--line); text-decoration: none; color: var(--ink); transition: border-color .15s, transform .15s }
+.cd-opt:hover { border-color: var(--ink); transform: translateY(-1px) }
+.cd-opt:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px }
+.cd-opt i { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; color: #fff; font: 600 16px/1 var(--body); font-style: normal; flex: none }
+.cd-opt b { display: block; font-size: 16px } .cd-opt small { display: block; color: var(--muted); font-size: 13px }
+.cd-mail { background: var(--paper); padding: 6px 6px 6px 14px }
+.cd-mail span { color: var(--ink) }
+.cd-mail .hire-copy-btn { background: var(--ink); color: var(--on-ink) }
+@media (max-width: 600px) { .cdlg { width: 100%; margin: auto 0 0 } .cd-card { border-radius: 26px 26px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) } }
+</style>
+</head>
+<body>
+
+
+<a class="skip" href="#guide">דלגו לתוכן</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="לראש העמוד">
+      <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="17" cy="17" r="15.5"/><path d="M21 17H10M15 12l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>מושן עם Claude</span>
+    </a>
+    <nav class="links" aria-label="ניווט בעמוד">
+      <a href="#guide">המדריך</a><a href="#principles">עקרונות</a><a href="#gallery">דוגמאות</a><a href="#play">נסו בעצמכם</a><a href="#builder">בונה פרומפטים</a><a href="#tips">טיפים</a><a href="#case">פרויקט אמיתי</a><a href="#faq">שאלות</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn share" type="button" id="shareBtn" aria-expanded="false" aria-controls="sharePop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg>שתפו</button>
+      <a class="btn primary" href="#builder">בנו פרומפט</a>
+    </div>
+  </div>
+  <div class="progress" aria-hidden="true"><i></i></div>
+</header>
+<div class="share-pop" id="sharePop" role="dialog" aria-label="שיתוף המדריך" hidden>
+  <h4>שתפו את המדריך</h4>
+  <p>שלחו למי שרוצה ליצור מושן עם Claude Code.</p>
+  <div class="sp-link"><input id="shareUrl" type="text" readonly aria-label="קישור לעמוד" value="https://claude.ai/artifact/FywErW4Q5cM3ZA5DGdLnt6"><button type="button" id="shareCopy">העתקה</button></div>
+  <div class="sp-grid" id="shareGrid"></div>
+</div>
+
+<main id="top">
+<div class="hero" id="hero"><div class="wrap hero-grid">
+  <div class="hero-copy">
+    <span class="eyebrow">מדריך מעשי · Claude Code</span>
+    <h1><span class="w"><span style="--i:0">תנו</span></span> <span class="w"><span style="--i:1">לטקסט</span></span> <em class="w"><span style="--i:2">לזוז.</span></em></h1>
+    <p class="lead">איך מבקשים מ-Claude Code סרטון מושן גרפיקס וטיפוגרפיה קינטית ומקבלים תוצאה של סטודיו: בריף נכון, גיליון פריימים לאישור, תצוגה חיה בדפדפן, ובסוף קובץ MP4 מוכן.</p>
+    <div class="cta">
+      <a class="btn primary" href="#guide">מתחילים במדריך <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a>
+      <a class="btn ghost" href="#gallery">לגלריית הדוגמאות</a>
+    </div>
+    <div class="facts">
+      <div><b>6</b><span>שלבים מבריף לקובץ</span></div>
+      <div><b>3</b><span>נקודות אישור שלך</span></div>
+      <div><b dir="ltr">1080p · 30fps</b><span>קובץ MP4 עם סאונד</span></div>
+    </div>
+  </div>
+  <div class="stage" id="heroStage"><canvas data-demo="hero" aria-label="הדגמה חיה של טיפוגרפיה קינטית: סרטים מתפתלים עם טקסט מעל מילת ענק" role="img"></canvas><span class="stage-tag">הדגמה חיה, נכתבה כקוד</span></div>
+</div></div>
+
+<div class="strips" aria-hidden="true">
+  <div class="strip a"><div class="in" id="stripA"></div></div>
+  <div class="strip b"><div class="in" id="stripB"></div></div>
+</div>
+
+<div class="manifesto"><div class="wrap"><p id="manifesto">Claude Code לא מנחש סגנון. הוא בונה כל פריים מתוך הבריף שלכם: הגריד, הצבע, הקצב והתנועה. ככל שהבריף מדויק יותר, הסרטון מדויק יותר.</p></div></div>
+
+<section id="reel" style="padding-top:0"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">הסרטון</span>
+    <h2>40 שניות. אחר כך תחליטו אם להישאר.</h2>
+    <p class="lead">סרטון קצר שנבנה כולו בקוד, בדיוק כמו מה שתלמדו לעשות כאן. הדליקו סאונד, זה שווה את זה.</p>
+  </div>
+  <div class="reel" id="reelBox">
+    <canvas data-demo="reel" id="reelCanvas" role="img" aria-label="סרטון הדגמה בטיפוגרפיה קינטית שמסביר מה לומדים בדף. התמליל המלא נמצא מתחת לסרטון."></canvas>
+    <button class="reel-big" id="reelBig" type="button" hidden aria-label="הפעלת הסרטון"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg></button>
+  </div>
+  <div class="reel-bar">
+    <button class="rb" id="reelPlay" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="reelPP" d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/></svg><span id="reelPlayTxt">עצירה</span></button>
+    <button class="rb" id="reelSound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path id="reelWave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" opacity="0"/><path id="reelX" d="M16 9.5l5 5M21 9.5l-5 5"/></svg><span id="reelSoundTxt">הפעלת סאונד</span></button>
+    <div class="reel-prog" aria-hidden="true"><i id="reelBar"></i></div>
+    <span class="reel-time" id="reelTime">0:00 / 0:40</span>
+  </div>
+  <details class="reel-tr"><summary>תמליל הסרטון</summary><p>רגע. לפני שאתם גוללים הלאה: כל מה שתראו בסרטון הזה לא עוצב בתוכנה. הוא נכתב בקוד, ו-Claude כתב אותו. אתם רק ביקשתם יפה. בלי טיימליין ובלי לגרור 400 קיפריימים, רק בריף טוב, וקצת סבלנות לרינדור. מה לומדים פה? בריף ש-Claude מבין בפעם הראשונה, תנועה שנוחתת בדיוק על הפעמה, ואיך לחסוך קרדיטים, וגם עצבים. והכי חשוב? זה כיף. שגיאה 404: עוד לא ניסיתם. גללו, נסו, תזוזו.</p></details>
+</div></section>
+
+<section id="guide"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">המדריך</span>
+    <h2>שישה שלבים, מהבריף ועד ה-<span class="lat">MP4</span></h2>
+    <p class="lead">Claude Code בונה את הסרטון כקוד: דף HTML שמצייר כל פריים לפי זמן. לכן הוא מדויק ומסונכרן, ואפשר לתקן כל פרט במילים. הסדר הזה חוסך הכי הרבה סבבי תיקונים.</p>
+  </div>
+  <div class="steps">
+    <article class="step">
+      <div class="num">01</div>
+      <div class="step-body">
+        <h3>אספו את החומרים לפני שמתחילים</h3>
+        <p>כל חומר שמצורף מראש הופך החלטה מנוחשת להחלטה מדויקת. העלו את הקבצים ישירות לשיחה.</p>
+        <ul class="check">
+          <li>קובץ שמע (MP3 או WAV), אם הסרטון מלווה במוזיקה</li>
+          <li>הטקסט המלא, מחולק לחלקים: פתיחה, בית, פזמון, סיום</li>
+          <li>קובץ פונט (WOFF2, TTF או OTF). בלי פונט, Claude יבחר אחד בעצמו</li>
+          <li>2–4 רפרנסים: תמונות או GIF של סגנון התנועה שאתם אוהבים</li>
+          <li>פורמט ואורך: מסך רחב, סטורי או פוסט מרובע</li>
+        </ul>
+      </div>
+      <div class="prompt"><div class="ph"><span>דוגמה להודעה פותחת</span><button class="copy" type="button">העתקה</button></div>
+<pre>מצרפת שיר (MP3), פונט (WOFF2) ו-3 תמונות השראה.
+אני רוצה סרטון טיפוגרפיה קינטית למילות השיר.
+פורמט: 1920×1080, אורך: כל השיר.
+לפני שאתה מתחיל, תגיד לי אם חסר לך משהו.</pre></div>
+    </article>
+    <article class="step">
+      <div class="num">02</div>
+      <div class="step-body">
+        <h3>כתבו בריף אחד, מסודר לפי נושאים</h3>
+        <p>הבריף הוא החלק החשוב ביותר. כתבו בשפה של מעצבים: גריד, צבעוניות, טיפוגרפיה ותנועה. ככל שתתארו את התחושה בצורה קונקרטית יותר, התוצאה תתקרב יותר.</p>
+        <ul class="check">
+          <li>גריד: כמה עמודות, שוליים בטוחים, ומה נשאר קבוע במסך</li>
+          <li>צבע: פלטה לכל חלק בשיר, לא רק פלטה אחת לכל הסרטון</li>
+          <li>תנועה: איזה אפקט לכל שורה, ואיך עוברים בין חלקים</li>
+          <li>קצב: BPM אם אתם יודעים, או בקשה לזהות אותו מהשיר</li>
+        </ul>
+      </div>
+      <div class="prompt"><div class="ph"><span>תבנית בריף</span><button class="copy" type="button">העתקה</button></div>
+<pre><span class="k">גריד:</span> 12 עמודות, שוליים בטוחים של 60px, סימני חיתוך בפינות וקוד זמן קטן בתחתית.
+<span class="k">טיפוגרפיה:</span> רק הפונט המצורף. מילה מרכזית בכל שורה בגודל ענק, השאר קטן ממנה פי 3 לפחות.
+<span class="k">צבע:</span> לכל חלק פלטה משלו. בית: שמנת, סגול וכתום. פזמון: ורוד וסגול. סיום: כחול לילה.
+<span class="k">תנועה:</span> כל מילה נכנסת על פעמה, עם האטה בסוף (ease-out). מעבר בין חלקים בפסים אלכסוניים.
+<span class="k">אפקטים:</span> טקסט על סרטים מתפתלים בבתים, מנהרת טקסט בפזמון, פיצוץ מילים בשורה הדרמטית.
+<span class="k">קצב:</span> זהה את ה-BPM מהשיר, ותן לכל המסך לפעום קלות עם התופים.</pre></div>
+    </article>
+    <article class="step">
+      <div class="num">03</div>
+      <div class="step-body">
+        <h3>בקשו גיליון פריימים לפני הכל</h3>
+        <p>גיליון פריימים מציג פריים אחד כל כמה שניות, על דף אחד. כך מאשרים את הכיוון העיצובי בדקה, לפני שמשקיעים ברינדור.</p>
+        <ul class="check">
+          <li>בקשו פריים כל 2 שניות, עם זמן מתחת לכל פריים</li>
+          <li>בדקו קודם היררכיה וצבע, ורק אחר כך פרטים</li>
+          <li>הצביעו על פריים לפי המספר שלו: "בפריים 14 הטקסט צפוף"</li>
+        </ul>
+      </div>
+      <div class="prompt"><div class="ph"><span>הבקשה</span><button class="copy" type="button">העתקה</button></div>
+<pre>לפני שאתה מרנדר משהו, תראה לי גיליון פריימים:
+פריים אחד כל 2 שניות לאורך כל הסרטון, עם מספר וזמן מתחת לכל פריים.
+אחרי שאאשר, תראה לי תצוגה חיה בדפדפן, ורק אחרי האישור השני תרנדר ל-MP4.</pre></div>
+    </article>
+    <article class="step">
+      <div class="num">04</div>
+      <div class="step-body">
+        <h3>תנו זמנים מדויקים לכל שורה</h3>
+        <p>זה הטיפ שחוסך הכי הרבה תסכול. Claude יכול לנתח קצב מתוך השיר, אבל הוא לא תמיד יודע מתי בדיוק כל מילה מושרת. אם תציינו את זמני השורות, הסנכרון יהיה מדויק כבר בפעם הראשונה.</p>
+        <ul class="check">
+          <li>האזינו פעם אחת ורשמו את הזמן שבו מתחילה כל שורה</li>
+          <li>או בקשו מ-Claude כלי הקשה: מקישים רווח בכל שורה, והזמנים נשמרים</li>
+        </ul>
+      </div>
+      <div class="prompt"><div class="ph"><span>פורמט זמנים</span><button class="copy" type="button">העתקה</button></div>
+<pre>הנה זמני השורות (דקה:שנייה):
+0:04 בוקר טוב לכולם
+0:06 אתם מוכנים לדבר הכי חשוב במשרד
+0:08 בכל בוקר המשרד פה מתעורר
+0:52 [פזמון] בתיה בתיה היא המלכה פה
+כל שורה צריכה להיכנס בדיוק בזמן שלה, והמילה המודגשת בה צריכה לנחות על הפעמה.</pre></div>
+    </article>
+    <article class="step">
+      <div class="num">05</div>
+      <div class="step-body">
+        <h3>תקנו בתצוגה החיה, במשפטים מדויקים</h3>
+        <p>בתצוגה החיה רואים את התנועה עם הסאונד. תיקון טוב מציין מקום (זמן או מספר פריים), מה לא עובד, ומה הכיוון הרצוי.</p>
+        <div class="vs">
+          <div class="bad"><b>פחות טוב</b>"הפזמון לא משהו, תשפר"</div>
+          <div class="good"><b>מצוין</b>"ב-0:54 השם נכנס מהר מדי. תאט את הכניסה לחצי שנייה עם קפיצה אלסטית, והגדל אותו ב-20%"</div>
+          <div class="bad"><b>פחות טוב</b>"צבעים יותר שמחים"</div>
+          <div class="good"><b>מצוין</b>"בבית השני החלף את השחור בכחול כהה, והשאר את הכתום כצבע הדגשה יחיד"</div>
+        </div>
+      </div>
+      <div class="prompt"><div class="ph"><span>בקשת תיקון</span><button class="copy" type="button">העתקה</button></div>
+<pre>3 תיקונים לתצוגה החיה:
+1. 0:31 – כותרת הפיצוץ לא קריאה. תוסיף לה קו מתאר בצבע הרקע.
+2. 1:19 – ההפסקה ארוכה מדי ריקה. תוסיף לב שפועם עם התופים.
+3. בכל הפזמונים – תן לטבעות המנהרה להסתובב לאט יותר, בערך בחצי מהמהירות.</pre></div>
+    </article>
+    <article class="step">
+      <div class="num">06</div>
+      <div class="step-body">
+        <h3>רינדור וייצוא</h3>
+        <p>Claude מצלם כל פריים מהדף ומחבר אותם לסרטון עם הסאונד. ציינו מראש את הגודל המקסימלי, כי אפקטים כמו גרעין (grain) מנפחים את הקובץ.</p>
+        <ul class="check">
+          <li>1080p ו-30fps מתאימים כמעט לכל שימוש</li>
+          <li>לוואטסאפ: בקשו גרסת 720p עד 40MB</li>
+          <li>בקשו לבדוק כמה פריימים מהקובץ הסופי לפני שהוא נשלח אליכם</li>
+        </ul>
+      </div>
+      <div class="prompt"><div class="ph"><span>בקשת רינדור</span><button class="copy" type="button">העתקה</button></div>
+<pre>מאשרת. תרנדר ל-MP4:
+1920×1080, 30 פריימים לשנייה, עם הסאונד המקורי.
+מקסימום 100MB, באיכות גבוהה יחסית.
+לפני שאתה שולח, תבדוק 4 פריימים מהקובץ הסופי שהטקסט תקין, ותדחוס ל-ZIP.</pre></div>
+    </article>
+  </div>
+</div></section>
+
+<section id="principles" class="pin"><div class="pin-sticky"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">עקרונות</span>
+    <h2>מה הופך תנועה לעיצוב</h2>
+    <p class="lead">שישה עקרונות שכדאי לכתוב בכל בריף. כל כרטיס מציג את העיקרון בתנועה, ואת הניסוח שעוזר ל-Claude להבין אותו.</p>
+    <div class="pin-prog" aria-hidden="true"><span id="pinNum">01 / 06</span><b></b></div>
+  </div>
+  <div class="pgrid" id="ptrack">
+    <article class="pcard"><div class="demo"><canvas data-demo="grid" role="img" aria-label="כותרת שנצמדת לעמודות בגריד של 12"></canvas></div>
+      <div class="txt"><span class="tag">גריד</span><h3>כל תנועה נוחתת על קו</h3><p>גריד של 12 עמודות נותן לטקסט מקומות קבועים לנחות בהם. בקשו: "כל אלמנט נעצר על קו עמודה".</p></div></article>
+    <article class="pcard"><div class="demo"><canvas data-demo="scale" role="img" aria-label="סולם טיפוגרפי של ארבעה גדלים"></canvas></div>
+      <div class="txt"><span class="tag">טיפוגרפיה</span><h3>היררכיה ברורה במבט</h3><p>מילה אחת ענקית וכל השאר קטן ממנה פי 3 ויותר. בקשו סולם גדלים קבוע, למשל יחס 1.6 בין שלבים.</p></div></article>
+    <article class="pcard"><div class="demo"><canvas data-demo="palette" role="img" aria-label="מעבר בין פלטות צבע של חלקי השיר"></canvas></div>
+      <div class="txt"><span class="tag">צבע</span><h3>פלטה לכל חלק בסיפור</h3><p>החלפת פלטה מסמנת לצופה שעברנו לבית או לפזמון. בקשו 3–4 צבעים לכל חלק, ומעבר צבעוני ביניהם.</p></div></article>
+    <article class="pcard"><div class="demo"><canvas data-demo="easing" role="img" aria-label="השוואת עקומות האצה: לינארית, האטה, קפיצה ואלסטית"></canvas></div>
+      <div class="txt"><span class="tag">תזמון</span><h3>עקומת התנועה היא האופי</h3><p>תנועה לינארית נראית מכנית. האטה (ease-out) מרגישה טבעית, קפיצה (back) שובבה, ואלסטית אנרגטית. ציינו בבריף איזו מהן.</p></div></article>
+    <article class="pcard"><div class="demo"><canvas data-demo="beat" role="img" aria-label="מילים שנוחתות על פעמות בקצב 110"></canvas></div>
+      <div class="txt"><span class="tag">קצב</span><h3>מילים שנוחתות על הפעמה</h3><p>כשהכניסות מסונכרנות לתופים, הסרטון מרגיש חי. בקשו לזהות BPM ולהעביר את עוצמת התופים לרעידה ולזום עדינים.</p></div></article>
+    <article class="pcard"><div class="demo"><canvas data-demo="stagger" role="img" aria-label="השוואה בין כניסה בבת אחת לכניסה מדורגת"></canvas></div>
+      <div class="txt"><span class="tag">דירוג</span><h3>אות אחרי אות</h3><p>השהיה קטנה בין אותיות (stagger) הופכת כניסה פשוטה לכוריאוגרפיה. בקשו עיכוב של 30–60 מילישניות בין אותיות.</p></div></article>
+  </div>
+</div></div></section>
+
+<section id="gallery" class="band" style="margin-top:clamp(72px,10vw,140px)"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">דוגמאות חיות</span>
+    <h2>מה אפשר לבקש. הכל כאן רץ כקוד.</h2>
+    <p class="lead">כל דוגמה היא טכניקה שמעצבי מושן מובילים משתמשים בה, ונבנתה כקוד בדיוק כמו שהסרטון שלכם ייבנה. לחצו על דוגמה כדי לראות אותה גדולה, או העתיקו את הפרומפט שמייצר אותה.</p>
+  </div>
+  <div class="ggrid" id="ggrid"></div>
+</div></section>
+
+<section id="play"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">מגרש משחקים</span>
+    <h2>נסו בעצמכם</h2>
+    <p class="lead">כתבו מילה, בחרו אפקט, צבע וקצב, וראו אותה זזה. כשאהבתם, העתיקו את הפרומפט שמייצר בדיוק את זה.</p>
+  </div>
+  <div class="pg">
+    <div class="pg-stage"><canvas data-demo="pg" role="img" aria-label="המילה שלכם בתנועה, לפי האפקט שבחרתם" id="pgCanvas"></canvas></div>
+    <form class="pg-ctrl" id="pgForm" autocomplete="off">
+      <div style="display:grid;gap:10px"><label for="pgWord">המילה שלכם</label><input class="pg-word" id="pgWord" type="text" maxlength="14" value="תנועה"></div>
+      <fieldset><legend>אפקט</legend><div class="seg opts" id="pgFx"></div></fieldset>
+      <fieldset><legend>פלטה</legend><div class="opts" id="pgPal"></div></fieldset>
+      <fieldset><legend>קצב</legend><div class="tempo"><output id="pgBpmOut" for="pgBpm">110</output><input type="range" id="pgBpm" min="70" max="170" value="110" aria-label="קצב בפעימות לדקה"><button type="button" class="tap" id="pgTap">הקישו קצב</button></div></fieldset>
+      <button type="button" class="btn primary" id="pgCopy">העתקת הפרומפט לאפקט הזה</button>
+    </form>
+  </div>
+</div></section>
+
+<section id="builder"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">בונה פרומפטים</span>
+    <h2>בחרו, העתיקו, הדביקו ל-<span class="lat">Claude</span></h2>
+    <p class="lead">סמנו את מה שמתאים לכם, כתבו במילים שלכם על מה הסרטון ולחצו על החץ. ארבע שאלות קצרות יעזרו להבין מה אתם צריכים, ואז הבריף ייכתב מולכם, מותאם בדיוק אליכם.</p>
+  </div>
+  <div class="builder">
+    <form class="form" id="bform" autocomplete="off">
+      <fieldset class="field"><legend>פורמט</legend><div class="opts" id="b-format"></div></fieldset>
+      <fieldset class="field"><legend>אורך</legend><div class="opts" id="b-length"></div></fieldset>
+      <fieldset class="field"><legend>סגנון</legend><div class="opts" id="b-style"></div></fieldset>
+      <fieldset class="field"><legend>אפקטים (אפשר כמה)</legend><div class="opts" id="b-fx"></div></fieldset>
+      <fieldset class="field"><legend>פלטת צבעים</legend><div class="opts" id="b-pal"></div></fieldset>
+      <fieldset class="field"><legend>מה אני מצרפת לשיחה</legend><div class="opts" id="b-mat"></div></fieldset>
+      <fieldset class="field"><legend>שלבי אישור</legend><div class="opts" id="b-steps"></div></fieldset>
+      <div class="field composer-field">
+        <label for="b-topic">על מה הסרטון? כתבו במילים שלכם</label>
+        <div class="composer">
+          <textarea id="b-topic" rows="1" enterkeyhint="send" placeholder="למשל: סרטון הוקרה למנהלת המשרד, על מילות שיר שכתבנו">סרטון הוקרה למנהלת המשרד, על מילות שיר שכתבנו</textarea>
+          <button class="send" id="b-send" type="submit" aria-label="יצירת הבריף">
+            <svg class="i-arrow" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.6 3.4L2.9 10.7c-.9.4-.8 1.6.1 1.9l6.5 2.1 2.1 6.5c.3.9 1.5 1 1.9.1l7.3-17.7c.3-.7-.4-1.4-1.1-1.1z" transform="scale(-1,1) translate(-24,0)"/></svg>
+            <span class="i-spin" aria-hidden="true"></span>
+          </button>
+        </div>
+        <p class="composer-hint"><kbd>Enter</kbd> לשליחה · <kbd>Shift</kbd>+<kbd>Enter</kbd> לשורה חדשה</p>
+      </div>
+    </form>
+    <div class="out" id="out">
+      <div class="prompt gen" id="genBox" data-state="empty" aria-live="polite">
+        <div class="ph"><span id="genTitle">הבריף שלך</span><button class="copy" type="button" id="b-copy" disabled>העתקה</button></div>
+        <div class="gen-empty" id="genEmpty">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l4.6 13.4L42 22l-13.4 4.6L24 40l-4.6-13.4L6 22l13.4-4.6z" fill="#FF94E6"/><path d="M38 4l1.6 4.4L44 10l-4.4 1.6L38 16l-1.6-4.4L32 10l4.4-1.6z" fill="#FF5A1F"/></svg>
+          <b>הבריף שלכם ייכתב כאן</b>
+          <span>בחרו אפשרויות, כתבו על מה הסרטון ולחצו על החץ או על Enter</span>
+        </div>
+        <div class="gen-status" id="genStatus" hidden><span class="spark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 4l4.6 13.4L42 22l-13.4 4.6L24 40l-4.6-13.4L6 22l13.4-4.6z" fill="currentColor"/></svg><svg class="s2" viewBox="0 0 48 48"><path d="M24 4l4.6 13.4L42 22l-13.4 4.6L24 40l-4.6-13.4L6 22l13.4-4.6z" fill="currentColor"/></svg></span><span><b>עובד על זה…</b><span id="genLine"></span></span></div>
+        <pre id="b-out"></pre>
+        <p class="gen-stale" id="genStale" hidden>שיניתם בחירות. לחצו על החץ כדי לעדכן את הבריף.</p>
+      </div>
+      <p class="out-note">טיפ: אחרי ההדבקה הוסיפו את זמני השורות (שלב 04), והסנכרון יהיה מדויק מהפעם הראשונה.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="tips" style="padding-top:0"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">טיפים</span>
+    <h2>ליצור טוב יותר, ולחסוך בדרך</h2>
+    <p class="lead">20 הרגלים קטנים שמשפרים את התוצאה וחוסכים זמן, מאמץ, קרדיטים ותסכול. סננו לפי מה שחשוב לכם עכשיו.</p>
+  </div>
+  <div class="tips-top">
+    <article class="hero-tip">
+      <div style="display:grid;gap:16px">
+        <span class="tn" style="font:400 56px/.8 var(--display);color:transparent;-webkit-text-stroke:1.5px var(--pink)" aria-hidden="true">01</span>
+        <h3>קודם רואים, אחר כך מרנדרים</h3>
+        <p>לפני שמבקשים סרטון מלא, בקשו מ-Claude גיליון פריימים: דף אחד עם פריים מכל כמה שניות. כך רואים מראש מה הוא מתכנן לעצב ולבנות, ומחליטים בדקה אחת אם לאשר, לתקן, או לנסות כיוון אחר לגמרי. השינוי קורה לפני שהושקעו זמן ורינדור.</p>
+        <div class="saves"><span class="bdg t">זמן</span><span class="bdg c">קרדיטים</span></div>
+      </div>
+      <div class="flow" aria-label="אחרי גיליון הפריימים יש שלוש אפשרויות: לאשר, לתקן או לבחור כיוון חדש">
+        <div class="sheet" aria-hidden="true"><i style="--d:0;background:#FF94E6"></i><i style="--d:1;background:#3D22EA"></i><i style="--d:2;background:#FF5A1F"></i><i style="--d:3;background:#F3EEE4"></i><i style="--d:4;background:#3D22EA"></i><i style="--d:5;background:#FF94E6"></i><i style="--d:6;background:#FFC83A"></i><i style="--d:7;background:#FF5A1F"></i><i style="--d:8;background:#F3EEE4"></i><i style="--d:9;background:#FF5A1F"></i><i style="--d:10;background:#FF94E6"></i><i style="--d:11;background:#3D22EA"></i></div>
+        <div class="opt-row"><b style="background:#9FE6C9">✓</b><span>מאשרים<small>ממשיכים לתצוגה חיה ולרינדור</small></span></div>
+        <div class="opt-row"><b style="background:var(--sun)">✎</b><span>מתקנים<small>"בפריים 14 הטקסט צפוף מדי"</small></span></div>
+        <div class="opt-row"><b style="background:var(--pink)">↺</b><span>כיוון חדש<small>בלי שהלך לאיבוד אפילו רינדור אחד</small></span></div>
+      </div>
+    </article>
+  </div>
+  <div class="tipbar" role="group" aria-label="סינון טיפים"><span>מה חשוב לכם?</span>
+    <label class="opt"><input type="radio" name="tipf" value="all" checked><span>הכל</span></label>
+    <label class="opt"><input type="radio" name="tipf" value="q"><span>איכות</span></label>
+    <label class="opt"><input type="radio" name="tipf" value="t"><span>זמן</span></label>
+    <label class="opt"><input type="radio" name="tipf" value="c"><span>קרדיטים</span></label>
+    <label class="opt"><input type="radio" name="tipf" value="e"><span>מאמץ</span></label>
+    <label class="opt"><input type="radio" name="tipf" value="f"><span>תסכול</span></label>
+    <span class="tips-count" id="tipsCount" aria-live="polite"></span>
+  </div>
+  <div class="tgrid" id="tgrid"><article class="tip" data-tags="t c f"><span class="tn" aria-hidden="true">02</span><h4>ביקורת לפני הרינדור</h4><p>כשהכל נראה מוכן, ולפני שמרנדרים, בקשו מ-Claude לעבור על הסרטון והקוד בעין ביקורתית: <em>"תעבור על הכל בביקורת בונה, תמצא באגים ודברים שאפשר לשפר"</em>. תיקון לפני רינדור עולה דקה. תיקון אחריו עולה רינדור שלם.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg c">קרדיטים</span><span class="bdg f">תסכול</span></div></article><article class="tip" data-tags="t c"><span class="tn" aria-hidden="true">03</span><h4>שלחו הכל בהודעה אחת</h4><p>בריף, קבצים ורפרנסים יחד. כל הודעת השלמה היא עוד סבב עבודה, ו-Claude מתחיל לבנות רק כשהתמונה שלמה.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg c">קרדיטים</span></div></article><article class="tip" data-tags="t c"><span class="tn" aria-hidden="true">04</span><h4>תקנו בתצוגה החיה, רנדרו פעם אחת</h4><p>כל שינוי נבדק בתצוגה החיה בדפדפן תוך שניות. את הרינדור ל-MP4 שומרים לסוף, כשהכל מאושר.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg c">קרדיטים</span></div></article><article class="tip" data-tags="t c"><span class="tn" aria-hidden="true">05</span><h4>רכזו תיקונים לרשימה אחת</h4><p>במקום תיקון אחרי תיקון, כתבו 3–5 תיקונים ממוספרים, כל אחד עם זמן או מספר פריים. סבב אחד במקום חמישה.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg c">קרדיטים</span></div></article><article class="tip" data-tags="t f"><span class="tn" aria-hidden="true">06</span><h4>תנו זמנים מוכנים</h4><p>רשימת זמנים לכל שורה חוסכת ל-Claude ניחושים, ולכם סבבי סנכרון. מספיקה האזנה אחת עם עט ביד.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg f">תסכול</span></div></article><article class="tip" data-tags="t f"><span class="tn" aria-hidden="true">07</span><h4>התחילו מהשלד</h4><p>קודם מבנה, תזמון וטקסטים במקום הנכון. אפקטים מטורפים מוסיפים רק אחרי שהשלד עובד, כי קל להוסיף נצנוץ ליסודות טובים, ולא להפך.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg f">תסכול</span></div></article><article class="tip" data-tags="t c"><span class="tn" aria-hidden="true">08</span><h4>בדקו קטע קצר לפני הכל</h4><p>בקשו רינדור של 10 שניות מהחלק הכי עמוס, למשל הפזמון. אם הוא נראה טוב, שאר הסרטון כמעט תמיד יעבוד.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg c">קרדיטים</span></div></article><article class="tip" data-tags="q f"><span class="tn" aria-hidden="true">09</span><h4>בקשו מ-Claude לבדוק את התוצר</h4><p><em>"לפני שאתה שולח, תבדוק 4 פריימים מהקובץ הסופי"</em>. בדיקה כזו תופסת בעיות שלא רואים בתצוגה, כמו טקסט משובש בקובץ עצמו.</p><div class="badges"><span class="bdg q">איכות</span><span class="bdg f">תסכול</span></div></article><article class="tip" data-tags="f e"><span class="tn" aria-hidden="true">10</span><h4>שמרו כל גרסה בשם אחר</h4><p>בקשו לשמור כל גרסה כקובץ נפרד: v1, v2, v3. אם כיוון חדש לא עבד, חוזרים לגרסה הקודמת בלי לבנות מחדש.</p><div class="badges"><span class="bdg f">תסכול</span><span class="bdg e">מאמץ</span></div></article><article class="tip" data-tags="t f"><span class="tn" aria-hidden="true">11</span><h4>צילום מסך שווה אלף מילים</h4><p>כשמשהו נראה לא טוב, צלמו מסך ושלחו אותו עם משפט אחד. Claude רואה בדיוק את מה שאתם רואים.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg f">תסכול</span></div></article><article class="tip" data-tags="q t"><span class="tn" aria-hidden="true">12</span><h4>פחות אפקטים, יותר השפעה</h4><p>2–3 אפקטים שחוזרים כמוטיב חזקים יותר מעשרה שונים. זה גם נבנה מהר יותר ונראה מכוון יותר.</p><div class="badges"><span class="bdg q">איכות</span><span class="bdg t">זמן</span></div></article><article class="tip" data-tags="t c"><span class="tn" aria-hidden="true">13</span><h4>קבעו מראש פורמט וגודל קובץ</h4><p>רזולוציה, יחס מסך ומשקל מקסימלי כבר בבריף, כדי לא לרנדר את אותו סרטון פעמיים.</p><div class="badges"><span class="bdg t">זמן</span><span class="bdg c">קרדיטים</span></div></article><article class="tip" data-tags="c e"><span class="tn" aria-hidden="true">14</span><h4>המשיכו באותה שיחה</h4><p>Claude זוכר את ההחלטות, הקבצים והקוד שכבר נבנה. שיחה חדשה מתחילה מאפס, ואת כל ההסבר צריך לתת מחדש.</p><div class="badges"><span class="bdg c">קרדיטים</span><span class="bdg e">מאמץ</span></div></article><article class="tip" data-tags="q e"><span class="tn" aria-hidden="true">15</span><h4>רפרנס אחד לכל רעיון</h4><p>2–4 רפרנסים ממוקדים עדיפים על 15 מעורבבים. כתבו ליד כל אחד מה בדיוק אהבתם: <em>"את הסרטים המתפתלים"</em>.</p><div class="badges"><span class="bdg q">איכות</span><span class="bdg e">מאמץ</span></div></article><article class="tip" data-tags="q"><span class="tn" aria-hidden="true">16</span><h4>תארו תחושה במונחים מדידים</h4><p>במקום "אנרגטי", כתבו <em>"כניסה על כל פעמה, קפיצה אלסטית, 110 BPM"</em>. מילים מדידות הופכות לתנועה מדויקת.</p><div class="badges"><span class="bdg q">איכות</span></div></article><article class="tip" data-tags="q f"><span class="tn" aria-hidden="true">17</span><h4>בקשו שאלות לפני שמתחילים</h4><p>סיימו את הבריף ב-<em>"אם חסר לך משהו, תשאל"</em>. שאלה אחת בהתחלה חוסכת בנייה שלמה על הנחה שגויה.</p><div class="badges"><span class="bdg q">איכות</span><span class="bdg f">תסכול</span></div></article><article class="tip" data-tags="f e"><span class="tn" aria-hidden="true">18</span><h4>בקשו הסבר קצר על כל שינוי</h4><p><em>"אחרי כל תיקון, תכתוב בשורה מה שינית"</em>. כך יודעים מה לבדוק, ושום שינוי לא מפתיע אתכם בהמשך.</p><div class="badges"><span class="bdg f">תסכול</span><span class="bdg e">מאמץ</span></div></article><article class="tip" data-tags="q t"><span class="tn" aria-hidden="true">19</span><h4>סכמו לקחים בסוף</h4><p>בסיום, בקשו מ-Claude רשימה קצרה של מה עבד ומה לא. בפרויקט הבא מצרפים אותה לבריף ומתחילים חכמים יותר.</p><div class="badges"><span class="bdg q">איכות</span><span class="bdg t">זמן</span></div></article><article class="tip" data-tags="q t"><span class="tn" aria-hidden="true">20</span><h4>שמרו את הבריף שעבד</h4><p>בריף שהביא תוצאה טובה הוא תבנית לפרויקט הבא. מחליפים נושא וקבצים, ומתחילים כמעט מהנקודה שבה סיימתם.</p><div class="badges"><span class="bdg q">איכות</span><span class="bdg t">זמן</span></div></article></div>
+</div></section>
+
+<section id="case" style="padding-top:0"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow">פרויקט אמיתי</span>
+    <h2>בתיה: שיר משרדי שהפך לסרטון</h2>
+    <p class="lead">שיר הוקרה למנהלת משרד, 32 שורות ושמונה חלקים. כל שורה קיבלה סצנה משלה, וכל חלק פלטה משלו. כך נראה גיליון הפריימים שאושר לפני הרינדור.</p>
+  </div>
+  <div class="case">
+    <figure><img src="storyboard.jpg" alt="גיליון פריימים: 16 פריימים מתוך הסרטון, טיפוגרפיה קינטית בוורוד, סגול, כתום ושחור" width="1618" height="918" loading="lazy">
+      <figcaption>16 מתוך 75 הפריימים בגיליון: שעון שמתגלגל ל-09:00, סרטים מתפתלים, מנהרת השם בפזמון, גליץ' ופרידה.</figcaption></figure>
+    <div>
+      <div class="numbers">
+        <div><b dir="ltr">2:30</b><span>אורך</span></div>
+        <div><b>110</b><span>BPM, זוהה מהשיר</span></div>
+        <div><b dir="ltr">4,518</b><span>פריימים</span></div>
+      </div>
+      <h3 style="margin-bottom:18px">מה למדנו בדרך</h3>
+      <ul class="lessons">
+        <li><i>1</i><div><b>זמנים מנוחשים לא מספיקים</b><p>בלי זמני שורות, Claude חישב אותם לפי הקצב, והמילים זזו מהשירה. מאז: נותנים זמנים, או מסנכרנים בהקשה.</p></div></li>
+        <li><i>2</i><div><b>בודקים את הקובץ הסופי, לא רק את התצוגה</b><p>בגרסה אחת העברית יצאה משובשת רק בקובץ ה-MP4. בדיקת ארבעה פריימים מהקובץ תפסה את זה לפני המסירה.</p></div></li>
+        <li><i>3</i><div><b>גרעין שמשתנה בכל פריים מנפח את הקובץ</b><p>790MB ירדו ל-100MB כשהגרעין הפך לסטטי, בלי הבדל שרואים בעין.</p></div></li>
+        <li><i>4</i><div><b>תצוגה בדפדפן צריכה תכנון משלה</b><p>הסרטון רץ חי כקוד והסאונד מנוגן דרך Web Audio, כדי שהתצוגה תעבוד גם בדפים עם מדיניות אבטחה מחמירה.</p></div></li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section id="faq" style="padding-top:0"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">שאלות</span><h2>שאלות שחוזרות</h2></div>
+  <div class="faq">
+    <details><summary>צריך לדעת לתכנת?</summary><p>לא. Claude Code כותב את הקוד, מריץ אותו ומרנדר. אתם מתארים, מאשרים ומתקנים במילים. כדאי להכיר את המונחים של מעצבי מושן, כי הם הופכים בקשות למדויקות.</p></details>
+    <details><summary>אפשר להשתמש בפונט שלי?</summary><p>כן. מעלים את קובץ הפונט לשיחה (WOFF2, TTF או OTF) ומבקשים להשתמש רק בו. Claude בודק שהפונט תומך בעברית ובמספרים לפני שהוא מתחיל.</p></details>
+    <details><summary>איך הסרטון מסתנכרן למוזיקה?</summary><p>Claude מנתח את השיר: קצב, פעמות ועוצמת התופים בכל פריים, וכך הגרפיקה פועמת עם המוזיקה. כדי שהמילים ייכנסו בדיוק בזמן, צרפו זמן לכל שורה (ראו שלב 04).</p></details>
+    <details><summary>כמה זמן לוקח הרינדור?</summary><p>שיר של שתיים וחצי דקות, בערך 4,500 פריימים, מתרנדר בכמה דקות עד רבע שעה. התיקונים לפניו מהירים, כי התצוגה החיה מתעדכנת מיד.</p></details>
+    <details><summary>אפשר לקבל גם גרסה לטלפון?</summary><p>כן. בקשו גרסה לאורך (1080×1920). כדאי לציין את זה כבר בבריף, כי הגריד והקומפוזיציה של מסך לאורך שונים לגמרי ממסך רחב.</p></details>
+    <details><summary>מה אם התוצאה לא מדויקת?</summary><p>תקנו בשלבים: קודם הכיוון הכללי בגיליון הפריימים, אחר כך תזמון ותנועה בתצוגה החיה, ורק בסוף פרטים קטנים. ציינו תמיד זמן או מספר פריים.</p></details>
+  </div>
+</div></section>
+</main>
+
+<footer>
+  <div class="end" id="end"><div class="big-end" id="bigEnd" aria-hidden="true">זוזו.</div></div>
+  <div class="wrap"><div class="foot">
+    <span class="credit">פותח ב<svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="לב"><path d="M12 21s-7.5-4.6-9.6-9.4C.9 8.2 3 4.5 6.6 4.5c2.1 0 3.8 1.2 5.4 3.1 1.6-1.9 3.3-3.1 5.4-3.1 3.6 0 5.7 3.7 4.2 7.1C19.5 16.4 12 21 12 21z"/></svg> ע״י <a class="me" data-contact href="https://mail.google.com/mail/?view=cm&fs=1&to=avigail1485@gmail.com&su=%D7%94%D7%99%D7%99%20%D7%90%D7%91%D7%99%D7%92%D7%99%D7%9C%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%9E%D7%93%D7%A8%D7%99%D7%9A%20%22%D7%9E%D7%95%D7%A9%D7%9F%20%D7%A2%D7%9D%20Claude%20Code%22&body=%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%95%D7%90%D7%94%D7%91%D7%AA%D7%99%2C%0A%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%A9%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%93%D7%91%D7%A8%20%D7%A2%D7%9C%D7%99%D7%95%3A%0A%0A" target="_blank" rel="noopener" title="כתבו לי: avigail1485@gmail.com">אביגיל פינקל</a></span>
+  </div></div>
+</footer>
+
+<dialog id="dlg" aria-label="דוגמה בגדול">
+  <div class="modal"><canvas id="dlgCanvas"></canvas></div>
+  <div class="mbar"><h3 id="dlgTitle"></h3><button class="close" type="button" id="dlgClose" aria-label="סגירה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+</dialog>
+<dialog class="qd" id="qd" aria-labelledby="qdTitle">
+  <form class="qd-card" id="qdForm" autocomplete="off">
+    <div class="qd-top">
+      <span class="qd-spark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 4l4.6 13.4L42 22l-13.4 4.6L24 40l-4.6-13.4L6 22l13.4-4.6z" fill="currentColor"/></svg></span>
+      <div><b>רגע לפני שאני כותב</b><small id="qdSub">ארבע שאלות קצרות, כדי שהבריף יתאים בדיוק לך</small></div>
+      <button type="button" class="qd-x" id="qdClose" aria-label="סגירת השאלות">×</button>
+    </div>
+    <div class="qd-prog" aria-hidden="true"><i id="qdBar"></i></div>
+    <div class="qd-body" id="qdBody">
+      <p class="qd-step" id="qdStep"></p>
+      <h3 id="qdTitle"></h3>
+      <p class="qd-why" id="qdWhy"></p>
+      <div class="qd-opts" id="qdOpts" role="radiogroup" aria-labelledby="qdTitle"></div>
+      <div class="qd-other" id="qdOtherWrap" hidden><input id="qdOther" type="text" maxlength="140" placeholder="כתבו במילים שלכם…" aria-label="תשובה משלכם"></div>
+    </div>
+    <div class="qd-nav">
+      <button type="button" class="qd-back" id="qdBack">→ חזרה</button>
+      <button type="button" class="qd-skip" id="qdSkip">דילוג</button>
+      <button type="submit" class="btn primary" id="qdNext" disabled>הבא</button>
+    </div>
+    <p class="qd-hint">מקשים 1–4 לבחירה · Enter להמשך · Esc ליציאה</p>
+  </form>
+</dialog>
+<dialog class="cdlg" id="cdlg" aria-labelledby="cdlgTitle">
+  <div class="cd-card">
+    <div class="cd-top"><h3 id="cdlgTitle">איך נוח לכם לכתוב לי?</h3><button type="button" class="qd-x" id="cdClose" aria-label="סגירה">×</button></div>
+    <p class="cd-sub">הטיוטה כבר מוכנה עם נושא ושורת פתיחה. נשאר רק לספר על הפרויקט.</p>
+    <div class="cd-opts">
+      <a class="cd-opt" href="https://mail.google.com/mail/?view=cm&fs=1&to=avigail1485@gmail.com&su=%D7%94%D7%99%D7%99%20%D7%90%D7%91%D7%99%D7%92%D7%99%D7%9C%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%9E%D7%93%D7%A8%D7%99%D7%9A%20%22%D7%9E%D7%95%D7%A9%D7%9F%20%D7%A2%D7%9D%20Claude%20Code%22&body=%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%95%D7%90%D7%94%D7%91%D7%AA%D7%99%2C%0A%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%A9%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%93%D7%91%D7%A8%20%D7%A2%D7%9C%D7%99%D7%95%3A%0A%0A" target="_blank" rel="noopener"><i style="background:#EA4335">G</i><span><b>Gmail</b><small>נפתח בלשונית חדשה</small></span></a>
+      <a class="cd-opt" href="https://outlook.live.com/mail/0/deeplink/compose?to=avigail1485@gmail.com&subject=%D7%94%D7%99%D7%99%20%D7%90%D7%91%D7%99%D7%92%D7%99%D7%9C%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%9E%D7%93%D7%A8%D7%99%D7%9A%20%22%D7%9E%D7%95%D7%A9%D7%9F%20%D7%A2%D7%9D%20Claude%20Code%22&body=%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%95%D7%90%D7%94%D7%91%D7%AA%D7%99%2C%0A%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%A9%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%93%D7%91%D7%A8%20%D7%A2%D7%9C%D7%99%D7%95%3A%0A%0A" target="_blank" rel="noopener"><i style="background:#0A64D6">O</i><span><b>Outlook</b><small>נפתח בלשונית חדשה</small></span></a>
+      <a class="cd-opt" href="mailto:avigail1485@gmail.com?subject=%D7%94%D7%99%D7%99%20%D7%90%D7%91%D7%99%D7%92%D7%99%D7%9C%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%9E%D7%93%D7%A8%D7%99%D7%9A%20%22%D7%9E%D7%95%D7%A9%D7%9F%20%D7%A2%D7%9D%20Claude%20Code%22&body=%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%95%D7%90%D7%94%D7%91%D7%AA%D7%99%2C%0A%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%A9%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%93%D7%91%D7%A8%20%D7%A2%D7%9C%D7%99%D7%95%3A%0A%0A" target="_blank" rel="noopener"><i style="background:var(--violet)">@</i><span><b>אפליקציית המייל שלי</b><small>Apple Mail, Outlook במחשב וכו׳</small></span></a>
+    </div>
+    <div class="hire-mail cd-mail"><span dir="ltr" id="cdMail">avigail1485@gmail.com</span><button type="button" class="hire-copy-btn" id="cdCopy">העתקת הכתובת</button></div>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+<button class="jump" id="jump" type="button" hidden>לבריף שלי ↓</button>
+
+<script>
+'use strict';
+document.documentElement.lang = 'he'; document.documentElement.dir = 'rtl';
+/* ---------- shared motion toolkit (virtual stage 1600×1000) ---------- */
+const VW = 1600, VH = 1000, CX = 800, CY = 500, TAU = Math.PI * 2;
+const C = { paper: '#EEEBEA', cream: '#F3EEE4', ink: '#150C48', violet: '#3D22EA', pink: '#FF94E6', orange: '#FF5A1F', sun: '#FFC83A', black: '#0D0C12', white: '#EEEBE6' };
+let FONT = 'Karantina';
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const frac = x => x - Math.floor(x);
+const hr = (i, s = 0) => frac(Math.sin(i * 127.1 + s * 311.7 + .123) * 43758.5453);
+const E = {
+  o3: t => 1 - Math.pow(1 - t, 3), o5: t => 1 - Math.pow(1 - t, 5), io: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+  i3: t => t * t * t,
+  back: t => { const c = 2.2; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); },
+  elastic: t => t <= 0 || t >= 1 ? t : Math.pow(2, -10 * t) * Math.sin((t * 10 - .75) * TAU / 3) + 1,
+  bounce: t => { const n = 7.5625, d = 2.75; if (t < 1 / d) return n * t * t; if (t < 2 / d) return n * (t -= 1.5 / d) * t + .75; if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + .9375; return n * (t -= 2.625 / d) * t + .984375; }
+};
+const BL = 60 / 110;
+const beatPulse = t => Math.pow(1 - frac(t / BL), 3);
+const font = s => `${s}px ${FONT}`;
+const VC = .3;
+function W(ctx, ch, size) { ctx.font = font(size); return ctx.measureText(ch).width; }
+function text(ctx, str, x, y, size, fill, align = 'center', stroke = 0) {
+  ctx.font = font(size); ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.direction = 'rtl';
+  if (stroke) { ctx.lineWidth = stroke; ctx.strokeStyle = fill; ctx.lineJoin = 'round'; ctx.strokeText(str, x, y + size * VC); }
+  else { ctx.fillStyle = fill; ctx.fillText(str, x, y + size * VC); }
+}
+function fit(ctx, str, maxW, maxS) { ctx.font = font(100); return Math.min(maxS, maxW / ctx.measureText(str).width * 100); }
+// right-to-left per-glyph layout around x=0
+function glyphs(ctx, str, x, y, size, fill, fn) {
+  ctx.font = font(size); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  const chars = [...str], ws = chars.map(ch => ctx.measureText(ch).width), total = ws.reduce((a, b) => a + b, 0);
+  let cx = total / 2;
+  chars.forEach((ch, i) => {
+    const w = ws[i], gx = cx - w / 2; cx -= w;
+    if (ch === ' ') return;
+    const p = fn ? fn(i, chars.length) : {};
+    if (!p || p.a === 0) return;
+    ctx.save(); ctx.translate(x + gx + (p.dx || 0), y + (p.dy || 0)); if (p.r) ctx.rotate(p.r);
+    ctx.scale(p.sx ?? p.s ?? 1, p.sy ?? p.s ?? 1); ctx.globalAlpha *= p.a ?? 1;
+    if (p.stroke) { ctx.lineWidth = p.stroke; ctx.strokeStyle = p.color || fill; ctx.lineJoin = 'round'; ctx.strokeText(ch, 0, size * VC); }
+    else { ctx.fillStyle = p.color || fill; ctx.fillText(ch, 0, size * VC); }
+    ctx.restore();
+  });
+  return total;
+}
+function samplePath(fn, n = 400) {
+  const pts = [], L = [0]; for (let i = 0; i <= n; i++) pts.push(fn(i / n));
+  for (let i = 1; i <= n; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  return { pts, L, len: L[n] };
+}
+function strokePath(ctx, p, w, col, upto = Infinity) {
+  ctx.beginPath(); ctx.moveTo(p.pts[0][0], p.pts[0][1]);
+  for (let i = 1; i < p.pts.length && p.L[i] <= upto; i++) ctx.lineTo(p.pts[i][0], p.pts[i][1]);
+  ctx.lineWidth = w; ctx.strokeStyle = col; ctx.lineJoin = 'round'; ctx.lineCap = 'butt'; ctx.stroke();
+}
+// Hebrew along a left-to-right path: glyphs placed in reverse order so it reads right-to-left
+function pathText(ctx, p, str, size, col, offset = 0, upto = Infinity) {
+  ctx.font = font(size); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = col;
+  const chars = [...str].reverse(), ws = chars.map(ch => ctx.measureText(ch).width), pat = ws.reduce((a, b) => a + b, 0);
+  let pos = -frac(offset / pat) * pat, k = 0, j = 0;
+  while (pos < p.len && pos < upto) {
+    const m = pos + ws[k] / 2;
+    if (m > 0 && m < upto) {
+      while (j < p.L.length - 2 && p.L[j + 1] < m) j++;
+      const a = p.pts[j], b = p.pts[j + 1], u = (m - p.L[j]) / Math.max(1e-6, p.L[j + 1] - p.L[j]);
+      if (chars[k] !== ' ') { ctx.save(); ctx.translate(lerp(a[0], b[0], u), lerp(a[1], b[1], u)); ctx.rotate(Math.atan2(b[1] - a[1], b[0] - a[0])); ctx.fillText(chars[k], 0, size * VC); ctx.restore(); }
+    }
+    pos += ws[k]; k = (k + 1) % chars.length;
+  }
+}
+function bg(ctx, col) { ctx.fillStyle = col; ctx.fillRect(-50, -50, VW + 100, VH + 100); }
+function extrude(ctx, str, x, y, size, front, side, depth, ang) {
+  const dx = Math.cos(ang), dy = Math.sin(ang);
+  for (let k = depth; k >= 1; k -= 2) text(ctx, str, x + dx * k, y + dy * k, size, side);
+  text(ctx, str, x, y, size, front);
+}
+function ribbonPath(t, yc, A, R, k, ph, dir) {
+  return samplePath(u => { const x = lerp(-380, VW + 380, u), q = u * k * TAU + ph + t * .5 * dir;
+    return [x + Math.cos(q) * R, yc + Math.sin(q * .5 + 1) * A + Math.sin(q) * R * dir]; }, 420);
+}
+function hud(ctx, t, col, label) {
+  ctx.save(); ctx.globalAlpha = .8; ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 3;
+  [[28, 28, 1, 1], [VW - 28, 28, -1, 1], [28, VH - 28, 1, -1], [VW - 28, VH - 28, -1, -1]].forEach(([x, y, sx, sy]) => { ctx.beginPath(); ctx.moveTo(x, y + sy * 24); ctx.lineTo(x, y); ctx.lineTo(x + sx * 24, y); ctx.stroke(); });
+  text(ctx, label, VW - 62, 58, 30, col, 'right');
+  ctx.font = font(26); ctx.textAlign = 'left'; ctx.direction = 'ltr';
+  const mm = Math.floor(t / 60), ss = Math.floor(t % 60), ff = Math.floor(frac(t) * 30);
+  ctx.fillText(`${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}:${String(ff).padStart(2, '0')}`, 62, VH - 50);
+  ctx.textAlign = 'right'; ctx.fillText('110 BPM', VW - 62, VH - 50); ctx.direction = 'rtl';
+  const b = Math.floor(t / BL) % 4; for (let i = 0; i < 4; i++) { ctx.globalAlpha = i === b ? 1 : .25; ctx.beginPath(); ctx.arc(70 + i * 22, 52, 6, 0, TAU); ctx.fill(); }
+  ctx.restore();
+}
+
+/* ---------- demos ---------- */
+const D = {};
+const PTR = { x: .5, y: .5, tx: .5, ty: .5 };
+D.vague = (ctx, t) => {
+  bg(ctx, '#FFFFFF');
+  const a = .5 + .5 * Math.sin(t * 1.2);
+  ctx.globalAlpha = .35 + a * .65; ctx.font = '72px Arial, sans-serif'; ctx.fillStyle = '#111'; ctx.textAlign = 'center'; ctx.direction = 'rtl'; ctx.textBaseline = 'middle';
+  ctx.fillText('בוקר טוב לכולם', CX, CY); ctx.globalAlpha = 1;
+};
+D.precise = (ctx, t) => {
+  bg(ctx, C.cream);
+  ctx.strokeStyle = C.ink; ctx.globalAlpha = .08; ctx.lineWidth = 1.5;
+  for (let i = 1; i < 12; i++) { ctx.beginPath(); ctx.moveTo(i * VW / 12, 0); ctx.lineTo(i * VW / 12, VH); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  const cyc = BL * 8, lt = t % cyc, rise = E.o3(seg(lt, 0, 1.1)), sy = lerp(VH + 320, 720, rise), R = 330 + beatPulse(t) * 14;
+  ctx.save(); ctx.translate(CX, sy); ctx.rotate(t * .2); ctx.strokeStyle = C.violet; ctx.lineWidth = 6;
+  for (let i = 0; i < 36; i++) { const a = i / 36 * TAU, r1 = R + 120 + 50 * (i % 2) + beatPulse(t) * 50; ctx.beginPath(); ctx.moveTo(Math.cos(a) * (R + 40), Math.sin(a) * (R + 40)); ctx.lineTo(Math.cos(a) * r1, Math.sin(a) * r1); ctx.stroke(); }
+  ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.arc(CX, sy, R, 0, TAU); ctx.clip(); ctx.fillStyle = C.orange; ctx.fillRect(CX - R, sy - R, R * 2, R * 2);
+  ctx.fillStyle = C.cream; for (let i = 0; i < 7; i++) ctx.fillRect(CX - R, sy + 30 + i * 46 + frac(t) * 46, R * 2, 4 + i * 3); ctx.restore();
+  const out = E.i3(seg(lt, cyc - .35, cyc));
+  ctx.globalAlpha = 1 - out;
+  glyphs(ctx, 'בוקר טוב', CX, 300, 260, C.ink, i => { const p = seg(lt, .1 + i * .07, .6 + i * .07); return { dy: (1 - E.bounce(p)) * -650, a: p > 0 ? 1 : 0, r: (1 - p) * (hr(i) - .5) }; });
+  const p2 = E.back(seg(lt, .9, 1.3)); ctx.save(); ctx.translate(CX, 560); ctx.scale(p2, p2); text(ctx, 'לכולם', 0, 0, 200, C.cream, 'center', 30); text(ctx, 'לכולם', 0, 0, 200, C.violet); ctx.restore();
+  ctx.globalAlpha = 1;
+};
+const PGPAL = [
+  { n: 'ורוד וסגול', bg: C.pink, a: C.violet, b: C.cream, c: C.orange, t: C.ink },
+  { n: 'לילה', bg: C.ink, a: C.pink, b: C.ink, c: C.orange, t: C.cream },
+  { n: 'כתום חם', bg: C.orange, a: C.ink, b: C.pink, c: C.cream, t: C.ink },
+  { n: 'שמנת', bg: C.cream, a: C.violet, b: C.cream, c: C.pink, t: C.ink }
+];
+const PG = { word: 'תנועה', fx: 'extrude', bpm: 110, pal: 0 };
+D.pg = (ctx, t) => {
+  const P = PGPAL[PG.pal], bl = 60 / PG.bpm, w = (PG.word.trim() || 'תנועה'), bp = Math.pow(1 - frac(t / bl), 3);
+  bg(ctx, P.bg);
+  if (PG.fx === 'extrude') {
+    for (let i = 0; i < 26; i++) { const a = i / 26 * TAU + t * .1, r0 = 420 + bp * 90; ctx.strokeStyle = P.a; ctx.globalAlpha = .22; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(CX + Math.cos(a) * r0, CY + Math.sin(a) * r0); ctx.lineTo(CX + Math.cos(a) * (r0 + 700), CY + Math.sin(a) * (r0 + 700)); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+    const lt = t % (bl * 2), sq = E.elastic(seg(lt, 0, .7)), size = fit(ctx, w, 1250, 480);
+    ctx.save(); ctx.translate(CX, CY); ctx.scale(lerp(.6, 1, sq), lerp(1.5, 1, sq)); ctx.rotate(-.05);
+    extrude(ctx, w, 0, 0, size, P.b, P.a, 56, .9 + Math.sin(t * .8) * .6); text(ctx, w, 0, 0, size, P.t, 'center', 9); text(ctx, w, 0, 0, size, P.b); ctx.restore();
+  } else if (PG.fx === 'tunnel') {
+    const ts = t * (PG.bpm / 100), N = 14, K = 900;
+    for (let id = Math.floor(ts) + N; id > Math.floor(ts); id--) {
+      const z = id - ts; if (z < .32) continue; const r = K / z, size = K / (z * (z + 1)) * .92; if (size < 5 || r - size > 1300) continue;
+      const bend = Math.min(1, z / 6), cx = CX + Math.sin(t * .8 + z * .45) * 140 * bend, cy = CY + Math.cos(t * .6 + z * .38) * 80 * bend, alt = id % 2 === 0;
+      if (alt) { ctx.beginPath(); ctx.arc(cx, cy, r + size * .56, 0, TAU); ctx.arc(cx, cy, Math.max(0, r - size * .56), 0, TAU, true); ctx.fillStyle = P.a; ctx.fill('evenodd'); }
+      ctx.font = font(size); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = alt ? P.bg : P.a;
+      const chars = [...(w + ' · ')].reverse(); let a = (alt ? 1 : -1) * t * .35 + id * .7; const end = a + TAU - .001; let k = 0;
+      while (a < end) { const ch = chars[k % chars.length], cw = ctx.measureText(ch).width, da = cw / r; if (a + da > end + .001) break; const am = a + da / 2;
+        if (ch !== ' ') { ctx.save(); ctx.translate(cx + Math.cos(am) * r, cy + Math.sin(am) * r); ctx.rotate(am + Math.PI / 2); ctx.fillText(ch, 0, size * VC); ctx.restore(); } a += da; k++; }
+    }
+  } else if (PG.fx === 'ribbon') {
+    const gs = fit(ctx, w, VW * .9, 820); ctx.save(); ctx.translate(CX, CY + 20); ctx.rotate(-.05); ctx.scale(1 + bp * .03, 1 + bp * .03);
+    glyphs(ctx, w, 0, 0, gs, P.c, i => ({ dy: Math.sin(t * 2 + i * .9) * 16 })); ctx.restore();
+    [[CY - 200, 150, 190, 2.2, 0, 1], [CY + 190, 160, 200, 1.6, 2, -1]].forEach(([yc, A, R, k, ph, dir]) => { const p = ribbonPath(t * PG.bpm / 110, yc, A, R, k, ph, dir); strokePath(ctx, p, 96, P.a); pathText(ctx, p, w + ' / ', 58, P.b, t * 240 * dir * PG.bpm / 110); });
+  } else if (PG.fx === 'explode') {
+    const items = [];
+    for (let i = 0; i < 36; i++) { let z = .5 + hr(i, 1) * 7 - t * (2 + hr(i, 2) * 1.4) * PG.bpm / 110; z = ((z % 7.5) + 7.5) % 7.5 + .25; items.push({ i, z, x: (hr(i, 3) - .5) * 2.6, y: (hr(i, 4) - .5) * 1.8, r: (hr(i, 5) - .5) * 1.5, sk: (hr(i, 6) - .5) * 1.3 }); }
+    items.sort((a, b) => b.z - a.z);
+    for (const it of items) { const s = 1 / it.z; ctx.save(); ctx.translate(CX + it.x * 820 * s, CY + it.y * 560 * s); ctx.rotate(it.r + t * .3 * (it.i % 2 ? 1 : -1)); ctx.transform(1, 0, it.sk, 1, 0, 0); ctx.scale(s, s);
+      ctx.globalAlpha = clamp((7.6 - it.z) / 2); if (it.i % 5 === 0) text(ctx, w, 0, 0, 220, P.t, 'center', 8); else text(ctx, w, 0, 0, 220, P.a); ctx.restore(); }
+    ctx.globalAlpha = 1; const p = E.o3(seg(t % (bl * 4), 0, .35)), s = lerp(1.8, 1, p), size = fit(ctx, w, 1100, 300);
+    ctx.save(); ctx.translate(CX, CY); ctx.scale(s, s); text(ctx, w, 0, 0, size, P.bg, 'center', size * .2); text(ctx, w, 0, 0, size, P.b === P.bg ? P.t : P.b); ctx.restore();
+  } else if (PG.fx === 'wave') {
+    const size = fit(ctx, w, 1300, 300), cols = [P.a, P.c, P.t, P.a];
+    for (let e = 3; e >= 0; e--) glyphs(ctx, w, CX, CY, size, e ? cols[e] : P.a, i => { const ph = t * 3 * PG.bpm / 110 - i * .5 - e * .18, st = 1 + Math.cos(ph) * .25; return e ? { dy: Math.sin(ph) * 120, sy: st, sx: 1 / st, stroke: 4, color: cols[e], a: .9 - e * .2 } : { dy: Math.sin(ph) * 120, sy: st, sx: 1 / st }; });
+  } else if (PG.fx === 'snap') {
+    ctx.strokeStyle = P.t; ctx.globalAlpha = .1; ctx.lineWidth = 1.5; for (let i = 1; i < 12; i++) { ctx.beginPath(); ctx.moveTo(i * VW / 12, 0); ctx.lineTo(i * VW / 12, VH); ctx.stroke(); } ctx.globalAlpha = 1;
+    const cyc = bl * 8, lt = t % cyc, size = fit(ctx, w, 1300, 380);
+    glyphs(ctx, w, CX, CY, size, P.a, i => { const pin = E.back(seg(lt, .15 + i * .05, .8 + i * .05)), pout = E.i3(seg(lt, cyc - .6 + i * .02, cyc)), q = pin * (1 - pout);
+      return { dx: (1 - q) * (hr(i, 1) - .5) * 1700, dy: (1 - q) * (hr(i, 2) - .5) * 1100, r: (1 - q) * (hr(i, 3) - .5) * 6, s: lerp(1.7, 1, q) }; });
+  }
+  // beat dots
+  const b = Math.floor(t / bl) % 4; for (let i = 0; i < 4; i++) { ctx.globalAlpha = i === b ? 1 : .3; ctx.fillStyle = P.t; ctx.beginPath(); ctx.arc(VW - 70 - i * 26, 60, 8 + (i === b ? bp * 4 : 0), 0, TAU); ctx.fill(); }
+  ctx.globalAlpha = .8; ctx.font = font(30); ctx.fillStyle = P.t; ctx.textAlign = 'left'; ctx.direction = 'ltr'; ctx.fillText(`${PG.bpm} BPM`, 60, 70); ctx.direction = 'rtl'; ctx.globalAlpha = 1;
+};
+D.hero = (ctx, t) => {
+  bg(ctx, C.paper);
+  // grid
+  ctx.strokeStyle = C.ink; ctx.globalAlpha = .07; ctx.lineWidth = 1.5;
+  for (let i = 1; i < 12; i++) { ctx.beginPath(); ctx.moveTo(i * VW / 12, 0); ctx.lineTo(i * VW / 12, VH); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  const words = ['תנועה', 'קצב', 'גריד', 'מושן'], cyc = BL * 8, wi = Math.floor(t / cyc) % words.length, lt = t % cyc;
+  const w = words[wi], gs = fit(ctx, w, VW * .9, 820);
+  const pin = E.back(seg(lt, 0, .55)), pout = E.i3(seg(lt, cyc - .3, cyc));
+  ctx.save(); ctx.translate(CX, CY + 20); ctx.rotate(-.05); const s = lerp(1.5, 1, pin) * (1 - pout * .6) * (1 + beatPulse(t) * .02); ctx.scale(s, s);
+  ctx.globalAlpha = clamp(pin * 2) * (1 - pout);
+  glyphs(ctx, w, 0, 0, gs, C.pink, i => ({ dy: Math.sin(t * 2 + i * .9) * 16 }));
+  ctx.restore(); ctx.globalAlpha = 1;
+  PTR.x += (PTR.tx - PTR.x) * .08; PTR.y += (PTR.ty - PTR.y) * .08; const py = (PTR.y - .5) * 2, px = (PTR.x - .5) * 2;
+  const rib = [[C.violet, C.cream, CY - 230 + py * 90, 130 + px * 40, 160, 2.1, 0, 1, 52], [C.orange, C.ink, CY + 40 + py * 50, 120 - px * 30, 140, 2.7, 3, -1, 64], [C.violet, C.cream, CY + 300 + py * 120, 100 + px * 50, 120, 1.7, 1.4, 1, 46]];
+  rib.forEach(([col, tc, yc, A, R, k, ph, dir, size], i) => {
+    const p = ribbonPath(t, yc, A, R, k, ph, dir);
+    strokePath(ctx, p, size * 1.6, col);
+    pathText(ctx, p, i === 1 ? 'טיפוגרפיה קינטית / ' : 'בריף · גיליון פריימים · תצוגה חיה · רינדור · ', size, tc, t * 230 * dir);
+  });
+  hud(ctx, t, C.ink, 'Claude Code');
+};
+D.ribbon = (ctx, t) => {
+  bg(ctx, C.cream);
+  const gs = fit(ctx, '220', VW * .95, 900);
+  text(ctx, 'שפה', CX, CY + 20, fit(ctx, 'שפה', VW * .8, 820), C.pink);
+  [[C.violet, CY - 200, 150, 190, 2.2, 0, 1], [C.violet, CY + 180, 160, 210, 1.6, 2, -1]].forEach(([col, yc, A, R, k, ph, dir]) => {
+    const p = ribbonPath(t, yc, A, R, k, ph, dir); strokePath(ctx, p, 92, col);
+    pathText(ctx, p, 'שלום / שפה / מילים / טקסט על נתיב / ', 54, C.cream, t * 240 * dir);
+  });
+};
+D.tunnel = (ctx, t) => {
+  bg(ctx, C.ink);
+  const ts = t * 1.2, N = 14, K = 900;
+  for (let id = Math.floor(ts) + N; id > Math.floor(ts); id--) {
+    const z = id - ts; if (z < .32) continue;
+    const r = K / z, size = K / (z * (z + 1)) * .92; if (size < 5 || r - size > 1300) continue;
+    const bend = Math.min(1, z / 6), cx = CX + Math.sin(t * .8 + z * .45) * 140 * bend, cy = CY + Math.cos(t * .6 + z * .38) * 80 * bend;
+    const alt = id % 2 === 0;
+    if (alt) { ctx.beginPath(); ctx.arc(cx, cy, r + size * .56, 0, TAU); ctx.arc(cx, cy, Math.max(0, r - size * .56), 0, TAU, true); ctx.fillStyle = C.pink; ctx.fill('evenodd'); }
+    ctx.font = font(size); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = alt ? C.ink : C.pink;
+    const chars = [...(alt ? 'מנהרה · ' : 'מושן · ')].reverse();
+    let a = (alt ? 1 : -1) * t * .35 + id * .7; const end = a + TAU - .001; let k = 0;
+    while (a < end) { const ch = chars[k % chars.length], w = ctx.measureText(ch).width, da = w / r; if (a + da > end + .001) break;
+      const am = a + da / 2; if (ch !== ' ') { ctx.save(); ctx.translate(cx + Math.cos(am) * r, cy + Math.sin(am) * r); ctx.rotate(am + Math.PI / 2); ctx.fillText(ch, 0, size * VC); ctx.restore(); }
+      a += da; k++; }
+  }
+};
+D.explode = (ctx, t) => {
+  bg(ctx, C.orange);
+  const words = ['בום', 'וואו', 'מושן', 'קצב', 'פיצוץ', 'אנרגיה'], items = [];
+  for (let i = 0; i < 40; i++) { let z = .5 + hr(i, 1) * 7 - t * (2.2 + hr(i, 2) * 1.4); z = ((z % 7.5) + 7.5) % 7.5 + .25;
+    items.push({ i, z, x: (hr(i, 3) - .5) * 2.6, y: (hr(i, 4) - .5) * 1.8, r: (hr(i, 5) - .5) * 1.5, sk: (hr(i, 6) - .5) * 1.3, w: words[i % words.length] }); }
+  items.sort((a, b) => b.z - a.z);
+  for (const it of items) { const s = 1 / it.z;
+    ctx.save(); ctx.translate(CX + it.x * 820 * s, CY + it.y * 560 * s); ctx.rotate(it.r + t * .3 * (it.i % 2 ? 1 : -1)); ctx.transform(1, 0, it.sk, 1, 0, 0); ctx.scale(s, s * (1 + .3 * Math.sin(it.i)));
+    ctx.globalAlpha = clamp((7.6 - it.z) / 2);
+    if (it.i % 5 === 0) text(ctx, it.w, 0, 0, 240, C.ink, 'center', 8); else text(ctx, it.w, 0, 0, 240, C.pink);
+    ctx.restore(); }
+  ctx.globalAlpha = 1;
+  const p = E.o3(seg(t % (BL * 4), 0, .35)), s = lerp(1.8, 1, p);
+  ctx.save(); ctx.translate(CX, CY); ctx.scale(s, s); text(ctx, 'בום!', 0, 0, 300, C.orange, 'center', 60); text(ctx, 'בום!', 0, 0, 300, C.cream); ctx.restore();
+};
+D.snap = (ctx, t) => {
+  bg(ctx, C.violet);
+  ctx.strokeStyle = C.cream; ctx.globalAlpha = .12; ctx.lineWidth = 1.5;
+  for (let i = 1; i < 12; i++) { ctx.beginPath(); ctx.moveTo(i * VW / 12, 0); ctx.lineTo(i * VW / 12, VH); ctx.stroke(); }
+  for (let j = 1; j < 6; j++) { ctx.beginPath(); ctx.moveTo(0, j * VH / 6); ctx.lineTo(VW, j * VH / 6); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  const cyc = 4.4, lt = t % cyc;
+  ['סדר', 'מתוך כאוס'].forEach((ln, j) => {
+    glyphs(ctx, ln, CX, CY - 150 + j * 300, j ? 220 : 300, j ? C.pink : C.cream, i => {
+      const id = j * 20 + i, pin = E.back(seg(lt, .2 + id * .025, .9 + id * .025)), pout = E.i3(seg(lt, cyc - .7 + id * .01, cyc));
+      const q = pin * (1 - pout);
+      return { dx: (1 - q) * (hr(id, 1) - .5) * 1700, dy: (1 - q) * (hr(id, 2) - .5) * 1100, r: (1 - q) * (hr(id, 3) - .5) * 6, s: lerp(1.7, 1, q) };
+    });
+  });
+  const g = E.o3(seg(lt, 1.1, 1.5)) * (1 - seg(lt, cyc - .7, cyc - .4));
+  ctx.strokeStyle = C.orange; ctx.lineWidth = 5; [CY - 30, CY + 250].forEach(y => { ctx.beginPath(); ctx.moveTo(VW, y); ctx.lineTo(VW - VW * g, y); ctx.stroke(); });
+};
+D.extrude = (ctx, t) => {
+  bg(ctx, C.pink);
+  for (let i = 0; i < 26; i++) { const a = i / 26 * TAU + t * .1, r0 = 420 + beatPulse(t) * 80; ctx.strokeStyle = C.violet; ctx.globalAlpha = .25; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(CX + Math.cos(a) * r0, CY + Math.sin(a) * r0); ctx.lineTo(CX + Math.cos(a) * (r0 + 600), CY + Math.sin(a) * (r0 + 600)); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  const lt = t % (BL * 2), sq = E.elastic(seg(lt, 0, .7));
+  ctx.save(); ctx.translate(CX, CY); ctx.scale(lerp(.6, 1, sq), lerp(1.5, 1, sq)); ctx.rotate(-.05);
+  extrude(ctx, 'וואו', 0, 0, 520, C.cream, C.violet, 60, .9 + Math.sin(t * .8) * .6);
+  text(ctx, 'וואו', 0, 0, 520, C.ink, 'center', 10); text(ctx, 'וואו', 0, 0, 520, C.cream);
+  ctx.restore();
+};
+D.glitch = (ctx, t, cv) => {
+  bg(ctx, C.black);
+  const cyc = 3.2, lt = t % cyc, amt = lt < 2.2 ? .5 + (frac(t * 4) < .2 ? 1 : 0) : 0, f = Math.floor(t * 30);
+  ctx.fillStyle = C.orange; for (let i = 0; i < 7; i++) if (amt && hr(f + i, 9) > .55) ctx.fillRect(hr(f + i, 4) * VW, hr(f + i, 5) * VH, 40 + hr(i + f, 6) * 300, 6 + hr(i, 7) * 26);
+  if (amt) { ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    [[-1, 0, '#ff0040'], [1, .5, '#00ff88'], [0, -1, '#3060ff']].forEach(([ox, oy, col], i) => text(ctx, 'שגיאה', CX + ox * (6 + amt * 22) * (1 + hr(f, i)), CY + oy * 8, 400, col));
+    ctx.restore(); }
+  else { const s = E.back(seg(lt, 2.2, 2.45)); ctx.save(); ctx.translate(CX, CY); ctx.scale(s, s); text(ctx, 'תוקן ✓', 0, 0, 340, C.white); ctx.restore(); }
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; for (let y = 0; y < VH; y += 6) ctx.fillRect(0, y, VW, 2);
+  if (amt && cv) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); const k = cv.width / VW * (cv._s || 1);
+    for (let i = 0; i < 8; i++) { const y = hr(f * 13 + i, 1) * cv.height, h = (10 + hr(f + i, 2) * 70) * k, dx = (hr(f + i * 7, 3) - .5) * 200 * k * amt;
+      ctx.drawImage(cv, 0, y, cv.width, h, dx, y, cv.width, h); } ctx.restore(); }
+};
+D.globe = (ctx, t) => {
+  bg(ctx, C.ink);
+  const R = 380, cy = CY, rot = t * .7;
+  ctx.strokeStyle = C.violet; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(CX, cy, R, 0, TAU); ctx.stroke();
+  const str = [...'סביב העולם · '].reverse();
+  for (let la = -3; la <= 3; la++) {
+    const lat = la * .36, rr = R * Math.cos(lat), y = cy + R * Math.sin(lat), size = 56 * Math.cos(lat) + 8;
+    ctx.font = font(size); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    const ws = str.map(ch => ctx.measureText(ch).width), total = ws.reduce((a, b) => a + b, 0), reps = Math.max(1, Math.round(TAU * rr / total)), sc = TAU * rr / (total * reps);
+    let a = rot * (la % 2 ? -1 : 1) + la;
+    for (let r = 0; r < reps; r++) for (let k = 0; k < str.length; k++) {
+      const da = ws[k] * sc / rr, am = a + da / 2; a += da; const z = Math.cos(am); if (str[k] === ' ') continue;
+      ctx.save(); ctx.translate(CX + Math.sin(am) * rr, y); ctx.scale(z, 1); ctx.globalAlpha = z > 0 ? 1 : .2; ctx.fillStyle = z > 0 ? (la % 2 ? C.orange : C.pink) : C.violet; ctx.fillText(str[k], 0, size * VC); ctx.restore();
+    }
+  }
+  ctx.globalAlpha = 1;
+};
+D.wave = (ctx, t) => {
+  bg(ctx, C.cream);
+  const cols = [C.violet, C.orange, C.pink, C.ink];
+  for (let e = 3; e >= 0; e--) {
+    glyphs(ctx, 'גל של אותיות', CX, CY, 230, cols[e], i => {
+      const ph = t * 3 - i * .45 - e * .18, y = Math.sin(ph) * 120, st = 1 + Math.cos(ph) * .25;
+      return e ? { dy: y, sy: st, sx: 1 / st, stroke: 4, color: cols[e], a: .9 - e * .2 } : { dy: y, sy: st, sx: 1 / st };
+    });
+  }
+};
+D.rows = (ctx, t) => {
+  bg(ctx, C.ink);
+  const rows = 7, rh = VH / rows;
+  for (let r = 0; r < rows; r++) {
+    const mid = r === 3, size = rh * (mid ? .86 : .74), dir = r % 2 ? 1 : -1, unit = 'טיפוגרפיה קינטית   ';
+    ctx.font = font(size); const uw = ctx.measureText(unit).width, off = frac(t * (260 + r * 25) * dir / uw) * uw, y = r * rh + rh / 2;
+    if (mid) { ctx.fillStyle = C.orange; ctx.fillRect(0, r * rh, VW, rh); }
+    for (let x = -uw; x < VW + uw * 2; x += uw) {
+      if (mid) text(ctx, unit, x + off, y, size, C.ink); else if (r % 2) text(ctx, unit, x + off, y, size, C.pink, 'center', 3); else text(ctx, unit, x + off, y, size, C.violet);
+    }
+  }
+};
+D.sun = (ctx, t) => {
+  bg(ctx, C.violet);
+  ctx.save(); ctx.translate(CX, CY); ctx.rotate(t * .15);
+  for (let i = 0; i < 18; i++) { ctx.save(); ctx.rotate(i / 18 * TAU); text(ctx, 'אור · שמש · ', 250, 0, 50, i % 2 ? C.pink : C.orange, 'left'); ctx.restore(); }
+  ctx.restore();
+  const R = 200 + beatPulse(t) * 16;
+  ctx.save(); ctx.beginPath(); ctx.arc(CX, CY, R, 0, TAU); ctx.clip(); ctx.fillStyle = C.orange; ctx.fillRect(CX - R, CY - R, R * 2, R * 2);
+  ctx.fillStyle = C.violet; for (let i = 0; i < 6; i++) ctx.fillRect(CX - R, CY + 20 + i * 34 + frac(t) * 34, R * 2, 3 + i * 3); ctx.restore();
+  ctx.fillStyle = C.sun; ctx.beginPath(); ctx.arc(CX, CY - 40, R * .45, 0, TAU); ctx.fill();
+};
+// principle mini-demos
+D.grid = (ctx, t) => {
+  bg(ctx, '#FFFFFF');
+  const col = VW / 12, cyc = BL * 4, step = Math.floor(t / cyc) % 4, lt = t % cyc;
+  const spans = [[0, 8], [4, 12], [2, 10], [6, 12]], [a0, b0] = spans[(step + 3) % 4], [a1, b1] = spans[step], p = E.back(seg(lt, 0, .6));
+  const a = lerp(a0, a1, p), b = lerp(b0, b1, p);
+  ctx.fillStyle = C.pink; ctx.globalAlpha = .35; ctx.fillRect(VW - b * col, 0, (b - a) * col, VH); ctx.globalAlpha = 1;
+  ctx.strokeStyle = C.violet; ctx.lineWidth = 2; ctx.globalAlpha = .35;
+  for (let i = 0; i <= 12; i++) { ctx.beginPath(); ctx.moveTo(i * col, 0); ctx.lineTo(i * col, VH); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  const x0 = VW - b * col, w = (b - a) * col, size = fit(ctx, 'גריד', w * .92, 520);
+  text(ctx, 'גריד', x0 + w / 2, CY - 40, size, C.ink);
+  ctx.fillStyle = C.orange; ctx.fillRect(x0, CY + size * .42, w, 14);
+  ctx.font = font(44); ctx.fillStyle = C.violet; ctx.textAlign = 'center'; ctx.direction = 'ltr';
+  ctx.fillText(`${Math.round(b - a)} / 12`, x0 + w / 2, VH - 70); ctx.direction = 'rtl';
+};
+D.scale = (ctx, t) => {
+  bg(ctx, C.cream);
+  const sizes = [380, 200, 110, 64], labels = ['כותרת ענק', 'משנה', 'שורת טקסט', 'כיתוב קטן'], cyc = BL * 2;
+  let y = 120; sizes.forEach((s, i) => {
+    const p = E.back(seg(t % (cyc * 4), i * .18, i * .18 + .5));
+    ctx.save(); ctx.translate(VW - 120, y + s * .5); ctx.scale(lerp(.3, 1, p), lerp(.3, 1, p)); ctx.globalAlpha = clamp(p * 2);
+    text(ctx, labels[i], 0, 0, s, i === 0 ? C.violet : C.ink, 'right'); ctx.restore();
+    ctx.globalAlpha = .7; ctx.font = font(40); ctx.fillStyle = C.orange; ctx.textAlign = 'left'; ctx.direction = 'ltr'; ctx.fillText(`${s}px`, 110, y + s * .5 + 14); ctx.direction = 'rtl';
+    y += s * .95 + 20;
+  });
+  ctx.globalAlpha = 1;
+};
+D.palette = (ctx, t) => {
+  const pals = [['בית', C.cream, C.ink, C.violet, C.orange], ['גשר', C.violet, C.cream, C.pink, C.orange], ['פזמון', C.pink, C.ink, C.violet, C.cream], ['סיום', C.ink, C.pink, C.orange, C.cream]];
+  const cyc = BL * 4, i = Math.floor(t / cyc) % 4, lt = t % cyc, P = pals[i], N = pals[(i + 1) % 4];
+  bg(ctx, P[1]);
+  [P[3], P[4]].forEach((c, k) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(k ? 330 : 1270, k ? 760 : 260, 150 + beatPulse(t) * 20, 0, TAU); ctx.fill(); });
+  text(ctx, P[0], CX, CY, 380, P[2]);
+  const p = seg(lt, cyc - .5, cyc);
+  [N[3], N[4], N[1]].forEach((c, k) => { const q = clamp(p * 1.4 - k * .1), lead = lerp(VW + 500, -700, E.io(q));
+    if (q > 0) { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(lead, -10); ctx.lineTo(VW + 600, -10); ctx.lineTo(VW + 1000, VH + 10); ctx.lineTo(lead + 400, VH + 10); ctx.fill(); } });
+};
+D.easing = (ctx, t) => {
+  bg(ctx, '#FFFFFF');
+  const lanes = [['לינארי', x => x], ['האטה', E.o3], ['קפיצה', E.back], ['אלסטי', E.elastic]], cyc = 2.4, p = clamp((t % cyc) / 1.4);
+  lanes.forEach(([name, f], i) => {
+    const y = 160 + i * 225;
+    ctx.strokeStyle = C.ink; ctx.globalAlpha = .12; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(1250, y); ctx.lineTo(260, y); ctx.stroke(); ctx.globalAlpha = 1;
+    text(ctx, name, VW - 60, y, 70, C.ink, 'right');
+    const x = lerp(1250, 260, f(p));
+    ctx.fillStyle = [C.violet, C.orange, C.pink, C.ink][i]; ctx.beginPath(); ctx.arc(x, y, 50, 0, TAU); ctx.fill();
+  });
+};
+D.beat = (ctx, t) => {
+  bg(ctx, C.ink);
+  const words = ['אחת', 'שתיים', 'שלוש', 'ארבע'], b = Math.floor(t / BL), lt = t % BL, p = E.o5(seg(lt, 0, .25));
+  const s = lerp(1.7, 1, p) * (1 + beatPulse(t) * .04);
+  ctx.save(); ctx.translate(CX, CY - 60); ctx.scale(s, s); text(ctx, words[b % 4], 0, 0, 340, b % 4 === 0 ? C.orange : C.pink); ctx.restore();
+  for (let i = 0; i < 4; i++) { ctx.fillStyle = i === b % 4 ? C.orange : '#ffffff30'; ctx.beginPath(); ctx.arc(CX + 165 - i * 110, VH - 170, 26 + (i === b % 4 ? beatPulse(t) * 14 : 0), 0, TAU); ctx.fill(); }
+  ctx.strokeStyle = C.violet; ctx.lineWidth = 6; ctx.beginPath();
+  for (let x = 0; x <= VW; x += 8) { const tt = t - (VW - x) / 900, k = Math.pow(1 - frac(tt / BL), 6); const y = VH - 70 - k * 60 * Math.abs(Math.sin(x * .3)); x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.stroke();
+};
+D.stagger = (ctx, t) => {
+  bg(ctx, C.cream);
+  const cyc = 2.6, lt = t % cyc;
+  ctx.fillStyle = C.ink; ctx.globalAlpha = .1; ctx.fillRect(0, CY - 2, VW, 4); ctx.globalAlpha = 1;
+  text(ctx, 'בבת אחת', VW - 70, 120, 56, C.violet, 'right'); text(ctx, 'מדורג', VW - 70, CY + 120, 56, C.orange, 'right');
+  glyphs(ctx, 'כוריאוגרפיה', CX, CY - 220, 190, C.ink, () => { const p = E.back(seg(lt, .1, .6)); return { dy: (1 - p) * 140, a: clamp(p * 2) }; });
+  glyphs(ctx, 'כוריאוגרפיה', CX, CY + 260, 190, C.ink, i => { const p = E.back(seg(lt, .1 + i * .06, .6 + i * .06)); return { dy: (1 - p) * 140, a: clamp(p * 2), r: (1 - p) * .4 }; });
+};
+
+const GALLERY = [
+  { id: 'tunnel', t: 'מנהרת טקסט', wide: true, chips: ['טבעות בעומק', 'פרספקטיבה', 'לולאה אינסופית'], p: 'צור מנהרת טקסט: טבעות של המילה "מושן" שנעות לעומק המסך בפרספקטיבה, כל טבעת מסתובבת לכיוון אחר, וטבעת אחת מכל שתיים צבועה בוורוד. המרכז זז קלות כדי ליצור עיקול.' },
+  { id: 'ribbon', t: 'טקסט על סרטים', chips: ['טקסט על נתיב', 'מילת ענק'], p: 'צור שני סרטים סגולים עבים שמתפתלים בלולאות לרוחב המסך, ועליהם טקסט בשמנת שזורם לאורכם. מאחוריהם מילת ענק בוורוד שתופסת 80% מהרוחב.' },
+  { id: 'explode', t: 'פיצוץ מילים', chips: ['תלת-ממד מזויף', 'חלקיקים'], p: 'צור פיצוץ מילים: עשרות מילים בוורוד על רקע כתום עפות לעבר המצלמה בעומק, עם סיבוב והטיה שונים לכל מילה. באמצע מילה ראשית שנוחתת עם קו מתאר בצבע הרקע.' },
+  { id: 'extrude', t: 'אקסטרוד וקפיצה', chips: ['תלת-ממד', 'squash & stretch'], p: 'צור מילה אחת ענקית עם עומק תלת-ממדי (אקסטרוד) בסגול, שנוחתת כל שתי פעמות עם מעיכה ומתיחה אלסטית. זווית העומק מסתובבת לאט.' },
+  { id: 'snap', t: 'סדר מתוך כאוס', chips: ['פיזור', 'הצמדה לגריד'], p: 'צור אנימציה שבה אותיות מפוזרות ומסובבות על כל המסך נצמדות למקומן בשורה, אחת אחרי השנייה, עם קפיצה קטנה. אחרי ההצמדה נמתחים קווי גריד כתומים.' },
+  { id: 'glitch', t: 'גליץ\' דיגיטלי', chips: ['RGB split', 'פרוסות'], p: 'צור אפקט גליץ\': המילה מתפצלת לשלושה ערוצי צבע (אדום, ירוק, כחול) שזזים זה מזה, עם פסי סריקה ופרוסות אופקיות שקופצות הצידה. אחרי 2 שניות הכל מתייצב לטקסט נקי.' },
+  { id: 'globe', t: 'כדור טקסט', chips: ['קווי רוחב', 'סיבוב'], p: 'צור כדור שמסתובב, עשוי מטקסט שעוטף אותו בקווי רוחב. אותיות בצד האחורי שקופות יותר, וכל קו רוחב מסתובב לכיוון הפוך מזה שלידו.' },
+  { id: 'wave', t: 'גל של אותיות', chips: ['סינוס', 'הדים'], p: 'צור שורת טקסט שבה כל אות עולה ויורדת בגל, עם מתיחה כשהיא למעלה. מאחוריה שלושה הדים במתאר צבעוני שמאחרים מעט אחריה.' },
+  { id: 'rows', t: 'שורות רצות', wide: true, chips: ['מרקיזה', 'מילוי ומתאר'], p: 'צור 7 שורות של אותו טקסט שרצות לרוחב, כל שורה לכיוון הפוך מהשורה שלידה. השורות מתחלפות בין מילוי למתאר, והשורה האמצעית מודגשת על רקע כתום.' },
+  { id: 'sun', t: 'שמש של מילים', chips: ['קרניים', 'סיבוב'], p: 'צור שמש כתומה עם פסים אופקיים בתחתית, וסביבה קרניים שעשויות מטקסט ומסתובבות לאט. השמש פועמת קלות עם הקצב.' }
+];
+
+/* ---------- stage runner: animate only what's visible ---------- */
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const stages = [];
+function makeStage(cv, id, mode = 'fit') {
+  const ctx = cv.getContext('2d');
+  const st = { cv, ctx, id, visible: false, t0: performance.now() / 1000, mode };
+  st.resize = () => { const r = cv.getBoundingClientRect(), big = id === 'hero' || id === 'pg' || id === 'reel' || cv.id === 'dlgCanvas', dpr = Math.min(big ? 2 : 1.5, devicePixelRatio || 1);
+    let w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr)); const cap = big ? 2200 : 1100; if (w > cap) { h = Math.round(h * cap / w); w = cap; } if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } };
+  st.draw = (t) => { const w = cv.width, h = cv.height, s = mode === 'cover' ? Math.max(w / VW, h / VH) : Math.min(w / VW, h / VH);
+    cv._s = 1; ctx.setTransform(s, 0, 0, s, (w - VW * s) / 2, (h - VH * s) / 2); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.direction = 'rtl';
+    try { D[id](ctx, t, cv); } catch (e) { console.error(id, e); } };
+  stages.push(st); return st;
+}
+const io = new IntersectionObserver(es => es.forEach(e => { const st = stages.find(s => s.cv === e.target); if (st) st.visible = e.isIntersecting; }), { rootMargin: '120px' });
+const ro = new ResizeObserver(es => es.forEach(e => { const st = stages.find(s => s.cv === e.target); if (st) { st.resize(); st.draw(reduce ? 1.4 : performance.now() / 1000 - st.t0); } }));
+function register(st) { io.observe(st.cv); ro.observe(st.cv); }
+let last = 0;
+function frame(now) {
+  if (now - last > 30) { last = now; const t = now / 1000; for (const st of stages) if (st.visible && !document.hidden) st.draw(t - st.t0); }
+  if (!reduce) requestAnimationFrame(frame);
+}
+
+/* ---------- gallery ---------- */
+const ggrid = document.getElementById('ggrid');
+GALLERY.forEach(g => {
+  const el = document.createElement('article'); el.className = 'gcard' + (g.wide ? ' wide' : '');
+  el.innerHTML = `<div class="demo" tabindex="0" role="button" aria-label="פתיחה בגדול: ${g.t}"><canvas role="img" aria-label="${g.t}"></canvas>
+    <span class="expand" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6"/></svg></span></div>
+    <div class="gmeta"><div><h3>${g.t}</h3><div class="chips">${g.chips.map(c => `<span>${c}</span>`).join('')}</div></div>
+    <button class="copy" type="button" data-prompt="${g.id}">העתקת פרומפט</button></div>`;
+  ggrid.appendChild(el);
+  const st = makeStage(el.querySelector('canvas'), g.id); register(st);
+  const demo = el.querySelector('.demo');
+  demo.addEventListener('click', () => openModal(g)); demo.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(g); } });
+});
+document.querySelectorAll('canvas[data-demo]').forEach(cv => register(makeStage(cv, cv.dataset.demo, cv.dataset.demo === 'hero' || cv.dataset.demo === 'reel' ? 'cover' : 'fit')));
+
+/* ---------- modal ---------- */
+const dlg = document.getElementById('dlg'), dlgCv = document.getElementById('dlgCanvas');
+const dlgStage = makeStage(dlgCv, 'tunnel');
+function openModal(g) { dlgStage.id = g.id; document.getElementById('dlgTitle').textContent = g.t; dlg.showModal(); dlgStage.visible = true; dlgStage.resize(); dlgStage.draw(1.4); }
+document.getElementById('dlgClose').onclick = () => dlg.close();
+dlg.addEventListener('close', () => { dlgStage.visible = false; });
+dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+new ResizeObserver(() => { if (dlg.open) dlgStage.resize(); }).observe(dlgCv);
+
+/* ---------- copy ---------- */
+const toast = msg => { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2200); };
+// copies inside the click; works where the Clipboard API is blocked by the viewer's permissions policy
+function writeClip(str) {
+  let ok = false;
+  try { const ta = document.createElement('textarea'); ta.value = str; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    const prev = document.activeElement, host = document.querySelector('dialog[open]') || document.body; host.appendChild(ta); ta.select(); ta.setSelectionRange(0, str.length); ok = document.execCommand('copy'); ta.remove(); if (prev && prev.focus) prev.focus({ preventScroll: true }); } catch (e) { ok = false; }
+  if (ok) return Promise.resolve();
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(str);
+  return Promise.reject(new Error('clipboard unavailable'));
+}
+function copyText(str, btn) {
+  const done = () => { btn.classList.add('done'); const o = btn.textContent; btn.textContent = 'הועתק ✓'; toast('הועתק. הדביקו ב-Claude Code'); setTimeout(() => { btn.classList.remove('done'); btn.textContent = o; }, 1600); };
+  writeClip(str).then(done, () => fallback());
+  function fallback() { const pre = btn.closest('.prompt')?.querySelector('pre'); if (pre) { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('הטקסט מסומן. העתיקו עם Ctrl+C'); } else toast('ההעתקה לא זמינה כאן'); }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  if (b.dataset.prompt) { const g = GALLERY.find(x => x.id === b.dataset.prompt); copyText(g.p, b); return; }
+  const pre = b.closest('.prompt')?.querySelector('pre'); if (pre) copyText(pre.innerText.trim(), b);
+});
+
+/* ---------- prompt builder ---------- */
+const B = {
+  format: { type: 'radio', opts: [['16:9', 'מסך רחב 16:9'], ['9:16', 'סטורי 9:16'], ['1:1', 'פוסט 1:1']], val: '16:9' },
+  length: { type: 'radio', opts: [['15', '15 שניות'], ['30', '30 שניות'], ['60', 'דקה'], ['song', 'כל השיר']], val: 'song' },
+  style: { type: 'radio', opts: [['bold', 'קינטי ונועז'], ['swiss', 'שוויצרי נקי'], ['retro', 'רטרו חם'], ['digital', 'דיגיטלי וגליצ\'י']], val: 'bold' },
+  fx: { type: 'check', opts: [['ribbon', 'טקסט על סרטים'], ['tunnel', 'מנהרת טקסט'], ['explode', 'פיצוץ מילים'], ['extrude', 'אקסטרוד 3D'], ['snap', 'הצמדה לגריד'], ['glitch', 'גליץ\''], ['globe', 'כדור טקסט'], ['wave', 'גל אותיות'], ['rows', 'שורות רצות']], val: ['ribbon', 'tunnel', 'explode'] },
+  pal: { type: 'radio', opts: [['brand', 'סגול · ורוד · כתום', [C.violet, C.pink, C.orange, C.cream]], ['mono', 'שחור · לבן · כתום', [C.black, C.white, C.orange, '#888']], ['sun', 'צהוב · כחול · אדום', [C.sun, '#1F3BFF', '#E8322B', '#F6F1E6']], ['mint', 'מנטה · נייבי · אפרסק', ['#9FE6C9', '#14204A', '#FFB38A', '#F4F1EC']]], val: 'brand' },
+  mat: { type: 'check', opts: [['audio', 'קובץ שמע'], ['font', 'קובץ פונט'], ['refs', 'רפרנסים'], ['times', 'זמני שורות']], val: ['audio', 'font', 'refs'] },
+  steps: { type: 'check', opts: [['sheet', 'גיליון פריימים'], ['live', 'תצוגה חיה בדפדפן']], val: ['sheet', 'live'] }
+};
+const fxText = { ribbon: 'טקסט שזורם על סרטים מתפתלים', tunnel: 'מנהרת טקסט בעומק', explode: 'פיצוץ מילים לעבר המצלמה', extrude: 'מילים עם עומק תלת-ממדי ונחיתה אלסטית', snap: 'אותיות מפוזרות שנצמדות לגריד', glitch: 'גליץ\' עם פיצול ערוצי צבע', globe: 'כדור שעשוי מטקסט', wave: 'גל של אותיות עם הדים', rows: 'שורות טקסט רצות בכיוונים מנוגדים' };
+const styleText = { bold: 'טיפוגרפיה קינטית נועזת: מילים ענקיות, ניגודים חדים וכניסות מהירות על הפעמה', swiss: 'שוויצרי נקי: גריד קפדני, הרבה שטח לבן, תנועות מדויקות עם האטה', retro: 'רטרו חם: צורות מעוגלות, גרעין עדין ותנועות קפיציות', digital: 'דיגיטלי: גליצ\'ים, פסי סריקה, פיקסלים ומעברים חדים' };
+const fmtText = { '16:9': '1920×1080 (מסך רחב)', '9:16': '1080×1920 (סטורי לאורך)', '1:1': '1080×1080 (פוסט מרובע)' };
+const lenText = { '15': '15 שניות', '30': '30 שניות', '60': 'דקה אחת', song: 'כל אורך השיר' };
+const matText = { audio: 'קובץ שמע: זהה ממנו BPM ופעמות, וסנכרן אליהם את התנועה', font: 'קובץ פונט: השתמש רק בו, ובדוק שהוא תומך בעברית', refs: 'רפרנסים: התייחס לסגנון התנועה והטיפוגרפיה שבהם', times: 'זמני שורות: כל שורה נכנסת בדיוק בזמן שלה' };
+Object.entries(B).forEach(([key, f]) => {
+  const box = document.getElementById('b-' + key);
+  f.opts.forEach(([v, label, sw]) => {
+    const id = `b-${key}-${v}`, lab = document.createElement('label'); lab.className = 'opt';
+    lab.innerHTML = `<input type="${f.type === 'radio' ? 'radio' : 'checkbox'}" id="${id}" name="b-${key}" value="${v}"><span>${sw ? `<span class="sw" aria-hidden="true">${sw.map(c => `<i style="background:${c}"></i>`).join('')}</span>` : ''}${label}</span>`;
+    const inp = lab.querySelector('input'); inp.checked = f.type === 'radio' ? f.val === v : f.val.includes(v);
+    box.appendChild(lab);
+  });
+});
+function vals(key) { return [...document.querySelectorAll(`input[name="b-${key}"]:checked`)].map(i => i.value); }
+const DIR = {
+  'הצוות והאדם שמוקדש לו הסרטון': 'קהל פנימי ואישי: מותר הומור פנימי ופרטים שרק הצוות מכיר. הסרטון צריך להרגיש תפור לאדם אחד.',
+  'משפחה וחברים קרובים': 'קהל קרוב: חום, אינטימיות ורגעים אישיים. פחות פרסומת, יותר מכתב אהבה בתנועה.',
+  'קהל רחב ברשתות': 'קהל ברשתות: 3 השניות הראשונות חייבות לעצור את הגלילה, וכל טקסט קריא גם בלי סאונד.',
+  'לקוחות פוטנציאליים ברשתות': 'לקוחות ברשתות: 3 השניות הראשונות חייבות לעצור את הגלילה, והמסר העיקרי מופיע עד השנייה החמישית. כל טקסט קריא גם בלי סאונד.',
+  'קהל באירוע, על מסך גדול': 'מסך גדול באולם: טקסט שקריא מהשורה האחרונה, תנועות רחבות, ובלי פרטים קטנים שהולכים לאיבוד.',
+  'קהל באירוע או בכנס': 'מסך גדול באולם: טקסט שקריא מהשורה האחרונה, תנועות רחבות, ובלי פרטים קטנים שהולכים לאיבוד.',
+  'הצוות והשותפים בחברה': 'קהל פנימי: גאווה ושייכות. אפשר יותר תוכן ופחות מכירה.',
+  'קבוצה קטנה ואישית': 'קהל קטן ואישי: אפשר להיות ספציפי, מפתיע ואינטימי.',
+  'מרגש וחם': 'תנועה רכה: האטות ארוכות (ease-out), נשימה בין שורות, ושיא שנבנה בהדרגה. פלטה חמה.',
+  'אנרגטי ומצחיק': 'תנועה אנרגטית: כניסות על כל פעמה, קפיצות אלסטיות ו-squash & stretch, מעברים חדים, ותזמון קומי עם הפסקה קצרה לפני כל פאנץ׳.',
+  'יוקרתי ומדויק': 'תנועה מאופקת: תנועות איטיות ומדויקות, הרבה שטח ריק, חשיפות במסכה במקום קפיצות, ולכל היותר שני צבעים פעילים בכל רגע.',
+  'מילות השיר, שורה אחרי שורה': 'כל שורה בשיר היא סצנה עם טיפול משלה, והמילה המרכזית בה בגודל ענק. המילים נכנסות בדיוק בזמן השירה.',
+  'שם או מסר אחד שחוזר': 'מוטיב חוזר: השם או המסר מופיעים שוב ושוב, כל פעם בטיפול אחר, ומקבלים את הרגע הגדול בסרטון.',
+  'הקצב והמוזיקה עצמה': 'הגרפיקה היא ויזואליזציה של המוזיקה: כל המסך פועם עם התופים, וצורות מגיבות לעוצמה.',
+  'המוצר והיתרון שלו': 'היתרון המרכזי מנוסח במשפט אחד קצר, ומקבל את הטיפול הטיפוגרפי החזק בסרטון.',
+  'הלוגו והמותג': 'צבעי המותג דומיננטיים לאורך כל הסרטון, והלוגו נבנה בהדרגה מאלמנטים שמופיעים קודם.',
+  'מסר אחד חד': 'מסר אחד קצר שכל הסרטון בנוי סביבו. כל השאר משרת אותו.',
+  'רצף של רעיונות קצרים': 'רצף מהיר של רעיונות קצרים, אחד כל 2–3 שניות, עם מעבר אחיד ביניהם.',
+  'רגע שיא מרגש עם השם או המסר': 'סיום בשיא: עצירה קצרה, ואז השם או המסר בגודל מלא עם התנועה הגדולה בסרטון, והחזקה של 2 שניות.',
+  'חיוך: סיום שובב ומפתיע': 'סיום עם טוויסט קטן ומחייך, ששובר את התבנית של הסרטון ברגע האחרון.',
+  'קריאה לפעולה: לשתף, להגיב, להירשם': 'קריאה לפעולה ברורה בשנייה האחרונה, בטקסט גדול, שמוחזקת לפחות 3 שניות.',
+  'קריאה לפעולה: קישור או הרשמה': 'קריאה לפעולה ברורה בשנייה האחרונה, בטקסט גדול, שמוחזקת לפחות 3 שניות.',
+  'חשיפת לוגו נקייה': 'חשיפת לוגו נקייה על רקע שקט, בלי אפקטים שמתחרים בו.',
+  'משפט מחץ שנשאר': 'משפט מחץ אחד שנכנס לבד, במסך שקט.'
+};
+const ansText = a => a ? (a.other ? a.other : a.label) : null;
+const ansDir = a => a ? (a.other ? `לפי מה שכתבתי: "${a.other}". תתרגם את זה להחלטות עיצוב ותנועה.` : DIR[a.label]) : null;
+function composePrompt(A = {}) {
+  const topic = document.getElementById('b-topic').value.trim() || 'סרטון טיפוגרפיה קינטית';
+  const fx = vals('fx'), mat = vals('mat'), steps = vals('steps'), pal = B.pal.opts.find(o => o[0] === vals('pal')[0]), fmt = vals('format')[0];
+  const music = /שיר|מוזיק|שמע|קצב|מילים/.test(topic) || mat.includes('audio');
+  const social = /רשתות/.test(ansText(A.aud) || '') || fmt === '9:16';
+  let s = `אני רוצה סרטון מושן גרפיקס בטיפוגרפיה קינטית, שנבנה כקוד (HTML ו-JavaScript) ומרונדר ל-MP4.\n`;
+  s += `\n## ההקשר\nנושא: ${topic}\n`;
+  if (A.aud) s += `קהל: ${ansText(A.aud)}\n`;
+  if (A.feel) s += `התחושה שהצופים צריכים לקבל: ${ansText(A.feel)}\n`;
+  if (A.star) s += `הכוכב של הסרטון: ${ansText(A.star)}\n`;
+  if (A.end) s += `הסיום: ${ansText(A.end)}\n`;
+  s += `\n## מפרט טכני\nפורמט: ${fmtText[fmt]}, 30 פריימים לשנייה\nאורך: ${lenText[vals('length')[0]]}\n`;
+  s += `\n## כיוון עיצובי\nסגנון: ${styleText[vals('style')[0]]}.\nפלטה: ${pal[1]}. תן לכל חלק בסרטון שילוב משלו מתוך הפלטה.\n`;
+  s += `גריד: 12 עמודות עם שוליים בטוחים. כל אלמנט נוחת על קו עמודה.\nטיפוגרפיה: מילה מרכזית ענקית בכל סצנה, והשאר קטן ממנה פי 3 לפחות. עברית מימין לשמאל.\n`;
+  s += `${ansDir(A.feel) || 'תנועה: כניסות על הפעמה עם האטה בסוף, דירוג של 40ms בין אותיות, ומעברים צבעוניים בין חלקים.'}\n`;
+  const notes = topicNotes(topic, fmt).filter(n => !(A.feel && /^האווירה|^קהל צעיר/.test(n)) && !(A.aud && /^יוצג על מסך גדול|^נראה שהסרטון מיועד לטלפון/.test(n)) && !(A.end && /^יש מותג/.test(n) && !/לוגו/.test(ansText(A.end) || '')));
+  const story = [ansDir(A.star), ansDir(A.end), ansDir(A.aud), ...notes].filter(Boolean);
+  if (story.length) s += `\n## מבנה וסיפור\n${story.map(x => '• ' + x).join('\n')}\n`;
+  if (fx.length) s += `\n## אפקטים\n${fx.map(f => '• ' + fxText[f]).join('\n')}\n`;
+  if (mat.length) s += `\n## מצורפים לשיחה\n${mat.map(m => '• ' + matText[m]).join('\n')}\n`;
+  const ok = [];
+  if (social) ok.push('המסר מובן בצפייה אחת, גם בלי סאונד');
+  if (music) ok.push('כל תנועה מרכזית נוחתת על פעמה');
+  if (A.star) ok.push(A.star.other ? `מה שנשאר בזיכרון אחרי צפייה אחת: "${A.star.other}"` : `הכוכב של הסרטון (${A.star.label}) הוא מה שזוכרים אחרי צפייה אחת`);
+  ok.push('אין טקסט חתוך, חופף או לא קריא באף פריים');
+  s += `\n## איך נדע שהצלחנו\n${ok.map(x => '• ' + x).join('\n')}\n`;
+  const st = [];
+  if (steps.includes('sheet')) st.push('גיליון פריימים: פריים כל 2 שניות, עם מספר וזמן');
+  if (steps.includes('live')) st.push('תצוגה חיה בדפדפן עם סאונד');
+  st.push('לפני הרינדור: עבור על הכל בביקורת בונה, מצא באגים ודברים לשיפור, ותקן אותם');
+  st.push('רינדור ל-MP4 עם הסאונד, ובדיקה של 4 פריימים מהקובץ הסופי');
+  s += `\n## תהליך עבודה, עם עצירה לאישור שלי אחרי כל שלב\n${st.map((x, i) => `${i + 1}. ${x}`).join('\n')}\n`;
+  s += `\nאם חסר לך משהו כדי להתחיל, תשאל אותי לפני שאתה בונה.`;
+  return s;
+}
+function topicNotes(t, fmt) {
+  const n = [];
+  if (/שיר|מוזיק|שמע|קצב|מילים/.test(t)) n.push('יש מוזיקה: זהה BPM ופעמות, וסנכרן כל כניסה של מילה לפעמה.');
+  if (/הוקרה|תודה|יום הולדת|חגיג|מסיבה|פרידה|ברכה/.test(t)) n.push('האווירה חגיגית ומרגשת: צבעים חמים, תנועות קופצניות, וסיום עם רגע שיא.');
+  if (/לוגו|מותג|חברה|מוצר|השקה/.test(t)) n.push('יש מותג: סיים בחשיפת לוגו נקייה, ושמור על צבעי המותג דומיננטיים.');
+  if (/כנס|הרצאה|מצגת|אירוע|מסך גדול/.test(t)) n.push('יוצג על מסך גדול: טקסטים גדולים שקריאים מרחוק, ותנועות לא מהירות מדי.');
+  if (/סטורי|אינסטגרם|טיקטוק|רילס|טלפון/.test(t) && fmt !== '9:16') n.push('נראה שהסרטון מיועד לטלפון: שקול פורמט 9:16.');
+  if (/ילד|משפחה|גן|בית ספר/.test(t)) n.push('קהל צעיר: צורות מעוגלות, צבעים בהירים ותנועה שובבה.');
+  return n;
+}
+(() => {
+  const form = document.getElementById('bform'), ta = document.getElementById('b-topic'), send = document.getElementById('b-send');
+  const box = document.getElementById('genBox'), outPre = document.getElementById('b-out'), status = document.getElementById('genStatus'), line = document.getElementById('genLine');
+  const copyBtn = document.getElementById('b-copy'), stale = document.getElementById('genStale'), title = document.getElementById('genTitle'), outEl = document.getElementById('out');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const grow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(140, ta.scrollHeight) + 'px'; };
+  ta.addEventListener('input', grow); grow();
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit ? form.requestSubmit(send) : run(); } });
+  let busy = false, done = false, runId = 0;
+  form.addEventListener('input', e => { if (done && e.target !== ta) stale.hidden = false; });
+  ta.addEventListener('input', () => { if (done) stale.hidden = false; });
+  const wait = ms => new Promise(r => setTimeout(r, still ? 0 : ms));
+
+  // ---- discovery questions (floating dialog) ----
+  const QS = topic => {
+    const music = /שיר|מוזיק|מילים|קצב/.test(topic), honor = /הוקרה|תודה|יום הולדת|פרידה|ברכה|מנהל|חתונה|בר מצווה|בת מצווה/.test(topic), brand = /לוגו|מותג|מוצר|השקה|חברה|עסק|לקוח/.test(topic);
+    return [
+      { id: 'aud', q: 'מי יצפה בסרטון?', why: 'כך נדע למי אנחנו מדברים, ואיפה הוא יוצג', opts: honor ? ['הצוות והאדם שמוקדש לו הסרטון', 'משפחה וחברים קרובים', 'קהל רחב ברשתות'] : brand ? ['לקוחות פוטנציאליים ברשתות', 'קהל באירוע או בכנס', 'הצוות והשותפים בחברה'] : ['קהל רחב ברשתות', 'קהל באירוע, על מסך גדול', 'קבוצה קטנה ואישית'] },
+      { id: 'feel', q: 'איזו תחושה הצופים צריכים לקבל?', why: 'התחושה קובעת את הקצב, את סוג התנועה ואת הצבעים', opts: ['מרגש וחם', 'אנרגטי ומצחיק', 'יוקרתי ומדויק'] },
+      { id: 'star', q: 'מה הכוכב של הסרטון?', why: 'הדבר האחד שהצופים צריכים לזכור', opts: music ? ['מילות השיר, שורה אחרי שורה', 'שם או מסר אחד שחוזר', 'הקצב והמוזיקה עצמה'] : brand ? ['המוצר והיתרון שלו', 'הלוגו והמותג', 'מסר אחד חד'] : ['מסר אחד חד', 'שם או מסר אחד שחוזר', 'רצף של רעיונות קצרים'] },
+      { id: 'end', q: 'מה צריך לקרות בסוף?', why: 'השנייה האחרונה היא מה שנשאר בזיכרון', opts: brand ? ['חשיפת לוגו נקייה', 'קריאה לפעולה: קישור או הרשמה', 'משפט מחץ שנשאר'] : ['רגע שיא מרגש עם השם או המסר', 'חיוך: סיום שובב ומפתיע', 'קריאה לפעולה: לשתף, להגיב, להירשם'] }
+    ];
+  };
+  const qd = document.getElementById('qd'), qf = document.getElementById('qdForm'), qOpts = document.getElementById('qdOpts'), qOther = document.getElementById('qdOther'), qOtherWrap = document.getElementById('qdOtherWrap');
+  const qNext = document.getElementById('qdNext'), qBack = document.getElementById('qdBack'), qBody = document.getElementById('qdBody');
+  let lastAnswers = {};
+  function ask(topic, prev) {
+    return new Promise(resolve => {
+      const qs = QS(topic), ans = {}; let i = 0, finished = false;
+      qs.forEach(q => { const p = prev && prev[q.id]; if (p && (p.other || q.opts.includes(p.label))) ans[q.id] = p; });
+      document.getElementById('qdSub').textContent = topic ? `על "${topic.length > 46 ? topic.slice(0, 46) + '…' : topic}"` : 'ארבע שאלות קצרות, כדי שהבריף יתאים בדיוק לך';
+      const valid = () => { const c = qf.querySelector('input[name=qa]:checked'); return c && (c.value !== 'other' || qOther.value.trim()); };
+      const sync = () => { qNext.disabled = !valid(); const c = qf.querySelector('input[name=qa]:checked'); qOtherWrap.hidden = !(c && c.value === 'other'); };
+      function show() {
+        const q = qs[i];
+        document.getElementById('qdStep').textContent = `שאלה ${i + 1} מתוך ${qs.length}`;
+        document.getElementById('qdTitle').textContent = q.q; document.getElementById('qdWhy').textContent = q.why;
+        document.getElementById('qdBar').style.width = `${(i / qs.length) * 100}%`;
+        qOpts.innerHTML = '';
+        [...q.opts, 'אחר: אכתוב בעצמי'].forEach((o, k) => {
+          const lab = document.createElement('label'); lab.className = 'qd-opt';
+          lab.innerHTML = `<input type="radio" name="qa" id="qa-${k}" value="${k < 3 ? k : 'other'}"><span><kbd>${k + 1}</kbd>${o}</span>`; qOpts.appendChild(lab);
+        });
+        const p = ans[q.id]; qOther.value = p && p.other ? p.other : '';
+        if (p) { const k = p.other ? 3 : q.opts.indexOf(p.label); const inp = qOpts.querySelectorAll('input')[k]; if (inp) inp.checked = true; }
+        qBack.hidden = i === 0; qNext.textContent = i === qs.length - 1 ? 'יצירת הבריף ✦' : 'הבא';
+        qBody.classList.remove('in'); void qBody.offsetWidth; qBody.classList.add('in'); sync();
+        const first = qOpts.querySelector('input:checked') || qOpts.querySelector('input'); setTimeout(() => (qOtherWrap.hidden ? first : qOther).focus({ preventScroll: true }), 30);
+      }
+      function record() { const c = qf.querySelector('input[name=qa]:checked'); if (!c) return; const q = qs[i];
+        ans[q.id] = c.value === 'other' ? { other: qOther.value.trim() } : { label: q.opts[+c.value] }; }
+      function finish(result) { if (finished) return; finished = true; cleanup(); if (qd.open) qd.close(); resolve(result); }
+      function next() { if (!valid()) return; record(); if (i < qs.length - 1) { i++; show(); } else { document.getElementById('qdBar').style.width = '100%'; finish(ans); } }
+      const onSubmit = e => { e.preventDefault(); next(); };
+      const onInput = () => sync();
+      const onChange = e => { sync(); if (e.target.name === 'qa' && e.target.value === 'other') setTimeout(() => qOther.focus(), 20); };
+      const onKey = e => {
+        if (e.target === qOther) { if (e.key === 'Enter') { e.preventDefault(); next(); } return; }
+        if (/^[1-4]$/.test(e.key)) { const inp = qOpts.querySelectorAll('input')[+e.key - 1]; if (inp) { inp.checked = true; inp.dispatchEvent(new Event('change', { bubbles: true })); inp.focus(); if (e.key !== '4') setTimeout(next, 160); } }
+        else if (e.key === 'Enter' && e.target.name === 'qa') { e.preventDefault(); next(); }
+      };
+      const onCancel = e => { e.preventDefault(); finish(null); };
+      const onClose = () => finish(null);
+      const onBack = () => { if (i > 0) { record(); i--; show(); } };
+      const onSkip = () => { delete ans[qs[i].id]; if (i < qs.length - 1) { i++; show(); } else finish(ans); };
+      const onBackdrop = e => { if (e.target === qd) finish(null); };
+      function cleanup() { qf.removeEventListener('submit', onSubmit); qf.removeEventListener('input', onInput); qf.removeEventListener('change', onChange); qf.removeEventListener('keydown', onKey);
+        qd.removeEventListener('cancel', onCancel); document.getElementById('qdClose').removeEventListener('click', onClose); qBack.removeEventListener('click', onBack); document.getElementById('qdSkip').removeEventListener('click', onSkip); qd.removeEventListener('click', onBackdrop); }
+      qf.addEventListener('submit', onSubmit); qf.addEventListener('input', onInput); qf.addEventListener('change', onChange); qf.addEventListener('keydown', onKey);
+      qd.addEventListener('cancel', onCancel); document.getElementById('qdClose').addEventListener('click', onClose); qBack.addEventListener('click', onBack); document.getElementById('qdSkip').addEventListener('click', onSkip); qd.addEventListener('click', onBackdrop);
+      show(); qd.showModal();
+    });
+  }
+  async function run() {
+    if (busy) return; busy = true; const id = ++runId;
+    const topic = ta.value.trim(), fx = vals('fx'), music = /שיר|מוזיק|שמע|קצב/.test(topic) || vals('mat').includes('audio');
+    const prevState = box.dataset.state, prevText = outPre.textContent, prevTitle = title.textContent;
+    send.setAttribute('aria-busy', 'true'); copyBtn.disabled = true; stale.hidden = true; done = false;
+    box.dataset.state = 'thinking'; status.hidden = false; title.textContent = 'הבריף שלך';
+    if (matchMedia('(max-width: 999px)').matches) outEl.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    const say = async (l, ms = 520) => { line.textContent = l; line.classList.remove('in'); void line.offsetWidth; line.classList.add('in'); await wait(ms); };
+    await say(topic ? 'קורא את מה שכתבת…' : 'לא כתבת נושא, אז נבנה יחד מההתחלה…', 650); if (id !== runId) return;
+    await say('יש לי כמה שאלות כדי לדייק…', 450); if (id !== runId) return;
+    const A = await ask(topic, lastAnswers);
+    if (!A) { // cancelled: restore what was there
+      box.dataset.state = prevState; outPre.textContent = prevText; title.textContent = prevTitle; status.hidden = true;
+      copyBtn.disabled = prevState !== 'done'; done = prevState === 'done'; send.removeAttribute('aria-busy'); busy = false; ta.focus(); toast('השאלות נסגרו. אפשר לשלוח שוב בכל רגע'); return;
+    }
+    lastAnswers = A;
+    const feel = A.feel ? (A.feel.other || A.feel.label) : null, aud = A.aud ? (A.aud.other || A.aud.label) : null;
+    const lines = ['מעבד את התשובות שלך…',
+      feel ? `מתרגם "${feel}" לקצב, תנועה וצבע…` : (music ? 'מתכנן סנכרון לפעמות של המוזיקה…' : 'בוחר גריד וסולם טיפוגרפי…'),
+      aud ? 'מתאים את הבריף לקהל שבחרת…' : (fx.length ? `מתאים ${fx.length === 1 ? 'אפקט אחד' : fx.length + ' אפקטים'} לסגנון שבחרת…` : 'בוחר אפקטים שמתאימים לסגנון…'),
+      'מגדיר איך נדע שהצלחנו…', 'כותב בריף מותאם אישית…'];
+    for (const l of lines) { await say(l, 480); if (id !== runId) return; }
+    const text = composePrompt(A);
+    box.dataset.state = 'writing'; status.hidden = true; outPre.textContent = '';
+    const caret = document.createElement('span'); caret.className = 'caret';
+    if (still) outPre.textContent = text;
+    else {
+      const node = document.createTextNode(''); outPre.append(node, caret);
+      const total = text.length, dur = Math.min(3200, 900 + total * 3); const t0 = performance.now();
+      await new Promise(res => { (function step(now) { if (id !== runId) return res(); const k = Math.min(total, Math.round(total * Math.min(1, (now - t0) / dur)));
+        node.textContent = text.slice(0, k); outPre.scrollTop = outPre.scrollHeight; if (k < total) requestAnimationFrame(step); else res(); })(performance.now()); });
+      caret.remove();
+    }
+    box.dataset.state = 'done'; title.textContent = Object.keys(A).length ? 'הבריף המותאם שלך מוכן ✓' : 'הבריף שלך מוכן ✓'; copyBtn.disabled = false; send.removeAttribute('aria-busy'); busy = false; done = true; outPre.scrollTop = 0;
+  }
+  form.addEventListener('submit', e => { e.preventDefault(); run(); });
+  copyBtn.onclick = e => { e.stopPropagation(); if (!copyBtn.disabled) copyText(outPre.textContent, e.currentTarget); };
+})();
+
+/* ---------- nav highlight ---------- */
+const links = [...document.querySelectorAll('.links a')];
+const secIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id)); }), { rootMargin: '-45% 0px -50% 0px' });
+['guide', 'principles', 'gallery', 'play', 'builder', 'tips', 'case', 'faq'].forEach(id => secIO.observe(document.getElementById(id)));
+
+/* ---------- font, then start ---------- */
+(async () => {
+  Promise.all([['gs-400.woff2', '400'], ['gs-600.woff2', '600']].map(async ([f, w]) => { const b = await (await fetch(f)).arrayBuffer(); const ff = new FontFace('Google Sans', b, { weight: w }); await ff.load(); document.fonts.add(ff); })).catch(e => console.warn('body font', e));
+  try { const buf = await (await fetch('drakonit.woff2')).arrayBuffer(); const ff = new FontFace('Drakonit', buf, { weight: '100 900' }); await ff.load(); document.fonts.add(ff); FONT = 'Drakonit'; }
+  catch (e) { try { await document.fonts.load('700 40px Karantina'); } catch (_) {} FONT = 'Karantina'; }
+  stages.forEach(st => { st.resize(); st.draw(1.4); });
+  if (!reduce) requestAnimationFrame(frame);
+})();
+
+
+
+/* ===== v7: showreel (drawn live) + generated soundtrack ===== */
+const RB = BL * 4, REEL_DUR = RB * 18.5;
+const RL = { off: 0, base: performance.now(), paused: false };
+RL.now = () => RL.paused ? RL.off : RL.off + (performance.now() - RL.base) / 1000;
+const SCN = [0, 2, 4, 6, 8, 10, 13, 15, 16.5].map(b => b * RB);
+function wordsIn(ctx, str, x, y, size, col, lt, o = {}) {
+  const words = str.split(' '); ctx.font = font(size); const gap = ctx.measureText(' ').width, ws = words.map(w => ctx.measureText(w).width), total = ws.reduce((a, b) => a + b, 0) + gap * (words.length - 1);
+  let cx = x + total / 2; const st = o.stagger ?? .11, dur = o.dur ?? .4, d0 = o.delay ?? 0;
+  words.forEach((w, i) => { const p = seg(lt, d0 + i * st, d0 + i * st + dur), wx = cx - ws[i] / 2; cx -= ws[i] + gap; if (p <= 0) return; const e = E.back(p);
+    ctx.save(); ctx.translate(wx, y + (1 - E.o3(p)) * size * .5); ctx.scale(lerp(.3, 1, e), lerp(1.5, 1, e) * lerp(.3, 1, e)); ctx.globalAlpha *= clamp(p * 3);
+    if (o.outline) text(ctx, w, 0, 0, size, o.outline, 'center', o.ow || size * .14);
+    text(ctx, w, 0, 0, size, (o.colors && o.colors[i % o.colors.length]) || col); ctx.restore(); });
+  return total;
+}
+function slam(ctx, str, x, y, size, front, side, lt, o = {}) {
+  const p = seg(lt, o.at || 0, (o.at || 0) + .32); if (p <= 0) return;
+  const s = lerp(o.from || 2.3, 1, E.o5(p)) * (1 + beatPulse(lt) * .015);
+  ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0); ctx.scale(s, s); ctx.globalAlpha *= clamp(p * 2.5);
+  if (side) extrude(ctx, str, 0, 0, size, front, side, o.depth || 40, o.ang ?? .9); else text(ctx, str, 0, 0, size, front);
+  ctx.restore();
+}
+const RS = [];
+RS[0] = (ctx, lt) => { bg(ctx, C.ink);
+  const up = E.io(seg(lt, RB - .25, RB + .25));
+  ctx.save(); ctx.translate(CX, lerp(CY, CY - 190, up)); ctx.scale(lerp(1, .55, up), lerp(1, .55, up)); slam(ctx, 'רגע.', 0, 0, 470, C.pink, C.violet, lt, { depth: 54, ang: .9 + Math.sin(lt) * .4 }); ctx.restore();
+  wordsIn(ctx, 'לפני שאתם גוללים הלאה…', CX, CY + 150, 118, C.cream, lt, { delay: RB + .1 });
+};
+RS[1] = (ctx, lt) => { bg(ctx, C.cream); gridLines(ctx, C.ink, .08);
+  wordsIn(ctx, 'כל מה שתראו בסרטון הזה', CX, CY - 170, 120, C.ink, lt, { delay: .05 });
+  if (lt > RB - .1) {
+    const l2 = lt - (RB - .1), size = 210; ctx.font = font(size); const wA = ctx.measureText('לא עוצב ').width, wB = ctx.measureText('בתוכנה.').width, tot = wA + wB;
+    wordsIn(ctx, 'לא עוצב בתוכנה.', CX, CY + 80, size, C.violet, l2, { stagger: .18 });
+    const sp = E.o3(seg(l2, .7, 1.05)); if (sp > 0) { ctx.strokeStyle = C.orange; ctx.lineWidth = 22; ctx.lineCap = 'round'; const x0 = CX - tot / 2 - 10; ctx.beginPath(); ctx.moveTo(x0 + (wB + 20), CY + 70); ctx.lineTo(x0 + (wB + 20) * (1 - sp), CY + 78); ctx.stroke(); }
+  }
+};
+RS[2] = (ctx, lt) => { bg(ctx, C.black);
+  const x0 = 210, y0 = 150, w = VW - 420, h = 430; ctx.fillStyle = '#1B1830'; roundRect(ctx, x0, y0, w, h, 26); ctx.fill();
+  ['#FF5F57', '#FEBC2E', '#28C840'].forEach((c, i) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x0 + 40 + i * 30, y0 + 36, 9, 0, TAU); ctx.fill(); });
+  const code = [["const ", C.pink], ["scene", C.white], [" = brief('בוקר טוב');", '#9FE6C9'], ["\n", 0], ["scene", C.white], [".letters.drop({ bounce: ", '#A7A0CF'], ["true", C.orange], [" });", '#A7A0CF'], ["\n", 0], ["scene", C.white], [".sync(", '#A7A0CF'], ["110", C.orange], [");  ", '#A7A0CF'], ["// BPM", '#6B6690'], ["\n", 0], ["render", C.sun], ["('mp4');  ", '#9FE6C9'], ["// ✨", '#6B6690']];
+  const total = code.reduce((a, c) => a + c[0].length, 0), shown = Math.floor(total * clamp(lt / (RB * .95)));
+  ctx.font = `600 40px ui-monospace, Menlo, Consolas, monospace`; ctx.textAlign = 'left'; ctx.direction = 'ltr'; ctx.textBaseline = 'alphabetic';
+  let cx = x0 + 50, cy = y0 + 110, k = 0;
+  for (const [str, col] of code) { if (k >= shown) break; if (str === '\n') { cx = x0 + 50; cy += 72; k++; continue; } const part = str.slice(0, shown - k); ctx.fillStyle = col; ctx.fillText(part, cx, cy); cx += ctx.measureText(part).width; k += str.length; }
+  if (frac(lt * 2) < .5) { ctx.fillStyle = C.pink; ctx.fillRect(cx + 4, cy - 34, 4, 42); }
+  ctx.direction = 'rtl';
+  slam(ctx, 'נכתב בקוד.', CX, 720, 230, C.pink, C.violet, lt, { at: RB, depth: 34 });
+  wordsIn(ctx, '(Claude כתב. אתם רק ביקשתם יפה)', CX, 880, 58, C.cream, lt, { delay: RB + .7, stagger: .07 });
+};
+RS[3] = (ctx, lt, t) => { reelTunnel(ctx, t, 'בלי טיימליין · ', 'בלי קיפריימים · ', C.ink, C.pink, C.violet);
+  const pw = E.o5(seg(lt, .1, .5)); ctx.fillStyle = C.ink; roundRect(ctx, CX - 640 * pw, CY - 170, 1280 * pw, 340, 34); ctx.fill();
+  if (pw > .9) { wordsIn(ctx, 'בלי לגרור 400 קיפריימים', CX, CY - 40, 112, C.cream, lt, { delay: .45 }); wordsIn(ctx, '(ובלי לבכות לתוך הטיימליין)', CX, CY + 95, 60, C.pink, lt, { delay: RB, stagger: .08 }); }
+};
+RS[4] = (ctx, lt) => { bg(ctx, C.orange);
+  const words = ['בום', 'וואו', 'קצב', 'מושן', 'זז'], items = [];
+  for (let i = 0; i < 34; i++) { let z = .5 + hr(i, 1) * 7 - lt * (2.6 + hr(i, 2) * 1.4); z = ((z % 7.5) + 7.5) % 7.5 + .25; items.push({ i, z, x: (hr(i, 3) - .5) * 2.6, y: (hr(i, 4) - .5) * 1.8, r: (hr(i, 5) - .5) * 1.5, sk: (hr(i, 6) - .5) * 1.3, w: words[i % 5] }); }
+  items.sort((a, b) => b.z - a.z);
+  for (const it of items) { const s = 1 / it.z; ctx.save(); ctx.translate(CX + it.x * 820 * s, CY + it.y * 560 * s); ctx.rotate(it.r + lt * .3 * (it.i % 2 ? 1 : -1)); ctx.transform(1, 0, it.sk, 1, 0, 0); ctx.scale(s, s);
+    ctx.globalAlpha = clamp((7.6 - it.z) / 2) * .9; if (it.i % 5 === 0) text(ctx, it.w, 0, 0, 220, C.ink, 'center', 8); else text(ctx, it.w, 0, 0, 220, C.pink); ctx.restore(); }
+  ctx.globalAlpha = 1;
+  const pl = E.o5(seg(lt, RB - .1, RB + .3)); if (pl > 0) { ctx.fillStyle = C.ink; roundRect(ctx, CX - 330 * pl, CY + 120, 660 * pl, 104, 52); ctx.fill(); }
+  wordsIn(ctx, 'רק בריף טוב.', CX, CY - 40, 250, C.cream, lt, { delay: .15, stagger: .16, outline: C.orange, ow: 50 });
+  wordsIn(ctx, 'וקצת סבלנות לרינדור', CX, CY + 170, 64, C.cream, lt, { delay: RB + .15 });
+};
+RS[5] = (ctx, lt, t) => { bg(ctx, C.violet);
+  const p = ribbonPath(t, VH - 110, 50, 70, 1.6, 0, 1); strokePath(ctx, p, 80, C.pink); pathText(ctx, p, 'בריף · גיליון פריימים · תצוגה חיה · רינדור · ', 48, C.ink, t * 220);
+  wordsIn(ctx, 'מה לומדים פה?', CX, 150, 120, C.cream, lt, { delay: .05 });
+  const items = [['בריף ש-Claude מבין בפעם הראשונה', .55], ['תנועה שנוחתת בדיוק על הפעמה', RB * .95], ['לחסוך קרדיטים. וגם עצבים.', RB * 1.7]];
+  items.forEach(([str, at], i) => { const q = E.back(seg(lt, at, at + .45)); if (q <= 0) return; const y = 330 + i * 165;
+    ctx.save(); ctx.translate((1 - q) * -500, 0); ctx.globalAlpha = clamp(q * 2);
+    ctx.fillStyle = i === 2 ? C.orange : C.pink; ctx.beginPath(); ctx.arc(VW - 230, y, 52, 0, TAU); ctx.fill(); text(ctx, String(i + 1), VW - 230, y - 4, 70, C.ink);
+    text(ctx, str, VW - 310, y, 84, C.cream, 'right'); ctx.restore(); });
+};
+RS[6] = (ctx, lt) => { bg(ctx, C.pink);
+  for (let i = 0; i < 28; i++) { const a = i / 28 * TAU + lt * .1, r0 = 430 + beatPulse(lt) * 70; ctx.strokeStyle = C.violet; ctx.globalAlpha = lt > RB ? .25 : .08; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(CX + Math.cos(a) * r0, CY + Math.sin(a) * r0); ctx.lineTo(CX + Math.cos(a) * (r0 + 700), CY + Math.sin(a) * (r0 + 700)); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  if (lt < RB) wordsIn(ctx, 'והכי חשוב?', CX, CY, 230, C.ink, lt, { delay: .1, stagger: .2 });
+  else { const l2 = lt - RB, sq = E.elastic(seg(l2, 0, .8));
+    ctx.save(); ctx.translate(CX, CY); ctx.scale(lerp(.6, 1, sq), lerp(1.5, 1, sq)); ctx.rotate(-.04); extrude(ctx, 'זה כיף.', 0, 0, 440, C.cream, C.violet, 56, .9); text(ctx, 'זה כיף.', 0, 0, 440, C.ink, 'center', 9); text(ctx, 'זה כיף.', 0, 0, 440, C.cream); ctx.restore();
+    const w = E.back(seg(l2, .5, .85)); ctx.save(); ctx.translate(CX - 560, CY - 230); ctx.rotate(-.25); ctx.scale(w, w); ctx.fillStyle = C.orange; ctx.beginPath(); ctx.arc(0, 0, 92, 0, TAU); ctx.fill();
+    ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(-28, -18, 12, 0, TAU); ctx.fill(); ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.strokeStyle = C.ink; ctx.beginPath(); ctx.moveTo(14, -20); ctx.lineTo(44, -20); ctx.stroke(); ctx.beginPath(); ctx.arc(0, 8, 42, .25, Math.PI - .25); ctx.stroke(); ctx.restore(); }
+};
+RS[7] = (ctx, lt, t, cv) => { bg(ctx, C.black); const f = Math.floor(lt * 30), clean = lt > 2.1, amt = clean ? 0 : .6 + (frac(lt * 4) < .2 ? .8 : 0);
+  ctx.fillStyle = C.orange; for (let i = 0; i < 7; i++) if (amt && hr(f + i, 9) > .55) ctx.fillRect(hr(f + i, 4) * VW, hr(f + i, 5) * VH, 40 + hr(i + f, 6) * 300, 6 + hr(i, 7) * 26);
+  const L = [['שגיאה 404:', CY - 120, 150], ['עוד לא ניסיתם.', CY + 80, 200]];
+  if (!clean) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; L.forEach(([s0, y, sz]) => [[-1, '#ff0040'], [1, '#00ff88'], [0, '#3060ff']].forEach(([o, c], i) => text(ctx, s0, CX + o * (5 + amt * 18) * (1 + hr(f, i)), y + (i === 2 ? -6 : 0), sz, c))); ctx.restore(); }
+  else { L.forEach(([s0, y, sz]) => text(ctx, s0, CX, y, sz, C.white)); const q = E.back(seg(lt, 2.15, 2.5)); ctx.save(); ctx.translate(CX, CY + 270); ctx.scale(q, q); ctx.fillStyle = C.orange; roundRect(ctx, -330, -50, 660, 100, 50); ctx.fill(); text(ctx, 'תיקון: גללו למטה ↓', 0, -4, 64, C.ink); ctx.restore(); }
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; for (let y = 0; y < VH; y += 6) ctx.fillRect(0, y, VW, 2);
+  if (amt && cv) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); for (let i = 0; i < 7; i++) { const y = hr(f * 13 + i, 1) * cv.height, h = (8 + hr(f + i, 2) * 50) * cv.height / 1000, dx = (hr(f + i * 7, 3) - .5) * .12 * cv.width * amt; ctx.drawImage(cv, 0, y, cv.width, h, dx, y, cv.width, h); } ctx.restore(); }
+};
+RS[8] = (ctx, lt) => { bg(ctx, C.paper); gridLines(ctx, C.ink, .07);
+  [['גללו.', C.violet, 1150], ['נסו.', C.orange, 800], ['תזוזו.', C.ink, 420]].forEach(([w, c, x], i) => slam(ctx, w, x, CY - 150, 230, c, null, lt, { at: i * BL, from: 2.6, rot: (i - 1) * .04 }));
+  const q = E.o5(seg(lt, RB, RB + .6)); if (q > 0) { ctx.save(); ctx.globalAlpha = q; ctx.translate(0, (1 - q) * 60);
+    ctx.strokeStyle = C.violet; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(1130, CY + 150, 52, 0, TAU); ctx.stroke(); ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(1158, CY + 150); ctx.lineTo(1102, CY + 150); ctx.moveTo(1124, CY + 128); ctx.lineTo(1102, CY + 150); ctx.lineTo(1124, CY + 172); ctx.stroke();
+    text(ctx, 'מושן עם Claude', 1050, CY + 150, 100, C.violet, 'right');
+    const hb = 1 + beatPulse(lt) * .18; ctx.save(); ctx.translate(380, CY + 140); ctx.scale(hb, hb); ctx.fillStyle = C.orange; heart(ctx, 0, 0, 3.2); ctx.fill(); ctx.restore();
+    const ay = Math.abs(Math.sin(lt * 4)) * 26; ctx.strokeStyle = C.ink; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(CX, CY + 290 + ay); ctx.lineTo(CX, CY + 380 + ay); ctx.moveTo(CX - 36, CY + 344 + ay); ctx.lineTo(CX, CY + 380 + ay); ctx.lineTo(CX + 36, CY + 344 + ay); ctx.stroke(); ctx.restore(); }
+};
+function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function gridLines(ctx, col, a) { ctx.save(); ctx.strokeStyle = col; ctx.globalAlpha = a; ctx.lineWidth = 1.5; for (let i = 1; i < 12; i++) { ctx.beginPath(); ctx.moveTo(i * VW / 12, 0); ctx.lineTo(i * VW / 12, VH); ctx.stroke(); } ctx.restore(); }
+function heart(ctx, cx, cy, s) { ctx.beginPath(); for (let i = 0; i <= 60; i++) { const a = i / 60 * TAU, x = cx + s * 16 * Math.pow(Math.sin(a), 3), y = cy - s * (13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a)); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); }
+function reelTunnel(ctx, t, s1, s2, back, ring, txt) {
+  bg(ctx, back); const ts = t * 1.3, N = 14, K = 900;
+  for (let id = Math.floor(ts) + N; id > Math.floor(ts); id--) { const z = id - ts; if (z < .32) continue; const r = K / z, size = K / (z * (z + 1)) * .92; if (size < 5 || r - size > 1300) continue;
+    const bend = Math.min(1, z / 6), cx = CX + Math.sin(t * .8 + z * .45) * 140 * bend, cy = CY + Math.cos(t * .6 + z * .38) * 80 * bend, alt = id % 2 === 0;
+    if (alt) { ctx.beginPath(); ctx.arc(cx, cy, r + size * .56, 0, TAU); ctx.arc(cx, cy, Math.max(0, r - size * .56), 0, TAU, true); ctx.fillStyle = ring; ctx.fill('evenodd'); }
+    ctx.font = font(size); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = alt ? back : ring;
+    const chars = [...(alt ? s2 : s1)].reverse(); let a = (alt ? 1 : -1) * t * .35 + id * .7; const end = a + TAU - .001; let k = 0;
+    while (a < end) { const ch = chars[k % chars.length], cw = ctx.measureText(ch).width, da = cw / r; if (a + da > end + .001) break; const am = a + da / 2;
+      if (ch !== ' ') { ctx.save(); ctx.translate(cx + Math.cos(am) * r, cy + Math.sin(am) * r); ctx.rotate(am + Math.PI / 2); ctx.fillText(ch, 0, size * VC); ctx.restore(); } a += da; k++; } }
+}
+const SCN_COL = [[C.violet, C.pink], [C.ink, C.orange], [C.pink, C.violet], [C.orange, C.cream], [C.violet, C.ink], [C.pink, C.orange], [C.black, C.violet], [C.orange, C.violet], [C.violet, C.pink]];
+const HUD_DARK = [true, false, true, true, false, true, false, true, false];
+D.reel = (ctx, _t, cv) => {
+  const T = RL.now(), t = ((T % REEL_DUR) + REEL_DUR) % REEL_DUR; let i = 0; SCN.forEach((s0, k) => { if (t >= s0) i = k; });
+  RS[i](ctx, t - SCN[i], t, cv);
+  // wipe into next scene
+  const nx = (i + 1) % SCN.length, tn = i + 1 < SCN.length ? SCN[i + 1] : REEL_DUR, pin = seg(t, tn - .22, tn), pout = i > 0 || t < .22 ? seg(t, SCN[i], SCN[i] + .22) : 1;
+  const draw = (q, cols, out) => cols.forEach((c, k) => { const qq = clamp(q * 1.3 - k * .12); if (qq <= 0 || qq >= 1 && !out) {} ctx.fillStyle = c;
+    const lead = out ? lerp(-700, VW + 500, E.io(qq)) : lerp(VW + 500, -700, E.io(qq)); ctx.beginPath(); if (out) { ctx.moveTo(lead, -10); ctx.lineTo(VW + 900, -10); ctx.lineTo(VW + 1300, VH + 10); ctx.lineTo(lead + 400, VH + 10); } else { ctx.moveTo(lead, -10); ctx.lineTo(VW + 600, -10); ctx.lineTo(VW + 1000, VH + 10); ctx.lineTo(lead + 400, VH + 10); } ctx.fill(); });
+  if (pin > 0) draw(pin, SCN_COL[nx], false);
+  if (pout < 1) draw(1 - pout, SCN_COL[i].slice().reverse(), false);
+  // hud
+  const hc = HUD_DARK[i] ? C.cream : C.ink; ctx.save(); ctx.globalAlpha = .85; ctx.fillStyle = hc; ctx.strokeStyle = hc;
+  ctx.fillStyle = C.orange; ctx.globalAlpha = .5 + .5 * Math.abs(Math.sin(T * 3)); ctx.beginPath(); ctx.arc(110, 104, 10, 0, TAU); ctx.fill(); ctx.globalAlpha = .85;
+  ctx.font = `600 26px ${'"Google Sans", sans-serif'}`; ctx.fillStyle = hc; ctx.textAlign = 'left'; ctx.direction = 'ltr'; ctx.fillText('LIVE CODE', 132, 113);
+  ctx.textAlign = 'right'; ctx.fillText(`${String(i + 1).padStart(2, '0')} / 09`, VW - 110, 113); ctx.direction = 'rtl';
+  ctx.globalAlpha = .25; ctx.fillRect(110, VH - 100, VW - 220, 3); ctx.globalAlpha = .9; ctx.fillRect(VW - 110 - (VW - 220) * (t / REEL_DUR), VH - 101, (VW - 220) * (t / REEL_DUR), 5);
+  ctx.restore();
+};
+
+/* soundtrack: synthesized live with Web Audio, scheduled against the reel clock */
+const AU = { ctx: null, on: false, master: null, noise: null, next: 0, timer: 0 };
+function auInit() {
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+  const a = AU.ctx = new AC(); const comp = a.createDynamicsCompressor(); comp.threshold.value = -20; comp.knee.value = 8; comp.ratio.value = 3.5; comp.attack.value = .004; comp.release.value = .18;
+  const makeup = a.createGain(); makeup.gain.value = 1.5;
+  const lim = a.createDynamicsCompressor(); lim.threshold.value = -4; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = .001; lim.release.value = .06;
+  const out = a.createGain(); out.gain.value = .9;
+  AU.master = a.createGain(); AU.master.gain.value = 0; AU.master.connect(comp); comp.connect(makeup); makeup.connect(lim); lim.connect(out); out.connect(a.destination);
+  const nb = a.createBuffer(1, a.sampleRate, a.sampleRate), d = nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; AU.noise = nb; return true;
+}
+function env(at, g, v, dec, att = .003) { g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(v, at + att); g.gain.exponentialRampToValueAtTime(0.0001, at + dec); }
+function kick(at, v = .9) { const a = AU.ctx, o = a.createOscillator(), g = a.createGain(); o.frequency.setValueAtTime(155, at); o.frequency.exponentialRampToValueAtTime(42, at + .28); env(at, g, v, .42); o.connect(g).connect(AU.master); o.start(at); o.stop(at + .45); }
+function noiseHit(at, type, freq, q, v, dec) { const a = AU.ctx, s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(); s.buffer = AU.noise; f.type = type; f.frequency.value = freq; f.Q.value = q; env(at, g, v, dec); s.connect(f).connect(g).connect(AU.master); s.start(at); s.stop(at + dec + .02); }
+const hat = (at, v = .14) => noiseHit(at, 'highpass', 7500, .7, v, .05);
+const clap = (at, v = .32) => noiseHit(at, 'bandpass', 1600, .9, v, .2);
+function tone(at, f, type, v, dec, cut = 1800) { const a = AU.ctx, o = a.createOscillator(), fl = a.createBiquadFilter(), g = a.createGain(); o.type = type; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = cut; env(at, g, v, dec, .01); o.connect(fl).connect(g).connect(AU.master); o.start(at); o.stop(at + dec + .05); }
+function whoosh(at) { const a = AU.ctx, s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(); s.buffer = AU.noise; f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(300, at); f.frequency.exponentialRampToValueAtTime(5000, at + .4);
+  g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(.22, at + .3); g.gain.exponentialRampToValueAtTime(0.0001, at + .45); s.connect(f).connect(g).connect(AU.master); s.start(at); s.stop(at + .5); }
+function boom(at) { const a = AU.ctx, o = a.createOscillator(), g = a.createGain(); o.frequency.setValueAtTime(70, at); o.frequency.exponentialRampToValueAtTime(28, at + 1.1); env(at, g, .8, 1.2); o.connect(g).connect(AU.master); o.start(at); o.stop(at + 1.25); }
+const mf = m => 440 * Math.pow(2, (m - 69) / 12);
+// soft flute: sine + quiet triangle, gentle attack and a light vibrato
+function flute(at, m, len, v = .16) { const a = AU.ctx, d = Math.max(.16, len * BL / 4 * .95), f0 = mf(m);
+  const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = 5.2; lg.gain.setValueAtTime(0, at); lg.gain.linearRampToValueAtTime(f0 * .006, at + Math.min(.25, d)); lfo.connect(lg);
+  [['sine', v], ['triangle', v * .35]].forEach(([type, vv]) => { const o = a.createOscillator(), f = a.createBiquadFilter(), g = a.createGain(); o.type = type; o.frequency.value = f0; lg.connect(o.frequency);
+    f.type = 'lowpass'; f.frequency.value = 2600; g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vv, at + .025); g.gain.setValueAtTime(vv * .85, at + d * .7); g.gain.exponentialRampToValueAtTime(0.0001, at + d + .12);
+    o.connect(f).connect(g).connect(AU.master); o.start(at); o.stop(at + d + .15); });
+  lfo.start(at); lfo.stop(at + d + .15); }
+// plucked chord (guitar-like "pah")
+function pluck(at, m, v = .05) { const a = AU.ctx, o = a.createOscillator(), f = a.createBiquadFilter(), g = a.createGain(); o.type = 'triangle'; o.frequency.value = mf(m);
+  f.type = 'lowpass'; f.frequency.setValueAtTime(2400, at); f.frequency.exponentialRampToValueAtTime(700, at + .25); env(at, g, v, .32, .004); o.connect(f).connect(g).connect(AU.master); o.start(at); o.stop(at + .35); }
+function oom(at, m, v = .34) { const a = AU.ctx; [['sine', v], ['triangle', v * .4]].forEach(([type, vv]) => { const o = a.createOscillator(), f = a.createBiquadFilter(), g = a.createGain(); o.type = type; o.frequency.value = mf(m);
+  f.type = 'lowpass'; f.frequency.value = 700; env(at, g, vv, .38, .006); o.connect(f).connect(g).connect(AU.master); o.start(at); o.stop(at + .42); }); }
+function softKick(at, v = .5) { const a = AU.ctx, o = a.createOscillator(), g = a.createGain(); o.frequency.setValueAtTime(110, at); o.frequency.exponentialRampToValueAtTime(52, at + .18); env(at, g, v, .3); o.connect(g).connect(AU.master); o.start(at); o.stop(at + .32); }
+function handDrum(at, v = .22) { const a = AU.ctx, o = a.createOscillator(), g = a.createGain(); o.frequency.setValueAtTime(230, at); o.frequency.exponentialRampToValueAtTime(150, at + .12); env(at, g, v, .16); o.connect(g).connect(AU.master); o.start(at); o.stop(at + .18); }
+const tamb = (at, v = .035) => noiseHit(at, 'bandpass', 5200, 1.5, v, .09);
+function chime(at, m, v = .09) { const a = AU.ctx, o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.value = mf(m); env(at, g, v, 1.4, .003); o.connect(g).connect(AU.master); o.start(at); o.stop(at + 1.5); }
+function softWhoosh(at) { const a = AU.ctx, s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(); s.buffer = AU.noise; f.type = 'bandpass'; f.Q.value = .8; f.frequency.setValueAtTime(400, at); f.frequency.exponentialRampToValueAtTime(2200, at + .4);
+  g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(.07, at + .3); g.gain.exponentialRampToValueAtTime(0.0001, at + .45); s.connect(f).connect(g).connect(AU.master); s.start(at); s.stop(at + .5); }
+const CHD = { C: [60, 64, 67], F: [60, 65, 69], G: [59, 62, 67], Am: [57, 60, 64] }, BASS = { C: [48, 43], F: [53, 48], G: [43, 50], Am: [45, 52] };
+const MEL = {
+  V1: [[0, 79, 2], [2, 76, 2], [4, 79, 2], [6, 81, 2], [8, 79, 4], [12, 76, 2], [14, 74, 2]],
+  V2: [[0, 72, 2], [2, 74, 2], [4, 76, 2], [6, 77, 2], [8, 81, 4], [12, 79, 4]],
+  V3: [[0, 79, 2], [2, 77, 2], [4, 76, 2], [6, 74, 2], [8, 71, 2], [10, 74, 2], [12, 79, 4]],
+  V4: [[0, 76, 4], [4, 72, 4], [8, 74, 2], [10, 76, 2], [12, 72, 4]],
+  H1: [[0, 81, 3], [3, 81, 1], [4, 79, 2], [6, 77, 2], [8, 81, 3], [11, 81, 1], [12, 84, 4]],
+  H2: [[0, 84, 3], [3, 83, 1], [4, 81, 2], [6, 79, 2], [8, 76, 3], [11, 77, 1], [12, 79, 4]],
+  H3: [[0, 77, 3], [3, 77, 1], [4, 76, 2], [6, 74, 2], [8, 79, 3], [11, 77, 1], [12, 74, 4]],
+  H4: [[0, 76, 2], [2, 79, 2], [4, 77, 2], [6, 74, 2], [8, 72, 6], [14, 79, 2]]
+};
+// one entry per bar (bar 18 is a half bar that rings into the loop restart)
+const PLAN = [
+  { c: 'C', intro: 1 }, { c: 'G', intro: 2 },
+  { c: 'C', m: 'V1', d: 1 }, { c: 'F', m: 'V2', d: 1 }, { c: 'G', m: 'V3', d: 1, tick: 1 }, { c: 'C', m: 'V4', d: 1, tick: 1 },
+  { c: 'C', m: 'V1', d: 2, oct: 1 }, { c: 'F', m: 'V2', d: 2, oct: 1 },
+  { c: 'F', m: 'H1', d: 2, chime: 1 }, { c: 'C', m: 'H2', d: 2 }, { c: 'G', m: 'H3', d: 2 }, { c: 'C', m: 'H4', d: 2 },
+  { c: 'C', m: 'V1', d: 2 }, { c: 'G', m: 'V3', d: 0, build: 1 },
+  { c: 'F', m: 'H1', d: 2, chime: 1, drop: 1 }, { c: 'C', m: 'H2', d: 2, pizz: 1 }, { c: 'G', m: 'H3', d: 2, pizz: 1 },
+  { c: 'C', m: 'H4', d: 2, oct: 1 }, { c: 'C', end: 1 }
+];
+const DINGS = [10 * 16 + 4, 10 * 16 + 28, 10 * 16 + 41];
+function fire(n, at) {
+  const idx = ((n % 296) + 296) % 296, bar = Math.floor(idx / 16), st = idx % 16, P = PLAN[bar], ch = CHD[P.c], bs = BASS[P.c];
+  if (SCN.some(s0 => Math.abs((s0 - .45) / (BL / 4) - idx) < .5) && idx > 4) softWhoosh(at);
+  if (P.chime && st === 0) { chime(at, 84, .1); chime(at, 88, .06); }
+  if (P.drop && st === 0) softKick(at, .8);
+  if (DINGS.includes(idx)) chime(at, 91, .1);
+  // the oom-pah never stops: bass on beats 1 and 3, plucked chord on 2 and 4, in every bar
+  if (st === 0 || st === 8) oom(at, bs[st === 0 ? 0 : 1], P.intro ? .24 : .34);
+  if (st === 4 || st === 12) ch.forEach((m, k) => pluck(at + k * .012, m + 12, P.intro ? .035 : .05));
+  if (P.intro) { // gentle music-box arpeggio leading into the tune
+    const arp = P.c === 'C' ? [72, 76, 79, 84, 79, 76, 79, 76] : [71, 74, 79, 83, 79, 74, 77, 79];
+    if (st % 2 === 0) chime(at, arp[st / 2], .08);
+    if (P.intro === 2 && st >= 12) handDrum(at, .12 + (st - 12) * .04);
+    return;
+  }
+  if (P.end) { if (st === 0) { ch.forEach(m => { flute(at, m + 12, 30, .07); }); chime(at, 84, .12); softKick(at, .6); } return; }
+  // soft percussion
+  if (P.d >= 1 && (st === 0 || st === 8)) softKick(at, P.d === 2 ? .55 : .42);
+  if (P.d >= 1 && (st === 4 || st === 12)) handDrum(at, .2);
+  if (P.d === 2 && st % 2 === 1) tamb(at, st % 4 === 3 ? .04 : .025);
+  if (P.d === 0 && P.build && st % 2 === 0) handDrum(at, .08 + st * .012);
+  if (P.tick && st % 2 === 1) noiseHit(at, 'bandpass', 2600, 5, .035, .025);
+  // melody
+  const mel = MEL[P.m]; if (mel) for (const [s0, m, len] of mel) { if (s0 !== st) continue;
+    flute(at, m, len, .16);
+    if (P.oct) flute(at, m - 12, len, .05);
+    if (P.pizz) { pluck(at, m + 12, .05); pluck(at + BL / 2, m + 12, .03); } }
+}
+function sched() { if (!AU.on || RL.paused) return; const step = BL / 4, nowR = RL.now(), hz = nowR + .35; let n = AU.next; if (n * step < nowR - .3 || n * step > nowR + 1) n = Math.ceil(nowR / step - 1e-6);
+  for (; n * step < hz; n++) { const at = AU.ctx.currentTime + Math.max(0, n * step - nowR); try { fire(n, at); } catch (e) {} } AU.next = n; }
+async function soundOn(v) {
+  if (v && !AU.ctx && !auInit()) return false;
+  AU.on = v;
+  if (v) { try { await AU.ctx.resume(); } catch (e) {} AU.next = Math.ceil(RL.now() / (BL / 4)); AU.master.gain.setTargetAtTime(1, AU.ctx.currentTime, .05); clearInterval(AU.timer); sched(); AU.timer = setInterval(sched, 40); }
+  else if (AU.ctx) { AU.master.gain.setTargetAtTime(0, AU.ctx.currentTime, .05); clearInterval(AU.timer); }
+  return true;
+}
+(() => {
+  const box = document.getElementById('reelBox'), play = document.getElementById('reelPlay'), pp = document.getElementById('reelPP'), ptxt = document.getElementById('reelPlayTxt');
+  const snd = document.getElementById('reelSound'), stxt = document.getElementById('reelSoundTxt'), big = document.getElementById('reelBig'), bar = document.getElementById('reelBar'), time = document.getElementById('reelTime');
+  const PLAY = 'M7 4.5v15l12.5-7.5z', PAUSE = 'M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z';
+  let userPaused = matchMedia('(prefers-reduced-motion: reduce)').matches, inView = false;
+  const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  function setPaused(p) {
+    if (p && !RL.paused) { RL.off = RL.now(); RL.paused = true; } else if (!p && RL.paused) { RL.base = performance.now(); RL.paused = false; if (AU.on) AU.next = Math.ceil(RL.now() / (BL / 4)); }
+    if (AU.ctx) AU.master.gain.setTargetAtTime(p || !AU.on ? 0 : 1, AU.ctx.currentTime, .04);
+    pp.setAttribute('d', p ? PLAY : PAUSE); ptxt.textContent = p ? 'המשך' : 'עצירה'; play.setAttribute('aria-label', p ? 'המשך הסרטון' : 'עצירת הסרטון'); big.hidden = !p || !userPaused;
+  }
+  const apply = () => setPaused(userPaused || document.hidden || (!inView && !AU.on));
+  play.addEventListener('click', () => { userPaused = !userPaused; apply(); });
+  big.addEventListener('click', e => { e.stopPropagation(); userPaused = false; apply(); });
+  box.addEventListener('click', e => { if (e.target === big || big.contains(e.target)) return; userPaused = !userPaused; apply(); });
+  snd.classList.add('nudge');
+  snd.addEventListener('click', async () => { const v = !AU.on; const ok = await soundOn(v); if (!ok) { toast('הדפדפן לא תומך בסאונד כאן'); return; }
+    snd.classList.remove('nudge'); snd.setAttribute('aria-pressed', v); stxt.textContent = v ? 'השתקה' : 'הפעלת סאונד';
+    document.getElementById('reelWave').setAttribute('opacity', v ? 1 : 0); document.getElementById('reelX').setAttribute('opacity', v ? 0 : 1);
+    if (v && userPaused) { userPaused = false; } apply(); });
+  new IntersectionObserver(es => { inView = es[0].intersectionRatio > .25; apply(); }, { threshold: [0, .25, .5] }).observe(box);
+  document.addEventListener('visibilitychange', apply);
+  (function ui() { const t = ((RL.now() % REEL_DUR) + REEL_DUR) % REEL_DUR; bar.style.width = `${t / REEL_DUR * 100}%`; time.textContent = `${fmt(t)} / ${fmt(REEL_DUR)}`; requestAnimationFrame(ui); })();
+  apply();
+})();
+
+/* ===== v3: interactive areas ===== */
+(() => {
+  // hero pointer
+  const hs = document.getElementById('heroStage');
+  hs.addEventListener('pointermove', e => { const r = hs.getBoundingClientRect(); PTR.tx = (e.clientX - r.left) / r.width; PTR.ty = (e.clientY - r.top) / r.height; });
+  hs.addEventListener('pointerleave', () => { PTR.tx = .5; PTR.ty = .5; });
+  // playground
+  const fxs = [['extrude', 'תלת-ממד'], ['tunnel', 'מנהרה'], ['ribbon', 'סרטים'], ['explode', 'פיצוץ'], ['wave', 'גל'], ['snap', 'הצמדה לגריד']];
+  const fxBox = document.getElementById('pgFx'), palBox = document.getElementById('pgPal');
+  fxs.forEach(([v, l]) => { const lab = document.createElement('label'); lab.className = 'opt'; lab.innerHTML = `<input type="radio" name="pgFx" id="pgFx-${v}" value="${v}" ${v === PG.fx ? 'checked' : ''}><span>${l}</span>`; fxBox.appendChild(lab); });
+  PGPAL.forEach((p, i) => { const lab = document.createElement('label'); lab.className = 'opt'; lab.innerHTML = `<input type="radio" name="pgPal" id="pgPal-${i}" value="${i}" ${i === PG.pal ? 'checked' : ''}><span><span class="sw" aria-hidden="true">${[p.bg, p.a, p.c].map(c => `<i style="background:${c}"></i>`).join('')}</span>${p.n}</span>`; palBox.appendChild(lab); });
+  const form = document.getElementById('pgForm'), word = document.getElementById('pgWord'), bpm = document.getElementById('pgBpm'), out = document.getElementById('pgBpmOut'), stage = document.querySelector('.pg-stage');
+  const sync = () => { PG.word = word.value; PG.fx = form.querySelector('input[name=pgFx]:checked').value; PG.pal = +form.querySelector('input[name=pgPal]:checked').value; PG.bpm = +bpm.value; out.textContent = PG.bpm; stage.style.background = PGPAL[PG.pal].bg; };
+  form.addEventListener('input', sync); form.addEventListener('submit', e => e.preventDefault()); sync();
+  let taps = []; const tap = document.getElementById('pgTap');
+  tap.addEventListener('click', () => { const now = performance.now(); taps = taps.filter(x => now - x < 3000); taps.push(now);
+    tap.classList.add('hit'); setTimeout(() => tap.classList.remove('hit'), 90);
+    if (taps.length >= 3) { const iv = (taps[taps.length - 1] - taps[0]) / (taps.length - 1), v = Math.round(Math.max(70, Math.min(170, 60000 / iv))); bpm.value = v; sync(); tap.textContent = `${v} BPM`; }
+    else tap.textContent = 'עוד הקשה…'; clearTimeout(tap.h); tap.h = setTimeout(() => { tap.textContent = 'הקישו קצב'; taps = []; }, 2500); });
+  const fxDesc = { extrude: 'המילה בעומק תלת-ממדי, נוחתת כל שתי פעמות עם מעיכה ומתיחה אלסטית, וקווי מהירות סביבה', tunnel: 'מנהרה של טבעות טקסט מהמילה, שנעות לעומק המסך, כל טבעת מסתובבת לכיוון אחר', ribbon: 'המילה בגודל ענק ברקע, ושני סרטים מתפתלים עם המילה שזורמת עליהם', explode: 'עשרות עותקים של המילה עפים לעבר המצלמה, ובמרכז המילה נוחתת כל 4 פעמות', wave: 'האותיות עולות ויורדות בגל עם מתיחה, ושלושה הדים במתאר צבעוני', snap: 'האותיות מפוזרות על המסך ונצמדות למקומן אחת אחרי השנייה, על גריד של 12 עמודות' };
+  document.getElementById('pgCopy').addEventListener('click', e => {
+    const P = PGPAL[PG.pal], w = PG.word.trim() || 'תנועה';
+    const txt = `צור אנימציית טיפוגרפיה קינטית למילה "${w}".\nאפקט: ${fxDesc[PG.fx]}.\nקצב: ${PG.bpm} BPM. כל תנועה מרכזית נוחתת על פעמה.\nפלטה: ${P.n} (רקע ${P.bg}, צבע ראשי ${P.a}, הדגשה ${P.c}).\nפונט ראווה עבה, 1920×1080, 30 פריימים לשנייה.\nתראה לי קודם תצוגה חיה בדפדפן, ורק אחרי אישור תרנדר ל-MP4.`;
+    copyText(txt, e.currentTarget);
+  });
+  // mobile: collapsible prompts in the guide
+  document.querySelectorAll('.step .prompt').forEach(pr => { const b = document.createElement('button'); b.type = 'button'; b.className = 'more'; b.textContent = 'הצגת הפרומפט המלא';
+    b.addEventListener('click', () => { const o = pr.classList.toggle('open'); b.textContent = o ? 'הסתרה' : 'הצגת הפרומפט המלא'; }); pr.appendChild(b); });
+  // mobile: jump to the live brief while filling the builder
+  const jump = document.getElementById('jump'), bform = document.getElementById('bform'), outEl = document.getElementById('out');
+  let inForm = false, outVis = false; const upd = () => { jump.hidden = !(inForm && !outVis); };
+  new IntersectionObserver(es => { inForm = es[0].isIntersecting; upd(); }).observe(bform);
+  new IntersectionObserver(es => { outVis = es[0].isIntersecting; upd(); }).observe(outEl);
+  jump.addEventListener('click', () => outEl.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }));
+})();
+
+
+/* ===== v4: tips filter ===== */
+(() => {
+  const cards = [...document.querySelectorAll('#tgrid .tip')], cnt = document.getElementById('tipsCount');
+  const more = document.createElement('button'); more.type = 'button'; more.className = 'btn ghost more-tips'; document.getElementById('tgrid').after(more);
+  const small = matchMedia('(max-width: 700px)'); let open = false, cur = 'all';
+  const apply = v => { cur = v; let n = 0, shown = 0; const lim = small.matches && !open ? 3 : Infinity;
+    cards.forEach(c => { const on = v === 'all' || c.dataset.tags.split(' ').includes(v); if (on) n++; const vis = on && shown < lim; if (vis) shown++; c.hidden = !vis; });
+    cnt.textContent = `${n} טיפים`; more.hidden = shown >= n; more.textContent = `הצגת כל ${n} הטיפים`; };
+  more.addEventListener('click', () => { open = true; apply(cur); });
+  small.addEventListener('change', () => apply(cur));
+  document.querySelectorAll('input[name=tipf]').forEach(i => i.addEventListener('change', () => apply(i.value)));
+  apply('all');
+})();
+
+
+/* ===== v10: email copy fallback (mail links can be blocked inside some viewers) ===== */
+(() => { const b = document.getElementById('hireCopy'); if (!b) return; const mail = document.getElementById('hireMail').textContent;
+  b.addEventListener('click', () => { const ok = () => { b.textContent = 'הועתק ✓'; b.classList.add('done'); toast('כתובת המייל הועתקה'); setTimeout(() => { b.textContent = 'העתקה'; b.classList.remove('done'); }, 1800); };
+    const sel = () => { const r = document.createRange(); r.selectNodeContents(document.getElementById('hireMail')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('הכתובת מסומנת. העתיקו עם Ctrl+C'); };
+    writeClip(mail).then(ok, sel); }); })();
+
+
+/* ===== v11: contact window (mail links are blocked inside some viewers, web mail always opens) ===== */
+(() => { const d = document.getElementById('cdlg'); if (!d) return;
+  document.querySelectorAll('[data-contact]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); d.showModal(); }));
+  document.getElementById('cdClose').addEventListener('click', () => d.close());
+  d.addEventListener('click', e => { if (e.target === d) d.close(); });
+  d.querySelectorAll('.cd-opt').forEach(a => a.addEventListener('click', () => setTimeout(() => d.close(), 150)));
+  const b = document.getElementById('cdCopy'), mail = document.getElementById('cdMail').textContent;
+  b.addEventListener('click', () => writeClip(mail).then(() => { b.textContent = 'הועתק ✓'; toast('כתובת המייל הועתקה'); setTimeout(() => b.textContent = 'העתקת הכתובת', 1800); },
+    () => { const r = document.createRange(); r.selectNodeContents(document.getElementById('cdMail')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('הכתובת מסומנת. העתיקו עם Ctrl+C'); }));
+})();
+
+/* ===== v2: share ===== */
+(() => {
+  const btn = document.getElementById('shareBtn'), pop = document.getElementById('sharePop'), input = document.getElementById('shareUrl');
+  const url = (/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname)) ? location.origin + location.pathname.replace(/index\.html$/, '') : input.value, title = 'מושן עם Claude Code: מדריך לטיפוגרפיה קינטית';
+  input.value = url;
+  const enc = encodeURIComponent;
+  const nets = [
+    ['וואטסאפ', '#25D366', 'W', `https://wa.me/?text=${enc(title + '\n' + url)}`],
+    ['טלגרם', '#2AABEE', 'T', `https://t.me/share/url?url=${enc(url)}&text=${enc(title)}`],
+    ['פייסבוק', '#1877F2', 'f', `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`],
+    ['לינקדאין', '#0A66C2', 'in', `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`],
+    ['X', '#111111', 'X', `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}`],
+    ['Threads', '#000000', '@', `https://www.threads.net/intent/post?text=${enc(title + ' ' + url)}`]
+  ];
+  const grid = document.getElementById('shareGrid');
+  nets.forEach(([n, c, l, h]) => { const a = document.createElement('a'); a.href = h; a.target = '_blank'; a.rel = 'noopener'; a.innerHTML = `<i style="background:${c}" aria-hidden="true">${l}</i>${n}`; grid.appendChild(a); });
+  const open = v => { pop.hidden = !v; btn.setAttribute('aria-expanded', v); if (v) { input.select(); document.getElementById('shareCopy').focus(); } };
+  btn.addEventListener('click', e => { e.stopPropagation(); open(pop.hidden); });
+  document.addEventListener('click', e => { if (!pop.hidden && !pop.contains(e.target) && e.target !== btn) open(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden) { open(false); btn.focus(); } });
+  document.getElementById('shareCopy').addEventListener('click', e => {
+    const b = e.currentTarget, ok = () => { b.textContent = 'הועתק ✓'; b.classList.add('done'); setTimeout(() => { b.textContent = 'העתקה'; b.classList.remove('done'); }, 1600); };
+    writeClip(url).then(ok, () => { input.select(); toast('הקישור מסומן. העתיקו עם Ctrl+C'); });
+  });
+})();
+
+/* ===== v2: scroll choreography ===== */
+document.documentElement.classList.add('js');
+(() => {
+  const root = document.documentElement, nav = document.querySelector('.nav'), hero = document.getElementById('hero');
+  // strips
+  const fill = (el, words) => { let h = ''; for (let k = 0; k < 4; k++) words.forEach((w, i) => { h += `<span class="${i % 2 ? 'o' : ''}">${w}</span><span>✦</span>`; }); el.innerHTML = h; };
+  const sA = document.getElementById('stripA'), sB = document.getElementById('stripB');
+  fill(sA, ['בריף', 'גיליון פריימים', 'תצוגה חיה', 'רינדור']); fill(sB, ['גריד', 'קצב', 'טיפוגרפיה', 'תנועה', 'צבע']);
+  // manifesto words
+  const man = document.getElementById('manifesto'), hl = { 'בריף': 'hl', 'הבריף': 'hl', 'פריים': 'hl2', 'מדויק': 'hl' };
+  man.innerHTML = man.textContent.replace('Claude Code', 'Claude\u00A0Code').split(' ').map(w => { const k = w.replace(/[.,:]/g, ''); return `<span class="mw ${hl[k] || ''}${/^[A-Za-z]/.test(w) ? ' lat' : ''}" dir="auto">${w}</span>`; }).join(' ');
+  const mws = [...man.querySelectorAll('.mw')];
+  // steps
+  const steps = [...document.querySelectorAll('.step')];
+  // big end letters
+  const be = document.getElementById('bigEnd'); be.innerHTML = [...be.textContent].map(ch => `<span>${ch}</span>`).join(''); const bes = [...be.children];
+  // pinned principles
+  const pin = document.getElementById('principles'), track = document.getElementById('ptrack'), pinNum = document.getElementById('pinNum');
+  let pinned = false, dist = 0;
+  const reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function layoutPin() {
+    const want = !reduceM && innerWidth >= 1060 && innerHeight >= 760;
+    root.classList.toggle('pinned', want); pinned = want;
+    if (!want) { pin.style.removeProperty('--pinH'); track.style.removeProperty('--px'); return; }
+    const pw = track.parentElement, cs = getComputedStyle(pw), inner = pw.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    dist = Math.max(0, track.scrollWidth - inner);
+    pin.style.setProperty('--pinH', `${innerHeight - 64 + dist + 120}px`);
+  }
+  // gallery spotlight + tilt
+  const band = document.getElementById('gallery');
+  band.addEventListener('pointermove', e => { const r = band.getBoundingClientRect(); band.style.setProperty('--mx', `${e.clientX - r.left}px`); band.style.setProperty('--my', `${e.clientY - r.top}px`); });
+  if (matchMedia('(pointer: fine)').matches && !reduceM) {
+    document.querySelectorAll('.gcard .demo').forEach(d => {
+      d.addEventListener('pointermove', e => { const r = d.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        d.style.setProperty('--ry', `${x * 9}deg`); d.style.setProperty('--rx', `${-y * 9}deg`); });
+      d.addEventListener('pointerleave', () => { d.style.setProperty('--ry', '0deg'); d.style.setProperty('--rx', '0deg'); });
+    });
+    document.querySelectorAll('.hero .btn.primary').forEach(b => {
+      b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .22}px, ${(e.clientY - r.top - r.height / 2) * .35}px)`; });
+      b.addEventListener('pointerleave', () => { b.style.transform = ''; });
+    });
+  }
+  let lastY = scrollY, vel = 0, xA = 0, xB = 0, dir = 1;
+  function tick() {
+    const y = scrollY, vh = innerHeight, dy = y - lastY; lastY = y;
+    vel += (dy - vel) * .18; if (Math.abs(dy) > .5) dir = dy > 0 ? 1 : -1;
+    const max = root.scrollHeight - vh; nav.style.setProperty('--sp', max > 0 ? (y / max).toFixed(4) : 0);
+    if (!reduceM) {
+      // hero
+      const hp = Math.min(1, Math.max(0, y / (hero.offsetHeight * .9))); hero.style.setProperty('--hp', hp.toFixed(4));
+      // strips: base drift + velocity, skew from velocity
+      const sp = 1.1 + Math.min(18, Math.abs(vel)) * .55;
+      const PA = sA.scrollWidth / 4, PB = sB.scrollWidth / 4; xA = (((xA + sp * dir) % PA) + PA) % PA; xB = (((xB - sp * dir) % PB) + PB) % PB;
+      const sk = Math.max(-14, Math.min(14, vel * .35));
+      sA.style.setProperty('--x', `${-xA}px`); sA.style.setProperty('--sk', `${-sk}deg`);
+      sB.style.setProperty('--x', `${-xB}px`); sB.style.setProperty('--sk', `${sk}deg`);
+      // big end
+      const rem = max - y, er = be.getBoundingClientRect(), ep = er.top > vh ? 0 : 1 - Math.min(1, Math.max(0, rem / (vh * .75)));
+      bes.forEach((s, i) => { const q = 1 - ep, m = i - (bes.length - 1) / 2; s.style.transform = `translate3d(${m * q * 60}px, ${(i % 2 ? 1 : -1) * q * 90}px, 0) rotate(${m * q * 12}deg)`; });
+    }
+    // manifesto
+    const mr = man.getBoundingClientRect(), mp = Math.min(1, Math.max(0, (vh * .82 - mr.top) / (mr.height + vh * .25)));
+    const on = Math.round(mp * mws.length); mws.forEach((w, i) => w.classList.toggle('on', i < on));
+    // steps
+    let act = -1;
+    steps.forEach((s, i) => { const r = s.getBoundingClientRect(), p = Math.min(1, Math.max(0, (vh * .55 - r.top) / r.height)); s.style.setProperty('--sp', p.toFixed(3)); if (r.top < vh * .55 && r.bottom > vh * .55) act = i; });
+    steps.forEach((s, i) => s.classList.toggle('active', i === act));
+    // pinned track
+    if (pinned) {
+      const r = pin.getBoundingClientRect(), total = pin.offsetHeight - (vh - 64), p = Math.min(1, Math.max(0, (64 - r.top) / Math.max(1, total)));
+      track.style.setProperty('--px', `${p * dist}px`); pin.style.setProperty('--pp', p.toFixed(3));
+      pinNum.textContent = `${String(Math.min(6, 1 + Math.floor(p * 5.999))).padStart(2, '0')} / 06`;
+    }
+    requestAnimationFrame(tick);
+  }
+  addEventListener('resize', layoutPin);
+  document.fonts.ready.then(layoutPin); layoutPin();
+  requestAnimationFrame(tick);
+})();
+</script>
+
+</body>
+</html>
