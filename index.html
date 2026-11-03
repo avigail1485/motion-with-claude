@@ -523,27 +523,6 @@ main { min-height: 100vh }
 html.lenis, html.lenis body { height: auto }
 html.lenis { scroll-behavior: auto }
 .lenis.lenis-stopped { overflow: clip }
-/* film grain over everything, very quiet */
-body::after { content: ""; position: fixed; inset: -50%; z-index: 60; pointer-events: none; opacity: .055; mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 1s steps(4) infinite }
-@keyframes grain { 25% { transform: translate(-3%, 2%) } 50% { transform: translate(2%, -3%) } 75% { transform: translate(-2%, -2%) } }
-/* preloader: a counter, then the curtain lifts */
-.pre { position: fixed; inset: 0; z-index: 80; pointer-events: none; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; clip-path: inset(0 0 0 0); transition: clip-path .9s cubic-bezier(.76, 0, .24, 1) }
-.pre.out { clip-path: inset(0 0 100% 0) }
-.pre[hidden] { display: none }
-.pre-in { display: grid; justify-items: center; gap: 10px; direction: ltr }
-.pre b { font: 400 clamp(110px, 22vw, 300px)/.8 var(--display); font-variant-numeric: tabular-nums; background: linear-gradient(100deg, #fff, var(--pink) 60%, var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent }
-.pre span { font: 600 13px/1 var(--body); letter-spacing: .3em; color: var(--on-ink-muted); direction: rtl }
-/* cursor: a dot and a ring that grows over anything clickable */
-.cur, .cur-ring { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; border-radius: 50%; mix-blend-mode: difference; will-change: transform }
-.cur { width: 8px; height: 8px; margin: -4px 0 0 -4px; background: #fff }
-.cur-ring { width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 1.5px solid #fff; display: grid; place-items: center; transition: width .35s cubic-bezier(.16, 1, .3, 1), height .35s cubic-bezier(.16, 1, .3, 1), margin .35s cubic-bezier(.16, 1, .3, 1), background .25s, border-color .25s }
-.cur-ring i { font: 600 12px/1 var(--body); font-style: normal; color: #000; opacity: 0; transition: opacity .2s; white-space: nowrap }
-.cur-ring.hov { width: 72px; height: 72px; margin: -36px 0 0 -36px; background: #fff }
-.cur-ring.lab { width: 96px; height: 96px; margin: -48px 0 0 -48px; background: #fff } .cur-ring.lab i { opacity: 1 }
-.cur-ring.down { width: 30px; height: 30px; margin: -15px 0 0 -15px }
-@media (hover: none), (pointer: coarse) { .cur, .cur-ring { display: none } }
 /* headings rise line by line, word by word */
 .rw { display: inline-block; overflow: hidden; vertical-align: top; padding-block: .08em; margin-block: -.08em }
 .rw > span { display: inline-block; transform: translateY(105%) rotate(3deg); transition: transform 1.1s cubic-bezier(.16, 1, .3, 1); transition-delay: calc(var(--i) * 70ms) }
@@ -552,30 +531,22 @@ html.split .sec-head h2 { animation: none !important; clip-path: none !important
 /* eyebrow line draws in, leads fade up */
 html.split .sec-head .lead { opacity: 0; transform: translateY(24px); transition: opacity .9s .25s, transform 1.1s .25s cubic-bezier(.16, 1, .3, 1) }
 html.split .sec-head.rv-on .lead { opacity: 1; transform: none }
-/* magnetic targets glide back */
-.mag { transition: transform .5s cubic-bezier(.16, 1, .3, 1) }
-@media (prefers-reduced-motion: reduce) { body::after { animation: none } .pre, .cur, .cur-ring { display: none !important } .rw > span { transform: none !important; transition: none } html.split .sec-head .lead { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .rw > span { transform: none !important; transition: none } html.split .sec-head .lead { opacity: 1; transform: none } }
 
-/* ===== v21: signatures from the references — block wipes, drawn strokes, stepped highlights, a title that dissolves, fanned cards ===== */
-.px { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 70; pointer-events: none }
-.sig-wrap { position: relative; display: inline-block }
-.sig { position: absolute; inset-inline: -6% -4%; bottom: -.34em; width: 110%; height: .4em; overflow: visible; pointer-events: none }
-.sig path { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke }
-.sig.on path { stroke-dashoffset: 0; transition: stroke-dashoffset 1.5s cubic-bezier(.65, 0, .35, 1) }
-.end { position: relative }
-.end-sig { position: relative; height: clamp(40px, 7vw, 90px); width: min(560px, 70%); margin: -.2em auto 0 } .end-sig .sig { inset: 0; width: 100%; height: 100% }
-/* the statement: highlight blocks build behind the key words in steps */
-.manifesto .mw.hl, .manifesto .mw.hl2 { position: relative; isolation: isolate; color: var(--ink) }
-.manifesto .mw.hl::before, .manifesto .mw.hl2::before { content: ""; position: absolute; inset: .1em -.12em .02em; z-index: -1; background: var(--pink); clip-path: inset(0 0 0 100%); transition: clip-path .55s steps(5) .15s }
-.manifesto .mw.hl2::before { background: var(--orange) }
-.manifesto .mw.on::before { clip-path: inset(0 0 0 0) }
-/* the hero title opens up and dissolves as you scroll away, like a title passing through cloud */
-.hero h1 { filter: blur(calc(var(--hp, 0) * 9px)); letter-spacing: calc(var(--hp, 0) * .14em) }
-/* the three cards under the hero arrive fanned like a hand of cards */
-.facts.here a { animation: fanIn 1.1s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(1.1s + var(--k) * 110ms) }
-.facts.here a:nth-child(1) { --k: 0; --r: -9deg; --x: 40px } .facts.here a:nth-child(2) { --k: 1; --r: 2deg; --x: 0px } .facts.here a:nth-child(3) { --k: 2; --r: 11deg; --x: -40px }
-@keyframes fanIn { from { opacity: 0; transform: translate(var(--x), 60px) rotate(var(--r)) scale(.9) } to { opacity: 1; transform: none } }
-@media (prefers-reduced-motion: reduce) { .px { display: none } .sig path { stroke-dashoffset: 0 } .hero h1 { filter: none; letter-spacing: normal } .facts.here a { animation: none } .manifesto .mw::before { transition: none } }
+
+/* ===== v22: the opening is one scroll-driven scene — the demo grows until you are inside it ===== */
+html.scene #hero { padding: 0; height: var(--sceneH, auto) }
+html.scene .scene-pin { position: sticky; top: var(--pinTop, 0px) }
+html.scene .scene-pin > .hero-grid { padding-block: clamp(32px, 5vw, 64px) clamp(56px, 7vw, 96px) }
+@media (min-width: 980px) { html.scene .scene-pin > .hero-grid { min-height: 100vh; align-content: center } }
+html.scene .stage { opacity: 0; transform: none !important; box-shadow: none }
+html.scene .hero-copy { transform: none; opacity: 1; will-change: transform, opacity, filter }
+.zoom { position: absolute; left: 0; right: 0; top: var(--zTop, 0px); height: var(--vh, 100vh); z-index: 3; pointer-events: none; transform-origin: 50% 50%; will-change: transform, clip-path; background: var(--paper-2) }
+.zoom canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block }
+.zoom-dim { position: absolute; inset: 0; background: var(--ink); opacity: 0 }
+.zoom-say { position: absolute; inset: 0; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; column-gap: .24em; padding-inline: 10%; text-align: center; font: 400 clamp(46px, 7.4vw, 128px)/1.02 var(--display); color: #fff; text-wrap: balance; margin: 0 }
+.zoom-say .zw { display: inline-block; opacity: 0; transform: translateY(.45em) }
+.zoom-say .zw.hl { color: var(--pink) }
 /* ===== v4: chat-style prompt builder ===== */
 .composer-field { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 4; background: var(--paper); padding-top: 10px; box-shadow: 0 -18px 18px -6px var(--paper) }
 .composer { display: flex; align-items: flex-end; gap: 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 28px; padding: 8px; transition: border-color .15s, box-shadow .15s }
@@ -756,7 +727,7 @@ html.split .sec-head.rv-on .lead { opacity: 1; transform: none }
 <div class="hero" id="hero"><div class="wrap hero-grid">
   <div class="hero-copy">
     <span class="eyebrow">מדריך חינמי · Claude Code</span>
-    <h1><span class="w"><span style="--i:0">תנו</span></span> <span class="w"><span style="--i:1">לטקסט</span></span> <span class="sig-wrap"><em class="w"><span style="--i:2">לזוז.</span></em><svg class="sig" viewBox="0 0 480 80" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="sigG1" x1="1" x2="0"><stop offset="0" stop-color="#FF94E6"/><stop offset="1" stop-color="#FF5A1F"/></linearGradient></defs><path pathLength="1" stroke="url(#sigG1)" d="M470 30 C 420 70, 380 18, 330 44 S 240 66, 190 34 S 90 14, 52 48 C 30 66, 12 40, 30 26"/></svg></span></h1>
+    <h1><span class="w"><span style="--i:0">תנו</span></span> <span class="w"><span style="--i:1">לטקסט</span></span> <em class="w"><span style="--i:2">לזוז.</span></em></h1>
     <p class="lead">כאן לומדים ליצור סרטוני מושן גרפיקס וטיפוגרפיה קינטית עם Claude Code, בלי תוכנת אנימציה ובלי לכתוב קוד. מתארים במילים, מאשרים פריימים, ומקבלים קובץ MP4 מוכן.</p>
     <div class="cta">
       <a class="btn primary" href="#guide">איך זה עובד, ב־6 שלבים <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a>
@@ -1020,7 +991,7 @@ html.split .sec-head.rv-on .lead { opacity: 1; transform: none }
 </main>
 
 <footer>
-  <div class="end" id="end"><div class="big-end" id="bigEnd" aria-hidden="true">זוזו.</div><div class="end-sig"><svg class="sig" viewBox="0 0 480 80" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="sigG2" x1="1" x2="0"><stop offset="0" stop-color="#FF94E6"/><stop offset="1" stop-color="#FF5A1F"/></linearGradient></defs><path pathLength="1" stroke="url(#sigG2)" d="M470 30 C 420 70, 380 18, 330 44 S 240 66, 190 34 S 90 14, 52 48 C 30 66, 12 40, 30 26"/></svg></div></div>
+  <div class="end" id="end"><div class="big-end" id="bigEnd" aria-hidden="true">זוזו.</div></div>
   <div class="wrap"><div class="foot">
     <span class="credit">פותח ב<svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="לב"><path d="M12 21s-7.5-4.6-9.6-9.4C.9 8.2 3 4.5 6.6 4.5c2.1 0 3.8 1.2 5.4 3.1 1.6-1.9 3.3-3.1 5.4-3.1 3.6 0 5.7 3.7 4.2 7.1C19.5 16.4 12 21 12 21z"/></svg> ע״י <a class="me" data-contact href="https://mail.google.com/mail/?view=cm&fs=1&to=avigail1485@gmail.com&su=%D7%94%D7%99%D7%99%20%D7%90%D7%91%D7%99%D7%92%D7%99%D7%9C%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%9E%D7%93%D7%A8%D7%99%D7%9A%20%22%D7%9E%D7%95%D7%A9%D7%9F%20%D7%A2%D7%9D%20Claude%20Code%22&body=%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%95%D7%90%D7%94%D7%91%D7%AA%D7%99%2C%0A%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20%D7%A9%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%93%D7%91%D7%A8%20%D7%A2%D7%9C%D7%99%D7%95%3A%0A%0A" target="_blank" rel="noopener" title="כתבו לי: avigail1485@gmail.com">אביגיל פינקל</a></span>
   </div></div>
@@ -1112,9 +1083,7 @@ html.split .sec-head.rv-on .lead { opacity: 1; transform: none }
   </div>
 </dialog>
 <div class="toast" id="toast" role="status" hidden></div>
-<div class="pre" id="pre" aria-hidden="true" hidden><div class="pre-in"><b id="preNum">000</b><span>מושן עם Claude</span></div></div>
-<canvas class="px" id="px" aria-hidden="true"></canvas>
-<div class="cur" id="cur" aria-hidden="true"></div><div class="cur-ring" id="curRing" aria-hidden="true"><i></i></div>
+
 
 <script src="brief-data.js"></script>
 <script>
@@ -2231,7 +2200,7 @@ document.documentElement.classList.add('js');
   window.currentView = () => cur;
   const show = (id, target, mode = 'push', focus = true) => { const v = views.find(x => x.id === id) || views[0], changed = cur !== v.id;
     if (changed) { views.forEach(x => x.els.forEach(e => { e.classList.toggle('v-off', x !== v); e.classList.remove('v-in'); }));
-      v.els.forEach(e => { void e.offsetWidth; e.classList.add('v-in'); }); const first = cur === null; cur = v.id; dispatchEvent(new Event('resize')); if (!first && window.playCurtain) window.playCurtain(); }
+      v.els.forEach(e => { void e.offsetWidth; e.classList.add('v-in'); }); const first = cur === null; cur = v.id; dispatchEvent(new Event('resize')); }
     links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + v.id));
     if (window.lenis) window.lenis.scrollTo(target || 0, { immediate: true, force: true }); else if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' }); else scrollTo({ top: 0, behavior: 'auto' });
 
@@ -2268,28 +2237,41 @@ document.documentElement.classList.add('js');
     document.querySelectorAll('dialog').forEach(d => mo.observe(d, { attributes: true, attributeFilter: ['open'] }));
   }
   if (still) return;
-  // preloader: once per visit
-  const pre = document.getElementById('pre'), num = document.getElementById('preNum');
-  let seen = false; try { seen = sessionStorage.getItem('pre') === '1'; sessionStorage.setItem('pre', '1'); } catch (e) {}
-  if (!seen) { pre.hidden = false; const t0 = performance.now(), D = 1100;
-    (function count(now) { const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3); num.textContent = String(Math.round(e * 100)).padStart(3, '0');
-      if (p < 1) requestAnimationFrame(count); else { pre.classList.add('out'); setTimeout(() => { pre.hidden = true; }, 950); } })(t0); }
-  // block wipe between screens: a staircase of blocks clears from the right (reading side) to the left
-  const px = document.getElementById('px'), pc = px.getContext('2d'), COLS = ['#3D22EA', '#3D22EA', '#3D22EA', '#5B3DF5', '#FF94E6', '#FF5A1F'];
-  let wipeT0 = -1;
-  window.playCurtain = () => { const dpr = Math.min(2, devicePixelRatio || 1); px.width = innerWidth * dpr; px.height = innerHeight * dpr; pc.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const size = innerWidth < 700 ? 56 : 84, cols = Math.ceil(innerWidth / size), rows = Math.ceil(innerHeight / size), blocks = [];
-    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const h = Math.sin(r * 12.9 + c * 78.2) * 43758.5; const n = h - Math.floor(h);
-      blocks.push({ x: innerWidth - (c + 1) * size, y: r * size, s: size, d: (c / cols) * .55 + (r / rows) * .15 + n * .12, col: COLS[Math.floor(n * COLS.length)] }); }
-    const first = wipeT0 < 0; wipeT0 = performance.now();
-    if (first || !px.running) { px.running = true; requestAnimationFrame(function step(now) { const t = (now - wipeT0) / 760; pc.clearRect(0, 0, innerWidth, innerHeight); let alive = false;
-      for (const b of blocks) { const p = (t - b.d) / .2; if (p >= 1) continue; alive = true; const k = p <= 0 ? 1 : 1 - Math.ceil(p * 3) / 3; if (k <= 0) continue; // stepped, not smooth
-        pc.fillStyle = b.col; pc.fillRect(b.x, b.y + b.s * (1 - k), b.s + 1, b.s * k + 1); }
-      if (alive) requestAnimationFrame(step); else { pc.clearRect(0, 0, innerWidth, innerHeight); px.running = false; } }); } };
-  // drawn strokes: under the hero word after it lands, under the footer word when it comes into view
-  const sigs = [...document.querySelectorAll('.sig')];
-  setTimeout(() => sigs[0] && sigs[0].classList.add('on'), seen ? 1300 : 2400);
-  const endSig = sigs[1]; if (endSig) new IntersectionObserver(es => es.forEach(e => endSig.classList.toggle('on', e.isIntersecting)), { threshold: .4 }).observe(endSig);
+  // ---- the opening scene: scroll carries you into the demo ----
+  (() => {
+    const hero = document.getElementById('hero'), grid = hero.querySelector('.hero-grid'), stage = document.getElementById('heroStage'), cv = stage.querySelector('canvas'), copy = hero.querySelector('.hero-copy');
+    if (!grid || !cv) return;
+    const pin = document.createElement('div'); pin.className = 'scene-pin'; hero.insertBefore(pin, grid); pin.appendChild(grid);
+    const zoom = document.createElement('div'); zoom.className = 'zoom'; zoom.setAttribute('aria-hidden', 'true');
+    const dim = document.createElement('div'); dim.className = 'zoom-dim';
+    const say = document.createElement('p'); say.className = 'zoom-say';
+    'כל פריים כאן נכתב בקוד. בלי טיימליין. בלי תוכנת אנימציה.'.split(' ').forEach((w, i) => { const sp = document.createElement('span'); sp.className = 'zw' + (/פריים|קוד/.test(w) ? ' hl' : ''); sp.textContent = w; say.append(sp, ' '); });
+    zoom.append(cv, dim, say); pin.appendChild(zoom); root.classList.add('scene');
+    const words = [...say.querySelectorAll('.zw')], clamp = v => Math.max(0, Math.min(1, v)), ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    let E = 0, pinH = 0, T = 0;
+    const layout = () => { const vh = innerHeight; root.style.setProperty('--vh', vh + 'px'); pinH = pin.offsetHeight; T = Math.min(0, vh - pinH); E = vh * (innerWidth < 700 ? 1.9 : 2.3);
+      hero.style.setProperty('--sceneH', `${pinH + E}px`); hero.style.setProperty('--pinTop', `${T}px`); pin.style.setProperty('--zTop', `${-T}px`); };
+    addEventListener('resize', layout); document.fonts.ready.then(layout); layout();
+    (function frame() {
+      if (!hero.classList.contains('v-off')) {
+        const r = hero.getBoundingClientRect(), P = clamp((T - r.top) / E), W = zoom.offsetWidth, H = zoom.offsetHeight;
+        const zr = zoom.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+        // the card's place inside the full-screen layer, before any transform
+        const z = ease(clamp(P / .42)), prev = zoom.style.transform; zoom.style.transform = 'none'; const zr0 = zoom.getBoundingClientRect(); zoom.style.transform = prev;
+        const cw = sr.width, ch = sr.height, cx = sr.left - zr0.left + cw / 2, cy = sr.top - zr0.top + ch / 2;
+        const s0 = Math.max(cw / W, ch / H), s = s0 + (1 - s0) * z, ix = (W - cw / s0) / 2 * (1 - z), iy = (H - ch / s0) / 2 * (1 - z), rad = 26 / s * (1 - z);
+        zoom.style.transform = `translate(${((cx - W / 2) * (1 - z)).toFixed(2)}px, ${((cy - H / 2) * (1 - z)).toFixed(2)}px) scale(${s.toFixed(4)})`;
+        zoom.style.clipPath = `inset(${iy.toFixed(1)}px ${ix.toFixed(1)}px round ${rad.toFixed(1)}px)`;
+        // the copy steps back and dissolves as the demo takes over
+        const c = clamp(P / .3); copy.style.opacity = (1 - c).toFixed(3); copy.style.transform = `translateY(${(-70 * c).toFixed(1)}px)`; copy.style.filter = c > 0 ? `blur(${(c * 8).toFixed(1)}px)` : '';
+        // inside: the screen dims and the line arrives word by word, then lifts away
+        dim.style.opacity = (clamp((P - .42) / .14) * .62).toFixed(3);
+        const w = clamp((P - .5) / .3) * words.length, out = clamp((P - .88) / .12);
+        words.forEach((el, i) => { const k = clamp(w - i); el.style.opacity = (k * (1 - out)).toFixed(3); el.style.transform = `translateY(${((1 - k) * .45 - out * .3).toFixed(3)}em)`; });
+      }
+      requestAnimationFrame(frame);
+    })();
+  })();
   // headings: split into words that rise when they come into view
   root.classList.add('split');
   const split = el => { let i = 0; [...el.childNodes].forEach(n => {
@@ -2301,23 +2283,6 @@ document.documentElement.classList.add('js');
   heads.forEach(h => { const h2 = h.querySelector('h2'); if (h2) split(h2); });
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('rv-on'); else if (e.boundingClientRect.top > 0) e.target.classList.remove('rv-on'); }), { threshold: .15 });
   heads.forEach(h => io.observe(h));
-  // depth: a few elements drift against the scroll
-  const par = [['.hero .stage', .06], ['.pop-screen', -.05], ['.pg-stage', .04], ['.hero-tip', .03]].flatMap(([q, k]) => [...document.querySelectorAll(q)].map(el => ({ el, k })));
-  (function drift() { const vh = innerHeight; par.forEach(({ el, k }) => { const r = el.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200 || !r.height) return; el.style.translate = `0 ${((r.top + r.height / 2 - vh / 2) * k).toFixed(1)}px`; }); requestAnimationFrame(drift); })();
-  if (!fine) return;
-  // magnetic buttons
-  document.querySelectorAll('.btn.primary, .btn.ghost, .pager a, .pop-big, .send').forEach(b => { b.classList.add('mag');
-    b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .18}px, ${(e.clientY - r.top - r.height / 2) * .28}px)`; });
-    b.addEventListener('pointerleave', () => { b.style.transform = ''; }); });
-  // cursor
-  const dot = document.getElementById('cur'), ring = document.getElementById('curRing'), lab = ring.querySelector('i');
-  let x = -100, y = -100, rx = -100, ry = -100;
-  addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; const t = e.target.closest && e.target.closest('a, button, label, summary, input, textarea, .gcard .demo, .pg-stage, .pop-screen');
-    const l = t && (t.matches('.gcard .demo') ? 'צפייה' : t.matches('.pop-screen') ? 'פליי' : '');
-    ring.classList.toggle('hov', !!t && !l); ring.classList.toggle('lab', !!l); if (l) lab.textContent = l; }, { passive: true });
-  addEventListener('pointerdown', () => ring.classList.add('down')); addEventListener('pointerup', () => ring.classList.remove('down'));
-  document.addEventListener('pointerleave', () => { x = y = -100; });
-  (function follow() { rx += (x - rx) * .18; ry += (y - ry) * .18; dot.style.transform = `translate(${x}px, ${y}px)`; ring.style.transform = `translate(${rx}px, ${ry}px)`; requestAnimationFrame(follow); })();
 })();
 </script>
 <script src="pop-engine.js"></script>
