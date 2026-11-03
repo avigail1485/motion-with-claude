@@ -514,14 +514,6 @@ main { min-height: 100vh }
 .opt-l { font-weight: 400 }
 .b-other { margin-top: 10px }
 .cp-row[hidden] { display: none }
-.insight { display: grid; gap: 10px; background: #ffffff0f; border: 1px solid #ffffff1f; border-radius: 16px; padding: 14px 16px; margin-bottom: 14px }
-.insight[hidden] { display: none }
-.in-h { font-size: 13px; letter-spacing: .06em; color: var(--pink) }
-.in-chips { display: flex; flex-wrap: wrap; gap: 6px } .in-chips span { font-size: 12.5px; font-weight: 600; color: var(--on-ink); background: #ffffff14; border-radius: 999px; padding: 4px 10px }
-.in-w { font-size: 14px; line-height: 1.55; color: var(--on-ink-muted) } .in-w b { color: var(--on-ink) }
-.in-beats { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px }
-.in-beats li { display: grid; gap: 2px; font-size: 13px; font-weight: 600; color: var(--on-ink); background: #3D22EA55; border-radius: 10px; padding: 6px 10px }
-.in-beats i { font-style: normal; font-weight: 400; font-size: 11.5px; color: var(--on-ink-muted); direction: ltr; text-align: right }
 .next { margin-top: 14px; background: #fff; border-radius: 18px; padding: 16px 18px; display: grid; gap: 6px; box-shadow: 0 1px 0 var(--line) }
 .next[hidden] { display: none }
 .next b { font-size: 16px } .next p { font-size: 15px; color: var(--muted) } .next a { font-weight: 600; color: var(--violet) }
@@ -1013,7 +1005,6 @@ main { min-height: 100vh }
           <b>הבריף שלכם ייכתב כאן</b>
           <span>כתבו על מה הסרטון, בחרו מה שמתאים ולחצו על החץ או על Enter</span>
         </div>
-        <div class="insight" id="genInsight" hidden></div>
         <pre id="b-out"></pre>
         <p class="gen-stale" id="genStale" hidden>שיניתם בחירות. לחצו על החץ כדי לעדכן את הבריף.</p>
       </div>
@@ -1064,6 +1055,7 @@ main { min-height: 100vh }
 </dialog>
 <div class="toast" id="toast" role="status" hidden></div>
 
+<script src="brief-data.js"></script>
 <script>
 'use strict';
 document.documentElement.lang = 'he'; document.documentElement.dir = 'rtl';
@@ -1626,38 +1618,105 @@ const TONE = {
   'אנרגטי ושובב': { motion: 'תנועה אנרגטית: כניסות מהירות וקצביות, קפיצות אלסטיות ו-squash & stretch, מעברים חדים ותזמון קומי.', palette: 'נועזת ורוויה.' },
   'חם ומרגש': { motion: 'תנועה רכה: האטות ארוכות (ease-out), נשימה בין מסרים, ושיא שנבנה בהדרגה.', palette: 'חמה ועוטפת.' }
 };
-const QSET = {
-  aud: { q: 'מי יצפה בסרטון?', why: 'כך נדע למי מדברים, ואיפה הוא יוצג',
-    promo: ['לקוחות פוטנציאליים', 'שותפים ומשקיעים', 'עובדים ומועמדים'], cta: ['עוקבים ברשתות', 'לקוחות קיימים', 'קהל חדש שעוד לא מכיר אותנו'], msg: ['הצוות והקהילה שלנו', 'קהל רחב ברשתות', 'קהל באירוע, על מסך גדול'], other: ['קהל רחב ברשתות', 'קהל באירוע, על מסך גדול', 'קבוצה קטנה ואישית'] },
-  tone: { q: 'איזו תחושה הצופים צריכים לקבל?', why: 'התחושה קובעת את סוג התנועה ואת הקצב', all: Object.keys(TONE) },
-  core: { promo: ['מה הכי חשוב שיבינו עליכם?', ['מה אנחנו עושים, במשפט אחד', 'למה דווקא אנחנו', 'האנשים והסיפור שמאחורינו']], cta: ['מה ההצעה?', ['מבצע או הנחה לזמן מוגבל', 'מוצר או שירות חדש', 'הרשמה לאירוע, לקורס או לניוזלטר']],
-    msg: ['מה המסר?', ['ערך או אמונה שאנחנו מובילים', 'תודה או הוקרה', 'הכרזה על שינוי או חדשות']], other: ['מה הכוכב של הסרטון?', ['מסר אחד חד', 'השם או המותג', 'רצף של רעיונות קצרים']], why: 'הדבר האחד שהצופים צריכים לזכור' },
-  end: { q: 'מה קורה בסוף?', why: 'השנייה האחרונה היא מה שנשאר בזיכרון',
-    promo: ['חשיפת לוגו וסלוגן', 'הזמנה לאתר או לעמוד', 'משפט מחץ שנשאר'], cta: ['לחצו על הקישור', 'הירשמו או הזמינו עכשיו', 'שלחו לנו הודעה'], msg: ['משפט שנשאר בזיכרון', 'בקשה לשתף', 'חתימה של המותג'], other: ['רגע שיא עם השם או המסר', 'סיום שובב ומפתיע', 'קריאה לפעולה'] }
+/* ---------- follow-up questions: a short flow that builds on each answer ----------
+   Every question is { id, sec, q, why, opts } or a free-text question { id, sec, q, why, text: true, ph }.
+   Option labels map to data through the small tables below. */
+const GOAL = { 'להציג אותנו: סרטון תדמית': 'promo', 'לגרום לאנשים לפעול: הנעה לפעולה': 'cta', 'להעביר מסר או רגש': 'msg' };
+const FIELD = { 'אוכל, קפה או מסעדה': 'food', 'חנות או מוצרים': 'retail', 'ייעוץ, משפט או פיננסים': 'finance', 'בריאות וטיפול': 'health', 'חינוך והדרכה': 'edu', 'חינוך ונוער': 'edu', 'בריאות ורווחה': 'health', 'קהילה ותרבות': 'nonprofit' };
+const WHERE = { 'בטלפון: רילס, טיקטוק או סטורי': 'reels', 'פוסט בפיד של אינסטגרם או פייסבוק': 'feed', 'מסך רחב: אתר, יוטיוב או מצגת': 'wide' };
+const CONTACT_ENDS = ['הזמנה לאתר או לעמוד', 'לחצו על הקישור', 'שלחו לנו הודעה', 'הירשמו או הזמינו עכשיו', 'קריאה לפעולה'];
+const Q = {
+  goal: { sec: 'המטרה', q: 'מה הסרטון צריך לעשות?', why: 'המטרה קובעת את המבנה ואת הסוף', opts: Object.keys(GOAL) },
+  who: { sec: 'למי זה', q: 'בשביל מי הסרטון?', why: 'כך נדע מאיזה עולם לקחת השראה', opts: ['עסק או מותג', 'אירוע או אדם שחוגגים', 'ארגון, עמותה או קהילה'] },
+  field: { sec: 'למי זה', q: 'במה העסק עוסק?', why: 'מהתחום נגזרים הצבעים, הפונטים והתנועה', opts: ['אוכל, קפה או מסעדה', 'חנות או מוצרים', 'שירות מקצועי'] },
+  service: { sec: 'למי זה', q: 'איזה שירות?', why: 'עוד דיוק קטן, ואנחנו שם', opts: ['ייעוץ, משפט או פיננסים', 'בריאות וטיפול', 'חינוך והדרכה'] },
+  occasion: { sec: 'למי זה', q: 'מה האירוע?', why: 'כל אירוע מבקש אווירה אחרת', opts: ['יום הולדת או חגיגה', 'פרידה, הוקרה או תודה', 'כנס, השקה או ערב חברה'] },
+  honoree: { sec: 'למי זה', q: 'למי הסרטון מוקדש?', why: 'כך נדע במי להתמקד', opts: ['לאדם אחד', 'לצוות או לקבוצה', 'לכל מי שבאירוע'] },
+  name: { sec: 'למי זה', q: 'איזה שם יופיע בסרטון?', why: 'אפשר לדלג אם עוד לא החלטתם', text: true, ph: 'למשל: רותי, או צוות המכירות' },
+  cause: { sec: 'למי זה', q: 'במה הארגון עוסק?', why: 'מהתחום נגזרת השפה החזותית', opts: ['חינוך ונוער', 'בריאות ורווחה', 'קהילה ותרבות'] },
+  offer: { sec: 'המסר', q: 'מה ההצעה?', why: 'זה הדבר שהצופים צריכים לרצות', opts: ['מבצע או הנחה לזמן מוגבל', 'מוצר או שירות חדש', 'הרשמה לאירוע, לקורס או לניוזלטר'] },
+  deadline: { sec: 'המסר', q: 'עד מתי ההצעה?', why: 'דחיפות אמיתית עובדת יותר מצעקה', opts: ['עד סוף השבוע', 'עד סוף החודש', 'אין תאריך יעד'] },
+  highlight: { sec: 'המסר', q: 'מה הכי מרשים בו?', why: 'את זה נראה, לא רק נגיד', opts: ['איך הוא נראה', 'מה הוא עושה', 'כמה הוא פשוט'] },
+  benefit: { sec: 'המסר', q: 'מה מקבלים מההרשמה?', why: 'התועלת היא מה שגורם ללחוץ', opts: ['ידע או מיומנות חדשה', 'מקום באירוע', 'עדכונים והטבות'] },
+  focus: { sec: 'המסר', q: 'מה הכי חשוב שיבינו עליכם?', why: 'הדבר האחד שנשאר אחרי צפייה', opts: ['מה אנחנו עושים, במשפט אחד', 'למה דווקא אנחנו', 'האנשים והסיפור שמאחורינו'] },
+  proof: { sec: 'המסר', q: 'יש משהו שמוכיח את זה?', why: 'הוכחה אחת שווה עשרה סופרלטיבים', opts: ['מספר: שנים, לקוחות או תוצאה', 'לקוח מוכר או פרס', 'לא צריך, נתמקד בתחושה'] },
+  orgGoal: { sec: 'המסר', q: 'מה הסרטון צריך להשיג?', why: 'המטרה קובעת את הסוף', opts: ['גיוס תרומות', 'גיוס מתנדבים', 'מודעות לנושא'] },
+  message: { sec: 'המסר', q: 'מה המסר?', why: 'הדבר האחד שנשאר אחרי צפייה', opts: ['ערך או אמונה שאנחנו מובילים', 'תודה או הוקרה', 'הכרזה על שינוי או חדשות'] },
+  delivery: { sec: 'המסר', q: 'איך הכי נכון להגיד את זה?', why: 'כך נבחר את מבנה הסצנות', opts: ['במשפט אחד חזק', 'כרצף של רגעים קטנים', 'כסיפור קצר עם שיא'] },
+  where: { sec: 'איפה ומי', q: 'איפה הסרטון יוצג?', why: 'כך נקבע גודל, יחס ואזורים בטוחים', opts: Object.keys(WHERE) },
+  aud: { sec: 'איפה ומי', q: 'מי יצפה בסרטון?', why: 'כך נדע למי מדברים',
+    biz: ['לקוחות חדשים שעוד לא מכירים אותנו', 'לקוחות קיימים', 'שותפים ומשקיעים'], event: ['האורחים באירוע, על מסך גדול', 'משפחה וחברים ברשתות', 'הצוות או הקבוצה'], org: ['תורמים ותומכים', 'מתנדבים פוטנציאליים', 'הקהל הרחב ברשתות'], any: ['קהל רחב ברשתות', 'קהל באירוע, על מסך גדול', 'קבוצה קטנה ואישית'] },
+  tone: { sec: 'התחושה', q: 'איזו תחושה הצופים צריכים לקבל?', why: 'התחושה קובעת את סוג התנועה ואת הקצב', opts: Object.keys(TONE) },
+  end: { sec: 'הסוף', q: 'מה קורה בסוף?', why: 'השנייה האחרונה היא מה שנשאר בזיכרון',
+    promo: ['חשיפת לוגו וסלוגן', 'הזמנה לאתר או לעמוד', 'משפט מחץ שנשאר'], cta: ['לחצו על הקישור', 'הירשמו או הזמינו עכשיו', 'שלחו לנו הודעה'], msg: ['משפט שנשאר בזיכרון', 'בקשה לשתף', 'חתימה של המותג'], other: ['רגע שיא עם השם או המסר', 'סיום שובב ומפתיע', 'קריאה לפעולה'] },
+  contact: { sec: 'הסוף', q: 'מה יופיע בסוף?', why: 'כתובת, טלפון או שם עמוד. אפשר לדלג', text: true, ph: 'למשל: www.example.co.il' }
 };
+const label = a => a ? (a.other || a.label) : '';
+// the flow is recomputed after every answer, so each question can build on the ones before it
+function questionFlow(A, ctx) {
+  const F = [], add = (id, extra) => F.push(Object.assign({ id }, Q[id], extra || {}));
+  if (!ctx.type) add('goal');
+  const type = ctx.type || GOAL[label(A.goal)] || '';
+  add('who'); const who = label(A.who);
+  if (who === 'עסק או מותג') { if (!ctx.world) { add('field'); if (label(A.field) === 'שירות מקצועי') add('service'); } }
+  else if (who === 'אירוע או אדם שחוגגים') { add('occasion'); if (/חגיגה|הוקרה/.test(label(A.occasion))) { add('honoree'); add('name'); } }
+  else if (who === 'ארגון, עמותה או קהילה') add('cause');
+  const org = who === 'ארגון, עמותה או קהילה';
+  if (type === 'cta' && !org) { add('offer'); const o = label(A.offer); if (o.startsWith('מבצע')) add('deadline'); else if (o.startsWith('מוצר')) add('highlight'); else if (o.startsWith('הרשמה')) add('benefit'); }
+  else if (type === 'promo') { add('focus'); add('proof'); }
+  else if (org) add('orgGoal');
+  else if (type === 'msg') { add('message'); add('delivery'); }
+  if (!ctx.fmt) add('where');
+  const aud = who === 'עסק או מותג' ? 'biz' : who === 'אירוע או אדם שחוגגים' ? 'event' : org ? 'org' : 'any';
+  add('aud', { opts: Q.aud[aud] });
+  add('tone');
+  add('end', { opts: Q.end[type] || Q.end.other });
+  if (CONTACT_ENDS.includes(label(A.end))) add('contact');
+  return F;
+}
 const DIR = {
-  'לקוחות פוטנציאליים': 'הקהל עוד לא מכיר אתכם: כל מה שמופיע צריך להיות מובן בצפייה ראשונה, בלי ידע מוקדם.',
-  'שותפים ומשקיעים': 'קהל מקצועי: אמינות, בהירות ומספרים. פחות קישוט, יותר ביטחון.',
-  'עובדים ומועמדים': 'קהל פנימי: אנשים, תרבות ושייכות. הסרטון צריך להרגיש כמו מקום שרוצים להיות בו.',
-  'עוקבים ברשתות': 'עוקבים שכבר מכירים אתכם: אפשר להיכנס ישר לעניין, עם הומור ושפה של הרשתות.',
+  'לקוחות חדשים שעוד לא מכירים אותנו': 'הקהל עוד לא מכיר אתכם: כל מה שמופיע צריך להיות מובן בצפייה ראשונה, בלי ידע מוקדם.',
   'לקוחות קיימים': 'לקוחות שכבר סומכים עליכם: מדברים אליהם כמו אל חברים, ומדגישים מה חדש בשבילם.',
-  'קהל חדש שעוד לא מכיר אותנו': 'קהל קר: ההצעה חייבת להיות מובנת תוך 3 שניות, בלי הקשר מוקדם.',
-  'הצוות והקהילה שלנו': 'קהל קרוב: מותר רגש, פרטים אישיים ושפה פנימית.',
+  'שותפים ומשקיעים': 'קהל מקצועי: אמינות, בהירות ומספרים. פחות קישוט, יותר ביטחון.',
+  'האורחים באירוע, על מסך גדול': 'מסך גדול באולם: טקסט שקריא מהשורה האחרונה, תנועות רחבות, ובלי פרטים קטנים.',
+  'משפחה וחברים ברשתות': 'קהל קרוב שצופה בטלפון: אישי, חם, ומובן גם בלי סאונד.',
+  'הצוות או הקבוצה': 'קהל פנימי: מותר הומור פנימי ופרטים שרק הם מכירים.',
+  'תורמים ותומכים': 'קהל של תורמים ותומכים: אמינות ושקיפות, בלי סחטנות רגשית.',
+  'מתנדבים פוטנציאליים': 'קהל של מתנדבים פוטנציאליים: מדברים אליהם בגובה העיניים, בלי רגשות אשם.',
+  'הקהל הרחב ברשתות': 'קהל רחב ברשתות: 3 השניות הראשונות חייבות לעצור את הגלילה.',
   'קהל רחב ברשתות': 'קהל רחב ברשתות: 3 השניות הראשונות חייבות לעצור את הגלילה.',
   'קהל באירוע, על מסך גדול': 'מסך גדול באולם: טקסט שקריא מהשורה האחרונה, תנועות רחבות, ובלי פרטים קטנים.',
   'קבוצה קטנה ואישית': 'קהל קטן ואישי: אפשר להיות ספציפי, מפתיע ואינטימי.',
   'מה אנחנו עושים, במשפט אחד': 'מה שהעסק עושה מנוסח במשפט אחד קצר, ומקבל את הטיפול הטיפוגרפי החזק בסרטון.',
   'למה דווקא אנחנו': 'היתרון הייחודי הוא הכוכב: מראים אותו, לא רק אומרים אותו.',
   'האנשים והסיפור שמאחורינו': 'הסיפור והאנשים במרכז: רגעים אנושיים, ופחות מוצר.',
-  'מבצע או הנחה לזמן מוגבל': 'ההצעה והמחיר הם הגיבורים. הדחיפות מורגשת, אבל בלי צעקה.',
-  'מוצר או שירות חדש': 'חשיפה של משהו חדש: בנייה של סקרנות, ואז רגע חשיפה ברור.',
-  'הרשמה לאירוע, לקורס או לניוזלטר': 'מה מקבלים מההרשמה מנוסח כתועלת ברורה, ותאריך או פרט מפתח מודגש.',
+  'מספר: שנים, לקוחות או תוצאה': 'רגע ההוכחה הוא מספר אחד גדול שרץ עד היעד. אצרף את המספר המדויק.',
+  'לקוח מוכר או פרס': 'רגע ההוכחה מציג את הלקוח או הפרס בצורה נקייה ומכובדת. אצרף לוגו או שם.',
+  'לא צריך, נתמקד בתחושה': 'בלי מספרים ולוגואים: ההוכחה היא התחושה והאיכות של הסרטון עצמו.',
+  'מבצע או הנחה לזמן מוגבל': 'ההצעה והמחיר הם הגיבורים: גדולים, ברורים וקלים לזכירה.',
+  'עד סוף השבוע': 'הדחיפות מורגשת: "עד סוף השבוע" מופיע בבירור, אבל בלי צעקה.',
+  'עד סוף החודש': 'הדחיפות מורגשת: "עד סוף החודש" מופיע בבירור, אבל בלי צעקה.',
+  'אין תאריך יעד': 'בלי שעון חול: הדחיפות באה מהערך, לא מהזמן.',
+  'מוצר או שירות חדש': 'חשיפה של משהו חדש: בונים סקרנות, ואז רגע חשיפה ברור.',
+  'איך הוא נראה': 'רגע החשיפה מציג את המוצר מקרוב, באור סטודיו, כמו תכשיט.',
+  'מה הוא עושה': 'מראים את המוצר בפעולה: בעיה אחת, פתרון אחד, בלי הסברים ארוכים.',
+  'כמה הוא פשוט': 'מראים כמה זה פשוט: שלושה צעדים או פחות, כל אחד בסצנה קצרה.',
+  'הרשמה לאירוע, לקורס או לניוזלטר': 'מה שמקבלים מההרשמה מנוסח כתועלת ברורה, ותאריך או פרט מפתח מודגש.',
+  'ידע או מיומנות חדשה': 'התועלת היא מה שיֵדעו לעשות אחרי, מנוסחת כתוצאה ולא כתוכנית לימודים.',
+  'מקום באירוע': 'התאריך, המקום ותחושת הרגע הם הגיבורים.',
+  'עדכונים והטבות': 'מראים דוגמה להטבה אחת שמקבלים, כדי שזה ירגיש מוחשי.',
+  'גיוס תרומות': 'מראים מה תרומה אחת משנה, ומסיימים בדרך פשוטה לתרום.',
+  'גיוס מתנדבים': 'מראים את החוויה ואת האנשים, ואיך קל להצטרף.',
+  'מודעות לנושא': 'נתון או רגע אחד שמזיז משהו בבטן, ומשפט שאפשר לצטט.',
   'ערך או אמונה שאנחנו מובילים': 'הערך מנוסח כמשפט אחד שאפשר לצטט, וכל הסרטון בונה אליו.',
   'תודה או הוקרה': 'הסרטון הוא מכתב תודה בתנועה: אישי, חם ומדויק.',
   'הכרזה על שינוי או חדשות': 'ההכרזה ברורה וחגיגית: מה משתנה, ולמה זה טוב.',
-  'מסר אחד חד': 'מסר אחד קצר שכל הסרטון בנוי סביבו. כל השאר משרת אותו.',
-  'השם או המותג': 'השם או המותג חוזרים כמוטיב, כל פעם בטיפול אחר, ומקבלים את הרגע הגדול.',
-  'רצף של רעיונות קצרים': 'רצף מהיר של רעיונות קצרים, אחד כל 2–3 שניות, עם מעבר אחיד ביניהם.',
+  'במשפט אחד חזק': 'כל הסרטון בונה אל משפט אחד, שמקבל את המסך כולו.',
+  'כרצף של רגעים קטנים': 'רצף של רגעים קצרים, אחד כל 2–3 שניות, עם מעבר אחיד ביניהם.',
+  'כסיפור קצר עם שיא': 'סיפור קצר: פתיחה, בנייה, שיא ורגע שקט אחריו.',
+  'לאדם אחד': 'הסרטון תפור לאדם אחד: השם שלו הוא הכוכב, ופרטים אישיים יוצרים חיוך.',
+  'לצוות או לקבוצה': 'הסרטון שייך לכל הקבוצה: שמות, רגעים משותפים ובדיחות פנימיות.',
+  'לכל מי שבאירוע': 'הסרטון פונה לכל האולם: אנרגיה משותפת ורגע שכולם מגיבים אליו.',
   'חשיפת לוגו וסלוגן': 'חשיפת לוגו נקייה עם הסלוגן, על רקע שקט, בלי אפקטים שמתחרים בהם.',
   'הזמנה לאתר או לעמוד': 'כתובת האתר או שם העמוד גדולים וקריאים, מוחזקים לפחות 3 שניות.',
   'משפט מחץ שנשאר': 'משפט מחץ אחד שנכנס לבד, במסך שקט.',
@@ -1671,7 +1730,7 @@ const DIR = {
   'סיום שובב ומפתיע': 'סיום עם טוויסט קטן ומחייך, ששובר את התבנית ברגע האחרון.',
   'קריאה לפעולה': 'קריאה לפעולה ברורה בשנייה האחרונה, בטקסט גדול, מוחזקת לפחות 3 שניות.'
 };
-const SOCIAL_AUD = ['עוקבים ברשתות', 'קהל רחב ברשתות', 'קהל חדש שעוד לא מכיר אותנו'];
+const SOCIAL_RX = /ברשתות|בטלפון|פוסט בפיד/;
 Object.entries(B).forEach(([key, f]) => {
   const box = document.getElementById('b-' + key);
   f.opts.forEach(([v, label]) => {
@@ -1700,8 +1759,8 @@ const typeLabel = () => typeOf() === 'other' ? (document.getElementById('b-type-
 const hasMusic = () => vals('sound')[0] === 'own';
 function keySums() { const mat = vals('mat'), snd = vals('sound')[0], f = vals('format')[0], l = vals('length')[0];
   const set = (id, t) => { const el = document.getElementById('ks-' + id); if (el) el.textContent = t; };
-  set('type', typeLabel() || 'לא נבחר');
-  set('place', [f ? lab('format', f) : 'פורמט לא נבחר', l ? lab('length', l) : 'אורך לא נבחר'].join(' · '));
+  set('type', typeLabel() || 'אפשר לבחור, או שנשאל בהמשך');
+  set('place', [f ? lab('format', f) : 'פורמט: נשאל בהמשך', l ? lab('length', l) : 'אורך: Claude יציע'].join(' · '));
   { const el = document.getElementById('ks-brand'), nm = document.getElementById('b-brand-name').value.trim();
     if (el) el.innerHTML = (nm ? `${nm.replace(/[<&]/g, '')} · ` : '') + (COLS.on && COLS.list.length ? COLS.list.map(c => `<i class="ks-dot" style="background:${c}"></i>`).join('') + ` ${one(COLS.list.length, 'צבע מותג אחד', 'צבעי מותג')}` : 'Claude יבחר פלטה'); }
   set('assets', [mat.length ? one(mat.length, 'חומר אחד', 'חומרים') : 'בלי חומרים', snd ? lab('sound', snd) : 'סאונד לא נבחר'].join(' · '));
@@ -1712,127 +1771,147 @@ document.querySelectorAll('.key').forEach(d => d.addEventListener('toggle', () =
 const ansText = a => a ? (a.other ? a.other : a.label) : null;
 const ansDir = a => a ? (a.other ? `לפי מה שכתבתי: "${a.other}". תרגם את זה להחלטות עיצוב ותנועה.` : DIR[a.label]) : null;
 const sec = n => { const m = Math.floor(n / 60), s = Math.round(n % 60); return m ? `${m}:${String(s).padStart(2, '0')}` : `${s}`; };
-function plan(A = {}) { // everything the builder understood, used for both the brief and the on-screen summary
-  const topic = document.getElementById('b-topic').value.trim(), type = typeOf() || 'other', fmt = vals('format')[0], len = vals('length')[0], snd = vals('sound')[0], mat = vals('mat');
-  const world = worldOf(topic), L = len && len !== 'song' ? +len : 0, beats = BEATS[type] || BEATS.other;
-  let acc = 0; const timeline = beats.map(([share, name, what], i) => { const a = acc; acc += share; const isEnd = i === beats.length - 1;
-    const desc = isEnd ? (ansDir(A.end) || (type === 'cta' ? DIR['קריאה לפעולה'] : 'סיום שנשאר בזיכרון: השם, המסר או הלוגו, במסך נקי.')) : what;
-    return { name, desc, from: L ? sec(a * L) : `${Math.round(a * 100)}%`, to: L ? sec(acc * L) : `${Math.round(acc * 100)}%` }; });
-  const audBig = A.aud && A.aud.label === 'קהל באירוע, על מסך גדול', bigCtx = audBig || hits(topic, BIG_WORDS) > 0 || fmt === 'deck';
-  const social = (fmt && FMT[fmt].social) || (A.aud && SOCIAL_AUD.includes(A.aud.label));
-  return { topic, type, fmt, len, snd, mat, world, beats: timeline, social, bigVertical: bigCtx && fmt === 'reels' };
+const flowCtx = () => { const topic = document.getElementById('b-topic').value.trim(); return { topic, type: typeOf(), fmt: vals('format')[0] || '', world: worldOf(topic) }; };
+function plan(A = {}) { // everything the builder understood from the form and the answers
+  const ctx = flowCtx(), topic = ctx.topic, len = vals('length')[0], snd = vals('sound')[0], mat = vals('mat');
+  const type = ctx.type || GOAL[label(A.goal)] || 'other', who = label(A.who), occ = label(A.occasion);
+  const fieldText = A.field && A.field.other ? A.field.other : A.cause && A.cause.other ? A.cause.other : A.service && A.service.other ? A.service.other : '';
+  const byId = id => WORLDS.find(w => w.id === id) || null;
+  let world = null;
+  // what the user said explicitly beats what we guessed from the topic
+  if (who === 'אירוע או אדם שחוגגים' && /חגיגה|הוקרה/.test(occ)) world = byId('celebration');
+  else if (who === 'ארגון, עמותה או קהילה') world = byId('nonprofit');
+  else world = byId(FIELD[label(A.service)] || FIELD[label(A.field)]) || (fieldText ? worldOf(fieldText) : null) || ctx.world;
+  const audBig = /מסך גדול/.test(label(A.aud)), confer = occ.startsWith('כנס');
+  let fmt = ctx.fmt || WHERE[label(A.where)] || '';
+  if (!ctx.fmt && fmt === 'wide' && (audBig || confer)) fmt = 'deck';
+  const bigCtx = audBig || confer || hits(topic, BIG_WORDS) > 0 || fmt === 'deck';
+  const social = (fmt && FMT[fmt].social) || SOCIAL_RX.test(label(A.aud));
+  const L = len && len !== 'song' ? +len : 0, beats = BEATS[type] || BEATS.other; let acc = 0;
+  const endDesc = (ansDir(A.end) || (type === 'cta' ? DIR['קריאה לפעולה'] : 'סיום שנשאר בזיכרון: השם, המסר או הלוגו, במסך נקי.')) + (A.contact && A.contact.other ? ` מה שמופיע בסוף: ${A.contact.other}` : '');
+  const timeline = beats.map(([share, name, what], i) => { const a = acc; acc += share;
+    return { name, desc: i === beats.length - 1 ? endDesc : what, from: L ? sec(a * L) : `${Math.round(a * 100)}%`, to: L ? sec(acc * L) : `${Math.round(acc * 100)}%` }; });
+  return { topic, type, fmt, len, snd, mat, world, fieldText, beats: timeline, social, bigVertical: bigCtx && fmt === 'reels' };
 }
 function composePrompt(A = {}) {
-  const P = plan(A), music = P.snd === 'own', brand = document.getElementById('b-brand-name').value.trim(), tone = A.tone && TONE[A.tone.label];
+  const P = plan(A), D = window.BRIEF_DATA, music = P.snd === 'own', sound = music || P.snd === 'design';
+  const brand = document.getElementById('b-brand-name').value.trim(), toneLabel = label(A.tone), tone = TONE[toneLabel];
+  const W = P.world ? D.WORLD[P.world.id] : null, base = W || D.DEFAULT;
+  const typeName = TYPE_NAME[P.type] || (typeOf() === 'other' ? typeLabel() : '');
   let s = `אתה מעצב מושן בכיר ברמה בינלאומית וארט דיירקטור. בנה סרטון מושן גרפיקס כקוד (HTML ו-JavaScript), ורנדר אותו ל-MP4.\n`;
+  // context
   s += `\n## ההקשר\nנושא: ${P.topic}\n`;
-  s += `סוג: ${typeLabel() ? (TYPE_NAME[P.type] || typeLabel()) : 'לא נבחר. הצע את הסוג שמתאים למטרה'}\n`;
+  s += `סוג: ${typeName || 'הצע את הסוג שמתאים למטרה'}\n`;
   if (brand) s += `מותג: ${brand}\n`;
+  if (P.fieldText) s += `תחום: ${P.fieldText}\n`; else if (A.cause) s += `תחום הארגון: ${ansText(A.cause)}\n`;
+  if (A.occasion) s += `אירוע: ${ansText(A.occasion)}\n`;
+  if (A.name && A.name.other) s += `השם שמופיע בסרטון: ${A.name.other}\n`;
   if (A.aud) s += `קהל: ${ansText(A.aud)}\n`;
   if (A.tone) s += `התחושה: ${ansText(A.tone)}\n`;
-  if (A.core) s += `הכי חשוב: ${ansText(A.core)}\n`;
+  // spec
   s += `\n## מפרט טכני\n`;
-  s += P.fmt ? `פורמט: ${lab('format', P.fmt)}, ${FMT[P.fmt].size} (${FMT[P.fmt].ratio}), 30 פריימים לשנייה\n${FMT[P.fmt].rule}\n` : `פורמט: לא נבחר. הצע את הפורמט שמתאים למקום שבו הסרטון יוצג, 30 פריימים לשנייה\n`;
-  s += `אורך: ${P.len === 'song' ? 'לפי אורך השיר שאצרף' : P.len ? lab('length', P.len) : 'לא נבחר. הצע אורך מתאים (בדרך כלל 15–30 שניות לרשתות)'}\n`;
+  s += P.fmt ? `פורמט: ${lab('format', P.fmt)}, ${FMT[P.fmt].size} (${FMT[P.fmt].ratio}), 30 פריימים לשנייה\n${FMT[P.fmt].rule}\n` : `פורמט: הצע את הפורמט שמתאים למקום שבו הסרטון יוצג, 30 פריימים לשנייה\n`;
+  s += `אורך: ${P.len === 'song' ? 'לפי אורך השיר שאצרף' : P.len ? lab('length', P.len) : 'הצע אורך מתאים (בדרך כלל 15–30 שניות לרשתות)'}\n`;
   if (P.bigVertical) s += `שים לב: הסרטון יוצג על מסך גדול, אבל הפורמט אנכי. הצע פורמט רחב, או קומפוזיציה שעובדת גם כך.\n`;
-  // art direction: one source per topic
+  // art direction: one source per subject
   s += `\n## כיוון אמנותי\n`;
   s += P.world ? `העולם של הסרטון: ${P.world.name}. קח השראה מהעולם הזה, לא מתבניות גנריות.\nשפה חזותית: ${P.world.look}\nטיפוגרפיה: ${P.world.type}\nרעיונות לפתיחה: ${P.world.ideas}\n`
     : `שפה חזותית: גזור אותה מתוך העולם של הנושא: חומרים, צורות, מטאפורות וצבעים שמזוהים איתו. לא תבניות גנריות.\n`;
+  if (!P.mat.includes('font')) s += `פונטים: ${base.fonts[0]} לכותרות ו-${base.fonts[1]} לטקסט (Google Fonts, תומכים בעברית, ברישיון פתוח). אם יש התאמה טובה יותר לקונספט, הצע אותה.\n`;
   if (COLS.on && COLS.list.length) s += `צבעי המותג: ${COLS.list.join(', ')}. השתמש רק בצבעים האלה ובגוונים שלהם, ושמור עליהם דומיננטיים לאורך כל הסרטון.\n`;
-  else s += `פלטה: ${P.world ? P.world.palette : tone ? tone.palette : 'בחר פלטה שמתאימה לנושא.'} הצג אותה בגיליון הפריימים לאישור.\n`;
-  s += `${tone ? tone.motion : P.world ? `תנועה: ${P.world.motion}` : 'תנועה: בחר שפת תנועה אחת שמתאימה לנושא, והחזק בה לאורך כל הסרטון.'}\n`;
-  // structure
+  else if (W) s += `פלטה: ${P.world.palette} נקודת פתיחה: ${W.hex.join(', ')}. הצג אותה בגיליון הפריימים לאישור.\n`;
+  else s += `פלטה: ${tone ? tone.palette : 'בחר פלטה שמתאימה לנושא.'} הצג אותה בגיליון הפריימים לאישור.\n`;
+  const ez = D.TONE_EASE[toneLabel] || (P.world && D.WORLD_EASE[P.world.id]) || ['expo', '400–700ms'], E = D.EASE[ez[0]];
+  s += `${tone ? tone.motion : P.world ? `תנועה: ${P.world.motion}` : 'תנועה: בחר שפת תנועה אחת שמתאימה לנושא, והחזק בה לאורך כל הסרטון.'} Easing ראשי: ${E.name}, ${E.css}, במשך ${ez[1]} לתנועה.\n`;
+  s += `טכניקות שמתאימות כאן:\n${base.tech.map(k => '• ' + D.TECH[k]).join('\n')}\n`;
+  s += `השראה: חפש את השפה של ${base.refs}. קח את הרמה ואת התנועה, לא העתקה.\n`;
+  // structure + what the answers asked for
   s += `\n## מבנה (${P.len && P.len !== 'song' ? 'בשניות' : 'באחוזים מאורך הסרטון'})\n${P.beats.map(b => `• ${b.from}–${b.to} · ${b.name}: ${b.desc}`).join('\n')}\n`;
-  const extra = [ansDir(A.aud), A.core ? ansDir(A.core) : null].filter(Boolean);
-  if (extra.length) s += extra.map(x => '• ' + x).join('\n') + '\n';
+  const story = ['honoree', 'focus', 'proof', 'offer', 'deadline', 'highlight', 'benefit', 'orgGoal', 'message', 'delivery', 'aud'].map(k => A[k] ? ansDir(A[k]) : null).filter(Boolean);
+  if (story.length) s += `\nדגשים לתוכן:\n${story.map(x => '• ' + x).join('\n')}\n`;
   // sound
   s += `\n## סאונד\n`;
   if (music) s += `מוזיקה: אצרף קובץ. זהה ממנו BPM ופעמות, ובנה סביבם את התזמון. אם יש בשיר מילים, כל שורה נכנסת בזמן שבו היא מושרת.\n`;
   else if (P.snd === 'design') s += `עיצוב סאונד: הצע פסקול ואפקטים${P.world ? ` בכיוון של ${P.world.sound.replace(/\.$/, '')}` : ''}. אם אין קובץ, בנה את הסאונד בקוד (Web Audio).\n`;
   else if (P.snd === 'none') s += `בלי סאונד: הסרטון חייב לעבוד לגמרי בלי שמע.\n`;
-  else s += `לא נבחר. הצע אם הסרטון צריך מוזיקה, ואיזו.\n`;
-  if (music || P.snd === 'design') s += `בתצוגה החיה: הטמע את השמע ישירות בדף (data URI באלמנט audio), התחל ניגון רק בלחיצה על פליי, וסנכרן את האנימציה ל-audio.currentTime. כך הסאונד יישמע גם בתצוגה המקדימה של Claude.\n`;
+  else s += `הצע אם הסרטון צריך מוזיקה, ואיזו.\n`;
+  if (sound) s += `בתצוגה החיה: הטמע את השמע ישירות בדף (data URI באלמנט audio), התחל ניגון רק בלחיצה על פליי, וסנכרן את האנימציה ל-audio.currentTime. כך הסאונד יישמע גם בתצוגה המקדימה של Claude.\n`;
   // materials
   s += P.mat.length ? `\n## מצורפים לשיחה\n${P.mat.map(m => '• ' + MAT[m]).join('\n')}\n` : `\n## חומרים\nלא צורפו חומרים. בחר פונט ראווה שתומך בעברית.\n`;
-  // craft bar, once
-  s += `\n## רמת הביצוע\n• כל פריים עובד גם כפוסטר: היררכיה ברורה, מילה גיבורה אחת בכל סצנה, והשאר קטן ממנה פי 3 לפחות.\n• עד שני פונטים. עברית מימין לשמאל, עם ריווח מדויק.\n• Easing מותאם לכל תנועה (לא linear), חפיפה ודירוג בין אלמנטים, ורגעי עצירה שנותנים לעין לנוח.\n• כל מעבר נובע מרעיון: אלמנט מסצנה אחת פותח את הבאה.\n• גריד של 12 עמודות ושוליים בטוחים.\n`;
-  // success
+  // the bar
+  s += `\n## רמת הביצוע\n• כל פריים עובד גם כפוסטר: היררכיה ברורה, מילה גיבורה אחת בכל סצנה, והשאר קטן ממנה פי 3 לפחות.\n• עד שני פונטים. עברית מימין לשמאל, עם ריווח מדויק.\n• חפיפה ודירוג בין אלמנטים, אף תנועה לא linear, ורגעי עצירה שנותנים לעין לנוח.\n• כל מעבר נובע מרעיון: אלמנט מסצנה אחת פותח את הבאה.\n• גריד של 12 עמודות ושוליים בטוחים.\n`;
   const ok = [];
   if (music) ok.push(P.social ? 'התנועה נוחתת על הפעמה, והמסר מובן גם בלי סאונד' : 'כל תנועה מרכזית נוחתת על הפעמה');
   else if (P.social) ok.push('המסר מובן גם בלי סאונד');
   if (P.social) ok.push('השנייה הראשונה עוצרת את הגלילה');
-  if (A.core) ok.push(A.core.other ? `מה שנשאר אחרי צפייה אחת: "${A.core.other}"` : `אחרי צפייה אחת זוכרים את מה שהכי חשוב: ${A.core.label}`);
+  const key = A.focus || A.offer || A.message || A.orgGoal;
+  if (key && key.other) ok.push(`מה שנשאר אחרי צפייה אחת: "${key.other}"`);
+  else ok.push({ cta: 'אחרי צפייה אחת ברור מה ההצעה ומה עושים עכשיו', promo: 'אחרי צפייה אחת ברור מי אתם ומה מייחד אתכם', msg: 'המסר נשאר אחרי צפייה אחת' }[P.type] || 'הדבר העיקרי נשאר אחרי צפייה אחת');
   ok.push('אין טקסט חתוך, חופף או לא קריא באף פריים');
   s += `\n## איך נדע שהצלחנו\n${ok.map(x => '• ' + x).join('\n')}\n`;
-  s += `\n## תהליך עבודה, עם עצירה לאישור שלי אחרי כל שלב\n1. שלושה כיווני קונספט קצרים: שם, רעיון במשפט, פלטה ושפת תנועה. כל אחד בהשראת העולם שלי\n2. גיליון פריימים: פריים כל 2 שניות, עם מספר וזמן\n3. תצוגה חיה בדפדפן${music || P.snd === 'design' ? ', עם סאונד' : ''}\n4. ביקורת בונה לפני הרינדור: מצא באגים ודברים לשיפור, ותקן אותם\n5. רינדור ל-MP4${music || P.snd === 'design' ? ' עם הסאונד' : ''}, ובדיקה של 4 פריימים מהקובץ הסופי\n`;
+  s += `\n## תהליך עבודה, עם עצירה לאישור שלי אחרי כל שלב\n1. שלושה כיווני קונספט קצרים: שם, רעיון במשפט, פלטה ושפת תנועה. כל אחד בהשראת העולם שלי\n2. גיליון פריימים: פריים כל 2 שניות, עם מספר וזמן\n3. תצוגה חיה בדפדפן${sound ? ', עם סאונד' : ''}\n4. ביקורת בונה לפני הרינדור: מצא באגים ודברים לשיפור, ותקן אותם\n5. רינדור ל-MP4${sound ? ' עם הסאונד' : ''}, ובדיקה של 4 פריימים מהקובץ הסופי\n`;
   s += `\nאם חסר לך משהו כדי להתחיל, שאל אותי לפני שאתה בונה.`;
   return s;
 }
-function insightHTML(A) {
-  const P = plan(A), esc = t => String(t).replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;');
-  const chips = [typeLabel() || 'סוג חופשי', P.fmt ? `${FMT[P.fmt].ratio} · ${lab('format', P.fmt)}` : 'פורמט לפי המלצה', P.len ? lab('length', P.len) : 'אורך לפי המלצה'];
-  return `<b class="in-h">מה הבונה הבין</b><div class="in-chips">${chips.map(c => `<span>${esc(c)}</span>`).join('')}</div>`
-    + `<p class="in-w">${P.world ? `<b>${esc(P.world.name)}</b> · ${esc(P.world.look)}` : 'לא זיהינו עולם מוכר, אז Claude יגזור את השפה החזותית מתוך הנושא שכתבתם.'}</p>`
-    + `<ol class="in-beats">${P.beats.map(b => `<li><i>${esc(b.from)}–${esc(b.to)}</i>${esc(b.name)}</li>`).join('')}</ol>`;
-}
 (() => {
   const form = document.getElementById('bform'), ta = document.getElementById('b-topic'), send = document.getElementById('b-send'), err = document.getElementById('b-topic-err');
-  const box = document.getElementById('genBox'), outPre = document.getElementById('b-out'), ins = document.getElementById('genInsight'), nextBox = document.getElementById('genNext');
+  const box = document.getElementById('genBox'), outPre = document.getElementById('b-out'), nextBox = document.getElementById('genNext');
   const copyBtn = document.getElementById('b-copy'), stale = document.getElementById('genStale'), title = document.getElementById('genTitle'), outEl = document.getElementById('out');
   const grow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(140, ta.scrollHeight) + 'px'; };
   ta.addEventListener('input', () => { grow(); if (ta.value.trim()) err.hidden = true; }); grow();
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit ? form.requestSubmit(send) : run(); } });
   let busy = false, done = false, runId = 0;
-  form.addEventListener('input', e => { if (done) stale.hidden = false; });
-  const showErr = (msg, focusEl, key) => { err.textContent = msg; err.hidden = false; if (key) { const d = document.querySelector(`.key[data-key="${key}"]`); d.open = true; } (focusEl || ta).focus(); };
-  // ---- follow-up questions (floating dialog) ----
-  const QS = () => { const t = typeOf() || 'other', core = QSET.core[t] || QSET.core.other;
-    return [{ id: 'aud', q: QSET.aud.q, why: QSET.aud.why, opts: QSET.aud[t] || QSET.aud.other }, { id: 'tone', q: QSET.tone.q, why: QSET.tone.why, opts: QSET.tone.all },
-      { id: 'core', q: core[0], why: QSET.core.why, opts: core[1] }, { id: 'end', q: QSET.end.q, why: QSET.end.why, opts: QSET.end[t] || QSET.end.other }]; };
+  form.addEventListener('input', () => { if (done) stale.hidden = false; });
+  const showErr = (msg, focusEl, key) => { err.textContent = msg; err.hidden = false; if (key) document.querySelector(`.key[data-key="${key}"]`).open = true; (focusEl || ta).focus(); };
+  // ---- follow-up questions: one at a time, each built on the answers so far ----
   const qd = document.getElementById('qd'), qf = document.getElementById('qdForm'), qOpts = document.getElementById('qdOpts'), qOther = document.getElementById('qdOther'), qOtherWrap = document.getElementById('qdOtherWrap');
   const qNext = document.getElementById('qdNext'), qBack = document.getElementById('qdBack'), qBody = document.getElementById('qdBody');
   let lastAnswers = {}, cancelAsk = null;
-  function ask(topic, prev) {
+  function ask(ctx, prev) {
     return new Promise(resolve => {
-      const qs = QS(), ans = {}; let i = 0, finished = false;
-      qs.forEach(q => { const p = prev && prev[q.id]; if (p && (p.other || q.opts.includes(p.label))) ans[q.id] = p; });
-      document.getElementById('qdSub').textContent = `על "${topic.length > 46 ? topic.slice(0, 46) + '…' : topic}"`;
-      const valid = () => { const c = qf.querySelector('input[name=qa]:checked'); return c && (c.value !== 'other' || qOther.value.trim()); };
-      const sync = () => { qNext.disabled = !valid(); const c = qf.querySelector('input[name=qa]:checked'); qOtherWrap.hidden = !(c && c.value === 'other'); };
+      const ans = {}; let i = 0, F = [], finished = false;
+      Object.keys(prev || {}).forEach(k => { ans[k] = prev[k]; });
+      document.getElementById('qdSub').textContent = `על "${ctx.topic.length > 46 ? ctx.topic.slice(0, 46) + '…' : ctx.topic}"`;
+      const cur = () => F[i];
+      const pick = () => { const q = cur(); if (q.text) return qOther.value.trim() ? { other: qOther.value.trim() } : null;
+        const c = qf.querySelector('input[name=qa]:checked'); if (!c) return null; return c.value === 'other' ? (qOther.value.trim() ? { other: qOther.value.trim() } : null) : { label: q.opts[+c.value] }; };
+      const sync = () => { const q = cur(), a = pick(); qNext.disabled = !a; const c = qf.querySelector('input[name=qa]:checked');
+        qOtherWrap.hidden = !(q.text || (c && c.value === 'other'));
+        const trial = Object.assign({}, ans, a ? { [q.id]: a } : {}), more = questionFlow(trial, ctx).length > i + 1; // the next step may depend on this very answer
+        qNext.textContent = more ? 'הבא' : 'לבריף שלכם ✦'; };
       function show() {
-        const q = qs[i];
-        document.getElementById('qdStep').textContent = `שאלה ${i + 1} מתוך ${qs.length}`;
+        F = questionFlow(ans, ctx); const q = cur();
+        document.getElementById('qdStep').textContent = `${q.sec} · שאלה ${i + 1} מתוך ${F.length}`;
         document.getElementById('qdTitle').textContent = q.q; document.getElementById('qdWhy').textContent = q.why;
-        document.getElementById('qdBar').style.width = `${(i / qs.length) * 100}%`;
-        qOpts.innerHTML = '';
-        [...q.opts, 'אחר: אכתוב בעצמי'].forEach((o, k) => {
+        document.getElementById('qdBar').style.width = `${(i / F.length) * 100}%`;
+        qOpts.innerHTML = ''; qOpts.hidden = !!q.text;
+        if (!q.text) [...q.opts, 'אחר: אכתוב בעצמי'].forEach((o, k) => {
           const l = document.createElement('label'); l.className = 'qd-opt';
-          l.innerHTML = `<input type="radio" name="qa" id="qa-${k}" value="${k < 3 ? k : 'other'}"><span><kbd>${k + 1}</kbd>${o}</span>`; qOpts.appendChild(l);
-        });
+          l.innerHTML = `<input type="radio" name="qa" id="qa-${k}" value="${k < q.opts.length ? k : 'other'}"><span><kbd>${k + 1}</kbd>${o}</span>`; qOpts.appendChild(l); });
+        qOther.placeholder = q.text ? q.ph : 'כתבו במילים שלכם…'; qOther.setAttribute('aria-label', q.text ? q.q : 'תשובה משלכם');
         const p = ans[q.id]; qOther.value = p && p.other ? p.other : '';
-        if (p) { const k = p.other ? 3 : q.opts.indexOf(p.label); const inp = qOpts.querySelectorAll('input')[k]; if (inp) inp.checked = true; }
-        qBack.hidden = i === 0; qNext.textContent = i === qs.length - 1 ? 'לבריף שלכם ✦' : 'הבא';
+        if (p && !q.text) { const k = p.other ? q.opts.length : q.opts.indexOf(p.label); const inp = qOpts.querySelectorAll('input')[k]; if (inp) inp.checked = true; }
+        qBack.hidden = i === 0;
         qBody.classList.remove('in'); void qBody.offsetWidth; qBody.classList.add('in'); sync();
         const first = qOpts.querySelector('input:checked') || qOpts.querySelector('input'); setTimeout(() => (qOtherWrap.hidden ? first : qOther).focus({ preventScroll: true }), 30);
       }
-      function record() { const c = qf.querySelector('input[name=qa]:checked'); if (!c) return; const q = qs[i];
-        ans[q.id] = c.value === 'other' ? { other: qOther.value.trim() } : { label: q.opts[+c.value] }; }
-      function finish(result) { if (finished) return; finished = true; cancelAsk = null; cleanup(); if (qd.open) qd.close(); resolve(result); }
+      function finish(result) { if (finished) return; finished = true; cancelAsk = null; cleanup(); if (qd.open) qd.close();
+        if (result) { const keep = new Set(questionFlow(result, ctx).map(q => q.id)); Object.keys(result).forEach(k => { if (!keep.has(k)) delete result[k]; }); } // drop answers from branches that were left
+        resolve(result); }
       cancelAsk = () => finish(null);
-      function next() { if (!valid()) return; record(); if (i < qs.length - 1) { i++; show(); } else { document.getElementById('qdBar').style.width = '100%'; finish(ans); } }
+      function next() { const a = pick(); if (!a) return; ans[cur().id] = a; F = questionFlow(ans, ctx); if (i < F.length - 1) { i++; show(); } else { document.getElementById('qdBar').style.width = '100%'; finish(ans); } }
       const onSubmit = e => { e.preventDefault(); next(); };
       const onInput = () => sync();
       const onChange = e => { sync(); if (e.target.name === 'qa' && e.target.value === 'other') setTimeout(() => qOther.focus(), 20); };
       const onKey = e => {
         if (e.target === qOther) { if (e.key === 'Enter') { e.preventDefault(); next(); } return; }
-        if (/^[1-4]$/.test(e.key)) { const inp = qOpts.querySelectorAll('input')[+e.key - 1]; if (inp) { inp.checked = true; inp.dispatchEvent(new Event('change', { bubbles: true })); inp.focus(); if (e.key !== '4') setTimeout(next, 160); } }
+        if (/^[1-4]$/.test(e.key)) { const inp = qOpts.querySelectorAll('input')[+e.key - 1]; if (inp) { inp.checked = true; inp.dispatchEvent(new Event('change', { bubbles: true })); inp.focus(); if (inp.value !== 'other') setTimeout(next, 160); } }
         else if (e.key === 'Enter' && e.target.name === 'qa') { e.preventDefault(); next(); }
       };
       const onCancel = e => { e.preventDefault(); finish(null); };
       const onClose = () => finish(null);
-      const onBack = () => { if (i > 0) { record(); i--; show(); } };
-      const onSkip = () => { delete ans[qs[i].id]; if (i < qs.length - 1) { i++; show(); } else finish(ans); };
+      const onBack = () => { if (i > 0) { const a = pick(); if (a) ans[cur().id] = a; i--; show(); } };
+      const onSkip = () => { delete ans[cur().id]; F = questionFlow(ans, ctx); if (i < F.length - 1) { i++; show(); } else finish(ans); };
       const onBackdrop = e => { if (e.target === qd) finish(null); };
       function cleanup() { qf.removeEventListener('submit', onSubmit); qf.removeEventListener('input', onInput); qf.removeEventListener('change', onChange); qf.removeEventListener('keydown', onKey);
         qd.removeEventListener('cancel', onCancel); document.getElementById('qdClose').removeEventListener('click', onClose); qBack.removeEventListener('click', onBack); document.getElementById('qdSkip').removeEventListener('click', onSkip); qd.removeEventListener('click', onBackdrop); }
@@ -1847,12 +1926,12 @@ function insightHTML(A) {
     if (vals('length')[0] === 'song' && !hasMusic()) { showErr('בחרתם "לפי אורך השיר" בלי מוזיקה. בחרו אורך אחר, או סמנו שתצרפו מוזיקה.', document.getElementById('b-length-15'), 'place'); return; }
     if (typeOf() === 'other' && !document.getElementById('b-type-other').value.trim()) { showErr('כתבו איזה סרטון אתם צריכים, או בחרו סוג אחר.', document.getElementById('b-type-other'), 'type'); return; }
     err.hidden = true; busy = true; const id = ++runId; send.setAttribute('aria-busy', 'true');
-    const A = await ask(topic, lastAnswers);
+    const A = await ask(flowCtx(), lastAnswers);
     send.removeAttribute('aria-busy'); busy = false;
     if (id !== runId) return; // the builder was closed meanwhile
     if (!A) { ta.focus(); toast('השאלות נסגרו. אפשר לשלוח שוב בכל רגע'); return; }
     lastAnswers = A;
-    outPre.textContent = composePrompt(A); ins.innerHTML = insightHTML(A); ins.hidden = false;
+    outPre.textContent = composePrompt(A);
     const mat = vals('mat').map(m => lab('mat', m)).concat(hasMusic() ? ['המוזיקה'] : []);
     document.getElementById('genNextMat').textContent = mat.length ? ` (${mat.join(', ')})` : '';
     box.dataset.state = 'done'; title.textContent = 'הבריף שלכם מוכן ✓'; copyBtn.disabled = false; done = true; stale.hidden = true; nextBox.hidden = false; outPre.scrollTop = 0;
