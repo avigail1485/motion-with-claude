@@ -547,6 +547,17 @@ html.scene .hero-copy { transform: none; opacity: 1; will-change: transform, opa
 .zoom-say { position: absolute; inset: 0; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; column-gap: .24em; padding-inline: 10%; text-align: center; font: 400 clamp(46px, 7.4vw, 128px)/1.02 var(--display); color: #fff; text-wrap: balance; margin: 0 }
 .zoom-say .zw { display: inline-block; opacity: 0; transform: translateY(.45em) }
 .zoom-say .zw.hl { color: var(--pink) }
+
+/* ===== v23: straight into Claude, by plan ===== */
+.plan { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+.plan label { position: relative; cursor: pointer }
+.plan input { position: absolute; opacity: 0; pointer-events: none }
+.plan span { display: grid; gap: 2px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; transition: border-color .15s, background .15s }
+.plan span b { font-size: 15px } .plan span small { font-size: 13px; color: var(--muted) }
+.plan input:checked + span { border-color: var(--violet); background: #3D22EA0d }
+.plan input:focus-visible + span { outline: 3px solid var(--orange); outline-offset: 2px }
+.go-claude { justify-content: center; margin-top: 4px } .go-claude[hidden] { display: none }
+.go-note { font-size: 14px; color: var(--muted) }
 /* ===== v4: chat-style prompt builder ===== */
 .composer-field { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 4; background: var(--paper); padding-top: 10px; box-shadow: 0 -18px 18px -6px var(--paper) }
 .composer { display: flex; align-items: flex-end; gap: 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 28px; padding: 8px; transition: border-color .15s, box-shadow .15s }
@@ -739,7 +750,7 @@ html.scene .hero-copy { transform: none; opacity: 1; will-change: transform, opa
       <a href="#builder"><b>03</b><span>בונה שכותב לכם את הבריף</span></a>
     </div>
   </div>
-  <div class="stage" id="heroStage"><canvas data-demo="hero" aria-label="הדגמה חיה של טיפוגרפיה קינטית: סרטים מתפתלים עם טקסט מעל מילת ענק" role="img"></canvas><span class="stage-tag">הדגמה חיה, נכתבה כקוד</span></div>
+  <div class="stage" id="heroStage"><canvas data-demo="hero" aria-label="הדגמה חיה של טיפוגרפיה קינטית: סרטים מתפתלים עם טקסט מעל מילת ענק" role="img"></canvas><span class="stage-tag">הדגמה חיה, נוצרה ממילים</span></div>
 </div></div>
 
 <div class="strips" aria-hidden="true">
@@ -753,13 +764,13 @@ html.scene .hero-copy { transform: none; opacity: 1; will-change: transform, opa
   <div class="pop-grid">
     <div class="sec-head pop-head">
       <span class="eyebrow">הסרטון</span>
-      <h2>77 שניות. הכל נכתב בקוד.</h2>
+      <h2>77 שניות. הכל נוצר ממילים.</h2>
       <p class="lead">הסרטון הזה נבנה כולו בשיחה עם Claude Code: האנימציה, הטיפוגרפיה, התזמון והקריינות. בלי תוכנת עריכה ובלי טיימליין. לחצו על פליי, ועדיף עם סאונד.</p>
-      <ul class="pop-facts"><li><b dir="ltr">1080×1920</b><span>אנכי, לרשתות</span></li><li><b dir="ltr">30fps</b><span>כל פריים מצויר בקוד</span></li><li><b dir="ltr">1:17</b><span>עם קריינות ואפקטים</span></li></ul>
+      <ul class="pop-facts"><li><b dir="ltr">1080×1920</b><span>אנכי, לרשתות</span></li><li><b dir="ltr">30fps</b><span>כל פריים נוצר מתיאור במילים</span></li><li><b dir="ltr">1:17</b><span>עם קריינות ואפקטים</span></li></ul>
     </div>
     <div class="pop-player">
       <div class="pop-screen" id="popScreen">
-        <canvas id="popCanvas" width="1080" height="1920" role="img" aria-label="סרטון פופ: טיפוגרפיה קינטית בסגנון רטרו, שנבנה כולו בקוד"></canvas>
+        <canvas id="popCanvas" width="1080" height="1920" role="img" aria-label="סרטון פופ: טיפוגרפיה קינטית בסגנון רטרו, שנוצר כולו בשיחה עם Claude"></canvas>
         <button class="pop-big" id="popBig" type="button" aria-label="הפעלת הסרטון עם סאונד"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg></button>
       </div>
       <audio id="popAud" preload="none" playsinline></audio>
@@ -777,7 +788,7 @@ html.scene .hero-copy { transform: none; opacity: 1; will-change: transform, opa
   <div class="sec-head">
     <span class="eyebrow">המדריך</span>
     <h2>שישה שלבים, מהבריף ועד ה-<span class="lat">MP4</span></h2>
-    <p class="lead">Claude Code בונה את הסרטון כקוד: דף HTML שמצייר כל פריים לפי זמן. לכן הוא מדויק ומסונכרן, ואפשר לתקן כל פרט במילים. הסדר הזה חוסך הכי הרבה סבבי תיקונים.</p>
+    <p class="lead">אתם מתארים במילים פשוטות, ו-Claude הופך את זה לסרטון מדויק ומסונכרן. כל תיקון, גם הכי קטן, נעשה במשפט. הסדר הזה חוסך הכי הרבה סבבי תיקונים.</p>
   </div>
   <div class="steps">
     <article class="step">
@@ -917,8 +928,8 @@ html.scene .hero-copy { transform: none; opacity: 1; will-change: transform, opa
 <section id="gallery" class="band"><div class="wrap">
   <div class="sec-head">
     <span class="eyebrow">דוגמאות חיות</span>
-    <h2>מה אפשר לבקש. הכל כאן רץ כקוד.</h2>
-    <p class="lead">כל דוגמה היא טכניקה שמעצבי מושן מובילים משתמשים בה, ונבנתה כקוד בדיוק כמו שהסרטון שלכם ייבנה. לחצו על דוגמה כדי לראות אותה גדולה, או העתיקו את הפרומפט שמייצר אותה.</p>
+    <h2>מה אפשר לבקש. הכל כאן נוצר ממילים.</h2>
+    <p class="lead">כל דוגמה היא טכניקה שמעצבי מושן מובילים משתמשים בה, ונוצרה מתיאור במילים, בדיוק כמו שהסרטון שלכם ייווצר. לחצו על דוגמה כדי לראות אותה גדולה, או העתיקו את הפרומפט שמייצר אותה.</p>
   </div>
   <div class="ggrid" id="ggrid"></div>
 </div></section>
@@ -1037,7 +1048,15 @@ html.scene .hero-copy { transform: none; opacity: 1; will-change: transform, opa
         <pre id="b-out"></pre>
         <p class="gen-stale" id="genStale" hidden>שיניתם בחירות. לחצו על החץ כדי לעדכן את הבריף.</p>
       </div>
-      <div class="next" id="genNext" hidden><b>מה עכשיו?</b><p>הדביקו את הבריף ב-Claude Code וצרפו לשיחה את החומרים שסימנתם<span id="genNextMat"></span>. Claude יציע כיווני קונספט, ואתם תבחרו.</p><a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">איך מתחילים עם Claude Code ↗</a></div>
+      <div class="next" id="genNext" hidden>
+        <b>איפה תעבדו עם Claude?</b>
+        <div class="plan" role="radiogroup" aria-label="המנוי שלכם ב-Claude">
+          <label><input type="radio" name="b-plan" value="free"><span><b>מנוי חינמי</b><small>Claude בצ׳אט</small></span></label>
+          <label><input type="radio" name="b-plan" value="pro"><span><b>מנוי בתשלום</b><small>Claude Code</small></span></label>
+        </div>
+        <a class="btn primary go-claude" id="goClaude" href="https://claude.ai/new" target="_blank" rel="noopener" hidden>פתחו את Claude <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a>
+        <p class="go-note" id="goNote">בחרו מנוי, והבריף יתאים את עצמו למה שאפשר לעשות בו.</p>
+      </div>
     </div>
   </div>
     </div>
@@ -1791,6 +1810,7 @@ const lab = (key, v) => (B[key].opts.find(o => o[0] === v) || [, v])[1];
 const typeOf = () => vals('type')[0] || '';
 const typeLabel = () => typeOf() === 'other' ? (document.getElementById('b-type-other').value.trim() || 'אחר') : (typeOf() ? lab('type', typeOf()) : '');
 const hasMusic = () => vals('sound')[0] === 'own';
+const planOf = () => (document.querySelector('input[name="b-plan"]:checked') || {}).value || '';
 function keySums() { const mat = vals('mat'), snd = vals('sound')[0], f = vals('format')[0], l = vals('length')[0];
   const set = (id, t) => { const el = document.getElementById('ks-' + id); if (el) el.textContent = t; };
   set('type', typeLabel() || 'אפשר לבחור, או שנשאל בהמשך');
@@ -1832,7 +1852,8 @@ function composePrompt(A = {}) {
   const brand = document.getElementById('b-brand-name').value.trim(), toneLabel = label(A.tone), tone = TONE[toneLabel];
   const W = P.world ? D.WORLD[P.world.id] : null, base = W || D.DEFAULT;
   const typeName = TYPE_NAME[P.type] || (typeOf() === 'other' ? typeLabel() : '');
-  let s = `אתה מעצב מושן בכיר ברמה בינלאומית וארט דיירקטור. בנה סרטון מושן גרפיקס כקוד (HTML ו-JavaScript), ורנדר אותו ל-MP4.\n`;
+  const chat = planOf() === 'free';
+  let s = chat ? `אתה מעצב מושן בכיר ברמה בינלאומית וארט דיירקטור. בנה סרטון מושן גרפיקס כעמוד HTML חי (Artifact) שמתנגן כמו סרטון, בגודל ובקצב שמפורטים כאן.\n` : `אתה מעצב מושן בכיר ברמה בינלאומית וארט דיירקטור. בנה סרטון מושן גרפיקס כקוד (HTML ו-JavaScript), ורנדר אותו ל-MP4.\n`;
   // context
   s += `\n## ההקשר\nנושא: ${P.topic}\n`;
   s += `סוג: ${typeName || 'הצע את הסוג שמתאים למטרה'}\n`;
@@ -1886,7 +1907,7 @@ function composePrompt(A = {}) {
   else ok.push({ cta: 'אחרי צפייה אחת ברור מה ההצעה ומה עושים עכשיו', promo: 'אחרי צפייה אחת ברור מי אתם ומה מייחד אתכם', msg: 'המסר נשאר אחרי צפייה אחת' }[P.type] || 'הדבר העיקרי נשאר אחרי צפייה אחת');
   ok.push('אין טקסט חתוך, חופף או לא קריא באף פריים');
   s += `\n## איך נדע שהצלחנו\n${ok.map(x => '• ' + x).join('\n')}\n`;
-  s += `\n## תהליך עבודה, עם עצירה לאישור שלי אחרי כל שלב\n1. שלושה כיווני קונספט קצרים: שם, רעיון במשפט, פלטה ושפת תנועה. כל אחד בהשראת העולם שלי\n2. גיליון פריימים: פריים כל 2 שניות, עם מספר וזמן\n3. תצוגה חיה בדפדפן${sound ? ', עם סאונד' : ''}\n4. ביקורת בונה לפני הרינדור: מצא באגים ודברים לשיפור, ותקן אותם\n5. רינדור ל-MP4${sound ? ' עם הסאונד' : ''}, ובדיקה של 4 פריימים מהקובץ הסופי\n`;
+  s += `\n## תהליך עבודה, עם עצירה לאישור שלי אחרי כל שלב\n1. שלושה כיווני קונספט קצרים: שם, רעיון במשפט, פלטה ושפת תנועה. כל אחד בהשראת העולם שלי\n2. גיליון פריימים: פריים כל 2 שניות, עם מספר וזמן\n3. ${chat ? 'תצוגה חיה כאן בשיחה' : 'תצוגה חיה בדפדפן'}${sound ? ', עם סאונד' : ''}\n4. ביקורת בונה לפני הרינדור: מצא באגים ודברים לשיפור, ותקן אותם\n${chat ? `5. גרסה סופית במסך מלא, עם כפתור פליי, כדי שאוכל להקליט אותה כסרטון` : `5. רינדור ל-MP4${sound ? ' עם הסאונד' : ''}, ובדיקה של 4 פריימים מהקובץ הסופי`}\n`;
   s += `\nאם חסר לך משהו כדי להתחיל, שאל אותי לפני שאתה בונה.`;
   return s;
 }
@@ -1969,11 +1990,19 @@ function composePrompt(A = {}) {
     if (!A) { ta.focus(); toast('השאלות נסגרו. אפשר לשלוח שוב בכל רגע'); return; }
     lastAnswers = A;
     outPre.textContent = composePrompt(A);
-    const mat = vals('mat').map(m => lab('mat', m)).concat(hasMusic() ? ['המוזיקה'] : []);
-    document.getElementById('genNextMat').textContent = mat.length ? ` (${mat.join(', ')})` : '';
     box.dataset.state = 'done'; title.textContent = 'הבריף שלכם מוכן ✓'; copyBtn.disabled = false; done = true; stale.hidden = true; nextBox.hidden = false; outPre.scrollTop = 0;
     if (matchMedia('(max-width: 999px)').matches) outEl.scrollIntoView({ behavior: 'auto', block: 'start' });
   }
+  // where to work: the plan picks the destination and reshapes the brief
+  const go = document.getElementById('goClaude'), goNote = document.getElementById('goNote');
+  const DEST = { free: ['https://claude.ai/new', 'העתיקו ופתחו את Claude', 'הבריף יועתק ו-Claude ייפתח בכרטיסייה חדשה. הדביקו אותו בשיחה, וצרפו את החומרים שסימנתם.'],
+    pro: ['https://claude.ai/code', 'העתיקו ופתחו את Claude Code', 'הבריף יועתק ו-Claude Code ייפתח בכרטיסייה חדשה. הדביקו אותו, וצרפו את החומרים שסימנתם.'] };
+  const applyPlan = () => { const p = planOf(); go.hidden = !p; if (!p) return; const [href, txt, note] = DEST[p]; go.href = href; go.firstChild.textContent = txt + ' '; goNote.textContent = note;
+    try { localStorage.setItem('claudePlan', p); } catch (e) {}
+    if (done) outPre.textContent = composePrompt(lastAnswers); };
+  try { const saved = localStorage.getItem('claudePlan'); if (saved) { const r = document.querySelector(`input[name="b-plan"][value="${saved}"]`); if (r) r.checked = true; } } catch (e) {}
+  document.querySelectorAll('input[name="b-plan"]').forEach(r => r.addEventListener('change', applyPlan)); applyPlan();
+  go.addEventListener('click', () => { writeClip(outPre.textContent).then(() => toast('הבריף הועתק. הדביקו אותו ב-Claude'), () => toast('העתיקו את הבריף עם הכפתור למעלה')); });
   // closing the builder cancels whatever is in flight
   window.resetBuilderRun = () => { runId++; busy = false; send.removeAttribute('aria-busy'); if (cancelAsk) cancelAsk(); };
   form.addEventListener('submit', e => { e.preventDefault(); run(); });
@@ -2245,7 +2274,7 @@ document.documentElement.classList.add('js');
     const zoom = document.createElement('div'); zoom.className = 'zoom'; zoom.setAttribute('aria-hidden', 'true');
     const dim = document.createElement('div'); dim.className = 'zoom-dim';
     const say = document.createElement('p'); say.className = 'zoom-say';
-    'כל פריים כאן נכתב בקוד. בלי טיימליין. בלי תוכנת אנימציה.'.split(' ').forEach((w, i) => { const sp = document.createElement('span'); sp.className = 'zw' + (/פריים|קוד/.test(w) ? ' hl' : ''); sp.textContent = w; say.append(sp, ' '); });
+    'כל פריים כאן נוצר ממילים פשוטות. בלי טיימליין. בלי תוכנת אנימציה.'.split(' ').forEach((w, i) => { const sp = document.createElement('span'); sp.className = 'zw' + (/מילים|פשוטות/.test(w) ? ' hl' : ''); sp.textContent = w; say.append(sp, ' '); });
     zoom.append(cv, dim, say); pin.appendChild(zoom); root.classList.add('scene');
     const words = [...say.querySelectorAll('.zw')], clamp = v => Math.max(0, Math.min(1, v)), ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     let E = 0, pinH = 0, T = 0;
