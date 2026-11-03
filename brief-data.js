@@ -47,11 +47,30 @@ window.BRIEF_DATA = (() => {
     nonprofit: { fonts: ['Rubik', 'Playpen Sans Hebrew'], hex: ['#FBF6EE', '#F2A65A', '#3E7C6B', '#2B3A67', '#E8D5B7'], tech: ['hand', 'morph', 'grain'], refs: 'charity campaign motion, hand-drawn animation, human storytelling films' },
     travel: { fonts: ['Assistant', 'Bellefair'], hex: ['#FDF6EC', '#4FB3D9', '#F2B880', '#E26D5C', '#24476B'], tech: ['path', 'camera', 'parallax'], refs: 'travel brand motion, map route animation, destination title cards' },
     kids: { fonts: ['Fredoka', 'Varela Round'], hex: ['#FFF8EC', '#FFD23F', '#3BCEAC', '#FF6F91', '#5468FF'], tech: ['squash', 'morph', 'slap'], refs: 'playful 2D motion, children brand animation, bouncy character type' },
-    retail: { fonts: ['Rubik', 'Heebo'], hex: ['#FFFFFF', '#111111', '#FF4D2E', '#FFD400', '#E9E6E1'], tech: ['slap', 'camera', 'count'], refs: 'product commercial motion, e-commerce promo, sale announcement motion' }
+    retail: { fonts: ['Rubik', 'Heebo'], hex: ['#FFFFFF', '#111111', '#FF4D2E', '#FFD400', '#E9E6E1'], tech: ['slap', 'camera', 'count'], refs: 'product commercial motion, e-commerce promo, sale announcement motion' },
+    stage: { fonts: ['Rubik Glitch', 'Heebo'], hex: ['#0B0B12', '#FF2E88', '#7A5CFF', '#F5F2EA', '#2DE2E6'], tech: ['glitch', 'ramp', 'stagger'], refs: 'festival line-up motion, concert visuals, event title sequences' },
+    auto: { fonts: ['Secular One', 'IBM Plex Sans Hebrew'], hex: ['#0D0F12', '#2A2F36', '#C9CED6', '#E4002B', '#F4F4F4'], tech: ['ramp', 'camera', 'line'], refs: 'automotive commercial motion, sleek car reveal, speed lines and light trails' }
   };
+  // the first second: hook ideas by video type
+  const HOOKS = {
+    promo: ['זום מתקריב קיצוני של חומר מהעולם שלכם אל המילה הראשונה', 'משפט של שלוש מילים שנכנס מילה אחרי מילה על מסך ריק', 'מספר אחד גדול שרץ ונעצר בקפיצה קטנה'],
+    cta: ['שאלה שפונה אל הצופה, בגודל מלא, כבר בפריים הראשון', 'ההטבה או המחיר קופצים לפני כל הסבר', 'אלמנט שנופל ונוחת בדיוק במרכז, עם אימפקט קטן'],
+    msg: ['מסך שקט עם מילה אחת שנושמת', 'דימוי מטאפורי מהעולם שלכם שמתגלה לאט', 'טקסט שנכתב מול העיניים, אות אחרי אות'],
+    other: ['תנועה מפתיעה כבר בפריים הראשון', 'המילה החשובה ביותר, ענקית, לפני כל דבר אחר', 'קומפוזיציה שנבנית מנקודה אחת']
+  };
+  // transitions by tone; pacing by running time
+  const TRANSITIONS = {
+    'יוקרתי ומדויק': 'wipe במסכה עם easing חד, ומעבר התאמה על צורה או קו',
+    'אנרגטי ושובב': 'whip pan עם טשטוש תנועה, וחיתוך על אימפקט עם טלטול קטן',
+    'חם ומרגש': 'dissolve דרך טקסטורה, ומעבר התאמה איטי בין סצנות',
+    '': 'מעבר התאמה בין סצנות, ו-wipe במסכה במעברים בין חלקים'
+  };
+  const PACING = { '15': '4–6 סצנות, 2–3 שניות כל אחת', '30': '7–9 סצנות, עם רגע עצירה אחד לפני הסוף', '60': '10–14 סצנות, עם רגע נשימה באמצע', song: 'סצנה לכל שורה או ביטוי, והחלפת טיפול בכל חלק', '': 'סצנה כל 2–4 שניות, עם רגע עצירה לפני הסוף' };
+  // Hebrew typesetting rules that generic motion templates usually get wrong
+  const HEB = 'בעברית: בדוק את כיוון השורה (bidi) בכל שורה שמשלבת מספרים, אנגלית או פיסוק; השתמש בגרשיים עבריים (״ ׳); בלי ריווח אותיות מוגדל; ריווח שורות הדוק בכותרות.';
   const DEFAULT = { fonts: ['Secular One', 'Heebo'], tech: ['mask', 'stagger', 'match'], refs: 'award-winning kinetic typography, title sequence design' };
   // easing and timing follow the chosen tone; without a tone, the content world's character decides
   const TONE_EASE = { 'יוקרתי ומדויק': ['expo', '600–900ms'], 'אנרגטי ושובב': ['back', '250–400ms'], 'חם ומרגש': ['quint', '700–1000ms'] };
   const WORLD_EASE = { tech: ['expo', '300–500ms'], sport: ['back', '200–350ms'], kids: ['back', '300–450ms'], celebration: ['back', '300–450ms'], fashion: ['expo', '700–1000ms'], realestate: ['inOut', '700–1000ms'], health: ['sine', '600–900ms'], finance: ['quint', '400–600ms'] };
-  return { EASE, TECH, WORLD, DEFAULT, TONE_EASE, WORLD_EASE };
+  return { EASE, TECH, WORLD, DEFAULT, TONE_EASE, WORLD_EASE, HOOKS, TRANSITIONS, PACING, HEB };
 })();

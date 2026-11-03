@@ -518,6 +518,47 @@ main { min-height: 100vh }
 .next[hidden] { display: none }
 .next b { font-size: 16px } .next p { font-size: 15px; color: var(--muted) } .next a { font-weight: 600; color: var(--violet) }
 .toast[popover] { inset: auto auto calc(22px + env(safe-area-inset-bottom, 0px)) 50%; margin: 0; border: 0; overflow: visible }
+
+/* ===== v20: award-level motion layer — smooth scroll, preloader, cursor, line reveals, curtains, depth ===== */
+html.lenis, html.lenis body { height: auto }
+html.lenis { scroll-behavior: auto }
+.lenis.lenis-stopped { overflow: clip }
+/* film grain over everything, very quiet */
+body::after { content: ""; position: fixed; inset: -50%; z-index: 60; pointer-events: none; opacity: .055; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1s steps(4) infinite }
+@keyframes grain { 25% { transform: translate(-3%, 2%) } 50% { transform: translate(2%, -3%) } 75% { transform: translate(-2%, -2%) } }
+/* preloader: a counter, then the curtain lifts */
+.pre { position: fixed; inset: 0; z-index: 80; pointer-events: none; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; clip-path: inset(0 0 0 0); transition: clip-path .9s cubic-bezier(.76, 0, .24, 1) }
+.pre.out { clip-path: inset(0 0 100% 0) }
+.pre[hidden] { display: none }
+.pre-in { display: grid; justify-items: center; gap: 10px; direction: ltr }
+.pre b { font: 400 clamp(110px, 22vw, 300px)/.8 var(--display); font-variant-numeric: tabular-nums; background: linear-gradient(100deg, #fff, var(--pink) 60%, var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent }
+.pre span { font: 600 13px/1 var(--body); letter-spacing: .3em; color: var(--on-ink-muted); direction: rtl }
+/* a curtain wipes across on every screen change */
+.curtain { position: fixed; inset: 0; z-index: 70; pointer-events: none; background: linear-gradient(160deg, var(--violet), #7B5CFF 55%, var(--pink)); clip-path: inset(100% 0 0 0) }
+.curtain.go { animation: curtain .8s cubic-bezier(.76, 0, .24, 1) both }
+@keyframes curtain { 0% { clip-path: inset(0 0 0 0) } 100% { clip-path: inset(0 0 100% 0) } }
+/* cursor: a dot and a ring that grows over anything clickable */
+.cur, .cur-ring { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; border-radius: 50%; mix-blend-mode: difference; will-change: transform }
+.cur { width: 8px; height: 8px; margin: -4px 0 0 -4px; background: #fff }
+.cur-ring { width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 1.5px solid #fff; display: grid; place-items: center; transition: width .35s cubic-bezier(.16, 1, .3, 1), height .35s cubic-bezier(.16, 1, .3, 1), margin .35s cubic-bezier(.16, 1, .3, 1), background .25s, border-color .25s }
+.cur-ring i { font: 600 12px/1 var(--body); font-style: normal; color: #000; opacity: 0; transition: opacity .2s; white-space: nowrap }
+.cur-ring.hov { width: 72px; height: 72px; margin: -36px 0 0 -36px; background: #fff }
+.cur-ring.lab { width: 96px; height: 96px; margin: -48px 0 0 -48px; background: #fff } .cur-ring.lab i { opacity: 1 }
+.cur-ring.down { width: 30px; height: 30px; margin: -15px 0 0 -15px }
+@media (hover: none), (pointer: coarse) { .cur, .cur-ring { display: none } }
+/* headings rise line by line, word by word */
+.rw { display: inline-block; overflow: hidden; vertical-align: top; padding-block: .08em; margin-block: -.08em }
+.rw > span { display: inline-block; transform: translateY(105%) rotate(3deg); transition: transform 1.1s cubic-bezier(.16, 1, .3, 1); transition-delay: calc(var(--i) * 70ms) }
+.rv-on .rw > span { transform: none }
+html.split .sec-head h2 { animation: none !important; clip-path: none !important }
+/* eyebrow line draws in, leads fade up */
+html.split .sec-head .lead { opacity: 0; transform: translateY(24px); transition: opacity .9s .25s, transform 1.1s .25s cubic-bezier(.16, 1, .3, 1) }
+html.split .sec-head.rv-on .lead { opacity: 1; transform: none }
+/* magnetic targets glide back */
+.mag { transition: transform .5s cubic-bezier(.16, 1, .3, 1) }
+@media (prefers-reduced-motion: reduce) { body::after { animation: none } .pre, .curtain, .cur, .cur-ring { display: none !important } .rw > span { transform: none !important; transition: none } html.split .sec-head .lead { opacity: 1; transform: none } }
 /* ===== v4: chat-style prompt builder ===== */
 .composer-field { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 4; background: var(--paper); padding-top: 10px; box-shadow: 0 -18px 18px -6px var(--paper) }
 .composer { display: flex; align-items: flex-end; gap: 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 28px; padding: 8px; transition: border-color .15s, box-shadow .15s }
@@ -676,7 +717,7 @@ main { min-height: 100vh }
       <span>מושן עם Claude<small class="logo-sub">המדריך ליצירת מושן עם AI</small></span>
     </a>
     <button class="menu-btn" type="button" id="menuBtn" aria-expanded="false" aria-controls="navLinks" aria-label="תפריט"><span></span><span></span><span></span></button>
-    <nav class="links" id="navLinks" aria-label="ניווט בעמוד">
+    <nav class="links" id="navLinks" aria-label="ניווט בעמוד" data-lenis-prevent>
       <a href="#hero"><i>00</i>פתיחה</a><a href="#guide"><i>01</i>המדריך</a><a href="#principles"><i>02</i>עקרונות</a><a href="#gallery"><i>03</i>דוגמאות</a><a href="#play"><i>04</i>נסו בעצמכם</a><a href="#builder"><i>05</i>בונה בריפים</a><a href="#tips"><i>06</i>טיפים</a><a href="#faq"><i>07</i>שאלות</a>
     </nav>
     <div class="nav-actions">
@@ -975,7 +1016,7 @@ main { min-height: 100vh }
       <div><b id="bdlgTitle">בונה בריפים</b><small>משפט אחד על הסרטון + כמה בחירות = בריף ברמת סטודיו, מוכן להדבקה ב-Claude Code</small></div>
       <button class="qd-x" type="button" id="bdClose" aria-label="סגירת בונה הבריפים">×</button>
     </div>
-    <div class="bd-body" id="bdBody">
+    <div class="bd-body" id="bdBody" data-lenis-prevent>
   <div class="builder">
     <form class="form" id="bform" autocomplete="off">
       <div class="keys">
@@ -1019,7 +1060,7 @@ main { min-height: 100vh }
   <div class="mbar"><h3 id="dlgTitle"></h3><button class="close" type="button" id="dlgClose" aria-label="סגירה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 </dialog>
 <dialog class="qd" id="qd" aria-labelledby="qdTitle">
-  <form class="qd-card" id="qdForm" autocomplete="off">
+  <form class="qd-card" id="qdForm" autocomplete="off" data-lenis-prevent>
     <div class="qd-top">
       <span class="qd-spark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 4l4.6 13.4L42 22l-13.4 4.6L24 40l-4.6-13.4L6 22l13.4-4.6z" fill="currentColor"/></svg></span>
       <div><b>עוד כמה פרטים לבריף</b><small id="qdSub">ארבע שאלות קצרות, כדי שהבריף שלכם יתאים בדיוק</small></div>
@@ -1054,6 +1095,9 @@ main { min-height: 100vh }
   </div>
 </dialog>
 <div class="toast" id="toast" role="status" hidden></div>
+<div class="pre" id="pre" aria-hidden="true" hidden><div class="pre-in"><b id="preNum">000</b><span>מושן עם Claude</span></div></div>
+<div class="curtain" id="curtain" aria-hidden="true"></div>
+<div class="cur" id="cur" aria-hidden="true"></div><div class="cur-ring" id="curRing" aria-hidden="true"><i></i></div>
 
 <script src="brief-data.js"></script>
 <script>
@@ -1600,6 +1644,10 @@ const WORLDS = [
     look: 'נופים, אור שמש, מפות וכרטיסים.', palette: 'שמיים, ים, חול ושקיעה.', type: 'סאנס רחב ואוורירי.', motion: 'זורם: תנועות מצלמה רחבות, ומעברים כמו מבט מחלון מטוס.', sound: 'אמביינט, גלים וגיטרה.', ideas: 'מסלול על מפה שנמתח למילה, כרטיס עלייה למטוס שמתהפך.' },
   { id: 'kids', name: 'ילדים ומשפחה', words: ['ילדים', 'ילד', 'ילדה', 'גן', 'גנים', 'גנון', 'הורים', 'משפחה', 'משפחתי', 'משפחתית', 'צעצוע', 'צעצועים', 'תינוק', 'תינוקות', 'פעוטות'],
     look: 'משחקי: צורות גדולות ומעוגלות ודמויות פשוטות.', palette: 'בהירה ושמחה, עם צבעים ראשוניים רכים.', type: 'פונט מעוגל ושמנמן.', motion: 'קופצני: squash & stretch ואלמנטים שמתנדנדים.', sound: 'מנגינה שובבה וצלילי פופ ובועות.', ideas: 'אותיות שקופצות כמו כדורים, ציור ילדים שמתעורר לחיים.' },
+  { id: 'stage', name: 'הופעות, פסטיבלים ובידור', words: ['הופעה', 'הופעות', 'פסטיבל', 'פסטיבלים', 'להקה', 'אמן', 'אמנית', 'אלבום', 'סטנדאפ', 'תיאטרון', 'הצגה', 'מועדון', 'ליין', 'די ג׳יי', 'דיג׳יי'],
+    look: 'אנרגיה של במה: תאורה דרמטית, צבעים רוויים על שחור, וטיפוגרפיה ענקית.', palette: 'לילית ורוויה: שחור, מג׳נטה, סגול וטורקיז.', type: 'פונט ראווה דרמטי עם אופי, בגודל שממלא את הפריים.', motion: 'פועם ודרמטי: חיתוכים חדים, פלאשים מבוקרים וטקסט שמתפוצץ.', sound: 'ביט אלקטרוני חזק, קהל ותאורה.', ideas: 'שם האירוע נדלק כמו שלט אור, ספירה לאחור עד הדלתות נפתחות.' },
+  { id: 'auto', name: 'רכב ותחבורה', words: ['רכב', 'רכבים', 'מכונית', 'מכוניות', 'אוטו', 'מוסך', 'אופנוע', 'אופנועים', 'השכרת רכב', 'ליסינג', 'נהיגה', 'חשמלי'],
+    look: 'מלוטש ומהיר: השתקפויות, קווי אור ומשטחים מבריקים.', palette: 'מתכתית: גרפיט, כסף, ומבטא אדום.', type: 'סאנס רחב וחזק, נטוי קלות.', motion: 'מהיר ומדויק: speed ramps, קווי מהירות וחשיפות בתנועת מצלמה.', sound: 'מנוע, whoosh של מעבר ובס עמוק.', ideas: 'קו אור שמשרטט את המילה, טקסט שחולף כמו רכב על כביש.' },
   { id: 'retail', name: 'מוצרים וחנויות', words: ['חנות', 'חנויות', 'מוצר', 'מוצרים', 'אונליין', 'מבצע', 'מבצעים', 'הנחה', 'הנחות', 'משלוח', 'משלוחים', 'קנייה', 'מכירה', 'מכירות', 'קופון'],
     look: 'המוצר הוא הגיבור: תאורת סטודיו, סיבוב 360 ותוויות מחיר גרפיות.', palette: 'לפי המוצר, עם צבע הנעה בולט למחיר ולכפתור.', type: 'סאנס עבה למחירים, ונקי לפרטים.', motion: 'מושך עין: zoom למוצר, מדבקות שנחבטות על המסך ומחיר שקופץ.', sound: 'ביט פופ קצבי וצלילי פופ קצרים.', ideas: 'המוצר נכנס בסיבוב ונוחת, תווית הנחה שנחבטת על המסך.' }
 ];
@@ -1824,9 +1872,12 @@ function composePrompt(A = {}) {
   const ez = D.TONE_EASE[toneLabel] || (P.world && D.WORLD_EASE[P.world.id]) || ['expo', '400–700ms'], E = D.EASE[ez[0]];
   s += `${tone ? tone.motion : P.world ? `תנועה: ${P.world.motion}` : 'תנועה: בחר שפת תנועה אחת שמתאימה לנושא, והחזק בה לאורך כל הסרטון.'} Easing ראשי: ${E.name}, ${E.css}, במשך ${ez[1]} לתנועה.\n`;
   s += `טכניקות שמתאימות כאן:\n${base.tech.map(k => '• ' + D.TECH[k]).join('\n')}\n`;
+  s += `מעברים: ${D.TRANSITIONS[toneLabel] || D.TRANSITIONS['']}.\n`;
+  s += `קצב: ${D.PACING[P.len || '']}.\n`;
   s += `השראה: חפש את השפה של ${base.refs}. קח את הרמה ואת התנועה, לא העתקה.\n`;
   // structure + what the answers asked for
   s += `\n## מבנה (${P.len && P.len !== 'song' ? 'בשניות' : 'באחוזים מאורך הסרטון'})\n${P.beats.map(b => `• ${b.from}–${b.to} · ${b.name}: ${b.desc}`).join('\n')}\n`;
+  s += `רעיונות לשנייה הראשונה: ${(D.HOOKS[P.type] || D.HOOKS.other).join('; ')}.\n`;
   const story = ['honoree', 'focus', 'proof', 'offer', 'deadline', 'highlight', 'benefit', 'orgGoal', 'message', 'delivery', 'aud'].map(k => A[k] ? ansDir(A[k]) : null).filter(Boolean);
   if (story.length) s += `\nדגשים לתוכן:\n${story.map(x => '• ' + x).join('\n')}\n`;
   // sound
@@ -1839,7 +1890,7 @@ function composePrompt(A = {}) {
   // materials
   s += P.mat.length ? `\n## מצורפים לשיחה\n${P.mat.map(m => '• ' + MAT[m]).join('\n')}\n` : `\n## חומרים\nלא צורפו חומרים. בחר פונט ראווה שתומך בעברית.\n`;
   // the bar
-  s += `\n## רמת הביצוע\n• כל פריים עובד גם כפוסטר: היררכיה ברורה, מילה גיבורה אחת בכל סצנה, והשאר קטן ממנה פי 3 לפחות.\n• עד שני פונטים. עברית מימין לשמאל, עם ריווח מדויק.\n• חפיפה ודירוג בין אלמנטים, אף תנועה לא linear, ורגעי עצירה שנותנים לעין לנוח.\n• כל מעבר נובע מרעיון: אלמנט מסצנה אחת פותח את הבאה.\n• גריד של 12 עמודות ושוליים בטוחים.\n`;
+  s += `\n## רמת הביצוע\n• כל פריים עובד גם כפוסטר: היררכיה ברורה, מילה גיבורה אחת בכל סצנה, והשאר קטן ממנה פי 3 לפחות.\n• עד שני פונטים. ${window.BRIEF_DATA.HEB}\n• חפיפה ודירוג בין אלמנטים, אף תנועה לא linear, ורגעי עצירה שנותנים לעין לנוח.\n• כל מעבר נובע מרעיון: אלמנט מסצנה אחת פותח את הבאה.\n• גריד של 12 עמודות ושוליים בטוחים.\n`;
   const ok = [];
   if (music) ok.push(P.social ? 'התנועה נוחתת על הפעמה, והמסר מובן גם בלי סאונד' : 'כל תנועה מרכזית נוחתת על הפעמה');
   else if (P.social) ok.push('המסר מובן גם בלי סאונד');
@@ -2163,9 +2214,10 @@ document.documentElement.classList.add('js');
   window.currentView = () => cur;
   const show = (id, target, mode = 'push', focus = true) => { const v = views.find(x => x.id === id) || views[0], changed = cur !== v.id;
     if (changed) { views.forEach(x => x.els.forEach(e => { e.classList.toggle('v-off', x !== v); e.classList.remove('v-in'); }));
-      v.els.forEach(e => { void e.offsetWidth; e.classList.add('v-in'); }); cur = v.id; dispatchEvent(new Event('resize')); }
+      v.els.forEach(e => { void e.offsetWidth; e.classList.add('v-in'); }); const first = cur === null; cur = v.id; dispatchEvent(new Event('resize')); if (!first && window.playCurtain) window.playCurtain(); }
     links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + v.id));
-    if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' }); else scrollTo({ top: 0, behavior: 'auto' });
+    if (window.lenis) window.lenis.scrollTo(target || 0, { immediate: true, force: true }); else if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' }); else scrollTo({ top: 0, behavior: 'auto' });
+
     const hash = '#' + (target && target.id ? target.id : v.id);
     if (mode === 'push' && location.hash !== hash) history.pushState(null, '', hash); else if (mode === 'replace') history.replaceState(null, '', hash);
     document.title = v.id === 'hero' ? baseTitle : `${name(v.id)} · ${baseTitle}`;
@@ -2184,6 +2236,58 @@ document.documentElement.classList.add('js');
   const h0 = location.hash.slice(1);
   if (h0 === 'builder') { show('hero', null, 'none', false); requestAnimationFrame(() => window.openBuilder && window.openBuilder()); }
   else { const r = resolve(h0); show(r ? r.vid : 'hero', r && r.t, 'none', false); }
+})();
+</script>
+<script src="vendor/lenis.min.js"></script>
+<script>
+/* ===== v20: award-level motion layer ===== */
+(() => {
+  const root = document.documentElement, still = matchMedia('(prefers-reduced-motion: reduce)').matches, fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  // smooth scroll (wheel only; touch keeps the native feel)
+  if (!still && window.Lenis) {
+    const lenis = new Lenis({ lerp: .09, smoothWheel: true, wheelMultiplier: 1 }); window.lenis = lenis;
+    (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
+    const mo = new MutationObserver(() => { document.querySelector('dialog[open]') ? lenis.stop() : lenis.start(); });
+    document.querySelectorAll('dialog').forEach(d => mo.observe(d, { attributes: true, attributeFilter: ['open'] }));
+  }
+  if (still) return;
+  // preloader: once per visit
+  const pre = document.getElementById('pre'), num = document.getElementById('preNum');
+  let seen = false; try { seen = sessionStorage.getItem('pre') === '1'; sessionStorage.setItem('pre', '1'); } catch (e) {}
+  if (!seen) { pre.hidden = false; const t0 = performance.now(), D = 1100;
+    (function count(now) { const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3); num.textContent = String(Math.round(e * 100)).padStart(3, '0');
+      if (p < 1) requestAnimationFrame(count); else { pre.classList.add('out'); setTimeout(() => { pre.hidden = true; }, 950); } })(t0); }
+  // curtain between screens
+  const cur = document.getElementById('curtain');
+  window.playCurtain = () => { cur.classList.remove('go'); void cur.offsetWidth; cur.classList.add('go'); };
+  // headings: split into words that rise when they come into view
+  root.classList.add('split');
+  const split = el => { let i = 0; [...el.childNodes].forEach(n => {
+      if (n.nodeType === 3) { const parts = n.textContent.split(/(\s+)/); const f = document.createDocumentFragment();
+        parts.forEach(w => { if (!w) return; if (/^\s+$/.test(w)) { f.append(w); return; } const o = document.createElement('span'); o.className = 'rw'; const inn = document.createElement('span'); inn.style.setProperty('--i', i++); inn.textContent = w; o.append(inn); f.append(o); });
+        n.replaceWith(f); }
+      else if (n.nodeType === 1) { const o = document.createElement('span'); o.className = 'rw'; const inn = document.createElement('span'); inn.style.setProperty('--i', i++); n.replaceWith(o); inn.append(n); o.append(inn); } }); };
+  const heads = [...document.querySelectorAll('.sec-head')];
+  heads.forEach(h => { const h2 = h.querySelector('h2'); if (h2) split(h2); });
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('rv-on'); else if (e.boundingClientRect.top > 0) e.target.classList.remove('rv-on'); }), { threshold: .15 });
+  heads.forEach(h => io.observe(h));
+  // depth: a few elements drift against the scroll
+  const par = [['.hero .stage', .06], ['.pop-screen', -.05], ['.pg-stage', .04], ['.hero-tip', .03]].flatMap(([q, k]) => [...document.querySelectorAll(q)].map(el => ({ el, k })));
+  (function drift() { const vh = innerHeight; par.forEach(({ el, k }) => { const r = el.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200 || !r.height) return; el.style.translate = `0 ${((r.top + r.height / 2 - vh / 2) * k).toFixed(1)}px`; }); requestAnimationFrame(drift); })();
+  if (!fine) return;
+  // magnetic buttons
+  document.querySelectorAll('.btn.primary, .btn.ghost, .pager a, .pop-big, .send').forEach(b => { b.classList.add('mag');
+    b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .18}px, ${(e.clientY - r.top - r.height / 2) * .28}px)`; });
+    b.addEventListener('pointerleave', () => { b.style.transform = ''; }); });
+  // cursor
+  const dot = document.getElementById('cur'), ring = document.getElementById('curRing'), lab = ring.querySelector('i');
+  let x = -100, y = -100, rx = -100, ry = -100;
+  addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; const t = e.target.closest && e.target.closest('a, button, label, summary, input, textarea, .gcard .demo, .pg-stage, .pop-screen');
+    const l = t && (t.matches('.gcard .demo') ? 'צפייה' : t.matches('.pop-screen') ? 'פליי' : '');
+    ring.classList.toggle('hov', !!t && !l); ring.classList.toggle('lab', !!l); if (l) lab.textContent = l; }, { passive: true });
+  addEventListener('pointerdown', () => ring.classList.add('down')); addEventListener('pointerup', () => ring.classList.remove('down'));
+  document.addEventListener('pointerleave', () => { x = y = -100; });
+  (function follow() { rx += (x - rx) * .18; ry += (y - ry) * .18; dot.style.transform = `translate(${x}px, ${y}px)`; ring.style.transform = `translate(${rx}px, ${ry}px)`; requestAnimationFrame(follow); })();
 })();
 </script>
 <script src="pop-engine.js"></script>
