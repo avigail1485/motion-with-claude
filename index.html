@@ -1909,7 +1909,8 @@ function composePrompt(A = {}) {
   s += `\n## איך נדע שהצלחנו\n${ok.map(x => '• ' + x).join('\n')}\n`;
   s += `\n## תהליך עבודה, עם עצירה לאישור שלי אחרי כל שלב\n1. שלושה כיווני קונספט קצרים: שם, רעיון במשפט, פלטה ושפת תנועה. כל אחד בהשראת העולם שלי\n2. גיליון פריימים: פריים כל 2 שניות, עם מספר וזמן\n3. ${chat ? 'תצוגה חיה כאן בשיחה' : 'תצוגה חיה בדפדפן'}${sound ? ', עם סאונד' : ''}\n4. ביקורת בונה לפני הרינדור: מצא באגים ודברים לשיפור, ותקן אותם\n${chat ? `5. גרסה סופית במסך מלא, עם כפתור פליי, כדי שאוכל להקליט אותה כסרטון` : `5. רינדור ל-MP4${sound ? ' עם הסאונד' : ''}, ובדיקה של 4 פריימים מהקובץ הסופי`}\n`;
   s += `\nאם חסר לך משהו כדי להתחיל, שאל אותי לפני שאתה בונה.`;
-  return s;
+  // a clean Markdown document: Claude reads the structure, and a long paste lands in Claude as an attached document
+  return `# בריף לסרטון מושן גרפיקס\n\n` + s.replace(/^• /gm, '- ').replace(/^(טכניקות שמתאימות כאן|דגשים לתוכן):$/gm, '**$1:**');
 }
 (() => {
   const form = document.getElementById('bform'), ta = document.getElementById('b-topic'), send = document.getElementById('b-send'), err = document.getElementById('b-topic-err');
@@ -1995,8 +1996,8 @@ function composePrompt(A = {}) {
   }
   // where to work: the plan picks the destination and reshapes the brief
   const go = document.getElementById('goClaude'), goNote = document.getElementById('goNote');
-  const DEST = { free: ['https://claude.ai/new', 'העתיקו ופתחו את Claude', 'הבריף יועתק ו-Claude ייפתח בכרטיסייה חדשה. הדביקו אותו בשיחה, וצרפו את החומרים שסימנתם.'],
-    pro: ['https://claude.ai/code', 'העתיקו ופתחו את Claude Code', 'הבריף יועתק ו-Claude Code ייפתח בכרטיסייה חדשה. הדביקו אותו, וצרפו את החומרים שסימנתם.'] };
+  const DEST = { free: ['https://claude.ai/new', 'העתיקו ופתחו את Claude', 'לחיצה אחת: הבריף מועתק כמסמך ו-Claude נפתח. שם: הדבקה ו-Enter.'],
+    pro: ['https://claude.ai/code', 'העתיקו ופתחו את Claude Code', 'לחיצה אחת: הבריף מועתק כמסמך ו-Claude Code נפתח. שם: הדבקה ו-Enter.'] };
   const applyPlan = () => { const p = planOf(); go.hidden = !p; goNote.classList.remove('ok'); if (!p) return; const [href, txt, note] = DEST[p]; go.href = href; go.firstChild.textContent = txt + ' '; goNote.textContent = note;
     try { localStorage.setItem('claudePlan', p); } catch (e) {}
     if (done) outPre.textContent = composePrompt(lastAnswers); };
@@ -2007,7 +2008,7 @@ function composePrompt(A = {}) {
   const pasteHint = touch ? 'לחיצה ארוכה על תיבת הטקסט ואז "הדבקה"' : `לחצו על תיבת הטקסט ואז ${isMac ? '⌘V' : 'Ctrl+V'}`;
   go.addEventListener('click', e => { const brief = outPre.textContent, base = DEST[planOf()][0], withQ = `${base}?q=${encodeURIComponent(brief)}`;
     const prefill = withQ.length <= MAX_URL; go.href = prefill ? withQ : base; // the browser follows the link right after this handler
-    writeClip(brief).then(() => { goNote.innerHTML = prefill ? `<b>✓ הבריף נשלח ל-Claude והועתק גם ללוח.</b> אם הוא לא מופיע בתיבת הטקסט: ${pasteHint}.` : `<b>✓ הבריף הועתק.</b> ב-Claude ${pasteHint}, ושלחו.`; goNote.classList.add('ok'); },
+    writeClip(brief).then(() => { goNote.innerHTML = prefill ? `<b>✓ הבריף נשלח ל-Claude והועתק גם ללוח.</b> אם הוא לא מופיע בתיבת הטקסט: ${pasteHint}.` : `<b>✓ הבריף הועתק כמסמך.</b> ב-Claude: ${pasteHint}. Claude יצרף אותו כמסמך, ונשאר רק Enter.`; goNote.classList.add('ok'); },
       () => { goNote.innerHTML = '<b>לא הצלחנו להעתיק אוטומטית.</b> העתיקו את הבריף עם כפתור "העתקה" למעלה, והדביקו אותו ב-Claude.'; goNote.classList.add('ok'); });
     setTimeout(() => { go.href = base; }, 0); });
   // closing the builder cancels whatever is in flight
